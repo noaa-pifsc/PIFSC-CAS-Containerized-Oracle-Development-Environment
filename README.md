@@ -16,6 +16,9 @@ The Centralized Authorization System (CAS) PIFSC Oracle Developer Environment (O
 -   ### DSC Version Control Information
     -   URL: https://picgitlab.nmfs.local/centralized-data-tools/pifsc-dsc
 
+## Prerequisites
+-   See the ODE [Prerequisites](https://picgitlab.nmfs.local/oracle-developer-environment/pifsc-oracle-developer-environment#prerequisites) for details
+
 ## Automated Preparation Process
 -   \*Note: The [prepare_docker_project.sh](./deployment_scripts/prepare_docker_project.sh) bash script retrieves the necessary files from the corresponding repositories and copies them into the docker image directory structure
 -   ### Database Dependencies
