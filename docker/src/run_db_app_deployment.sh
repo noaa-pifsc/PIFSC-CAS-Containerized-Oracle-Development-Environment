@@ -141,9 +141,10 @@ EOF
 
   # --- COPY TO SHARED VOLUME (Runs in foreground) ---
   echo "Copying APEX static images to shared volume (in foreground)..."
-  rm -rf ${APEX_STATIC_DIR}/i
-  # Move the new images folder to the volume
-  mv /tmp/apex/images ${APEX_STATIC_DIR}/i
+  
+  # Clear out any old 'images' folder and move the new one in.
+  rm -rf ${APEX_STATIC_DIR}/images
+  mv /tmp/apex/images ${APEX_STATIC_DIR}/
   FILE_COPY_STATUS=$? # Save the exit code of the file copy
   if [ $FILE_COPY_STATUS -eq 0 ]; then
   	echo "Static files copied successfully."
@@ -159,6 +160,23 @@ EOF
     DB_INSTALL_STATUS=$?
     if [ $DB_INSTALL_STATUS -eq 0 ]; then
       echo "APEX database upgrade successful."
+      
+      # run this code only if the APEX upgrade just finished, unlock the APEX_PUBLIC_USER account
+      echo "Unlocking APEX accounts..."
+      sqlplus -s -l ${SYS_CREDENTIALS} <<EOF
+        WHENEVER SQLERROR EXIT SQL.SQLCODE
+        ALTER SESSION SET CONTAINER = XEPDB1;
+        -- Use the same password for all internal accounts for simplicity
+        ALTER USER APEX_PUBLIC_USER IDENTIFIED BY "${DB_PASSWORD}" ACCOUNT UNLOCK;
+        exit;
+EOF
+      if [ $? -eq 0 ]; then
+        echo "APEX_PUBLIC_USER unlocked successfully."
+      else
+        echo "ERROR: Failed to unlock APEX_PUBLIC_USER."
+        exit 1
+      fi
+      
     else
       echo "ERROR: Background APEX database upgrade failed."
     fi
