@@ -1,36 +1,57 @@
-Credentials:
 
-	Oracle:
-		Port: 1521
-		Host: localhost:8181
-		SID: XEPDB1
-		username: system
-		password: pwd
-		
-		system/"pwd"@localhost:1521/XEPDB1
-		
-		cd C:\Users\jesse.abdul\Documents\Version Control\Git\pifsc-dsc\SQL
-		sqlplus /nolog
-		@queries/dev_container_setup/dev_container_create_DSC_schema.sql
-		sys/"pwd"@localhost:1521/XEPDB1
-		
-		sqlplus /nolog
-		@dev_container_setup/container_deploy_dev.sql
-		DSC/"containerpw"@localhost:1521/XEPDB1
+_ create a new .sh configuration file that specifies the apex version instead of modifying the run_db_app_deployments.sh script.  
 
-		
-		sqlplus /nolog
-		@dev_container_setup/container_deploy_dev.sql
-		CAS/"containerpw"@localhost:1521/XEPDB1
 
-		
-		
-	APEX:
-		http://localhost:8181/ords/apex
-		Workspace: internal
-		User:      ADMIN
-		Password:  Welcome_1 
+
+
+
+
+_ rename the docker image to have a pifsc prefix instead of a noaa prefix
+	_ rename the container names:
+		_ auto_db_app_deploy
+		_ db_container
+		_ ords_apex
+
+
+_ update the documentation to reference the authorization key instead of logging in to oracle container registry with the username/password
+
+
+_ Update the versions of Oracle XE and ORDS-Developer in this repo and then allow the downstream repos to pull those changes to propagate the changes
+
+_ look into the DB/APEX configuration files from Gwo
+
+
+X VS Code can be used for markdown
+
+X document the login to oracle registry
+
+_ remove traceroute from dockerfile
+
+_ update the ords-developer image (implement dockerfile) to copy the conn_string.txt file into the appropriate folder so it doesn't disappear each time the container is run
 	
+_ set pwd in ENV file
+
+_ pull the upstream README.md changes into the repo
+
+
+
+git bash commands:
+
+cd /c/Users/jesse.abdul/Documents/Version\ Control/Git/pifsc-oracle-developer-environment/deployment_scripts
+
+bash prepare_docker_project.sh
+bash build_deploy_project_dev.sh
+
+
+
+troubleshooting tips:
+	If the project is not working as expected when it is prepared using prepare_docker_project.sh:
+		for dev: is the correct branch being specified in the ODE or resource (e.g. DSC, CAS) URL?
+		Is the branch spelled correctly?
+	Is the project_config.sh correct?
+		Does it point at a different project_folder_name than the prepared directory?
+		
+		
 
 
 bugs:

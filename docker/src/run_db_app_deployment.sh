@@ -79,7 +79,7 @@ if echo "${CURRENT_VERSION_CHECK}" | grep -q "${TARGET_APEX_VERSION}"; then
   
   # --- NEW CHECK ---
   # Check if static files are also in place
-  if [ -f "${APEX_STATIC_DIR}/i/apex_version.js" ]; then
+  if [ -f "${APEX_STATIC_DIR}/apex_version.js" ]; then
     echo "Static files are in place. No upgrade needed."
     SKIP_LOGIC_BLOCK=1
   else
@@ -143,9 +143,11 @@ EOF
   echo "Copying APEX static images to shared volume (in foreground)..."
   
   # Clear out any old 'images' folder and move the new one in.
-  rm -rf ${APEX_STATIC_DIR}/images
-  mv /tmp/apex/images ${APEX_STATIC_DIR}/
-  FILE_COPY_STATUS=$? # Save the exit code of the file copy
+  rm -rf ${APEX_STATIC_DIR}/*
+  # Move the *contents* of the images folder to the root of the volume
+  mv /tmp/apex/images/* ${APEX_STATIC_DIR}/
+  chown -R 54321:0 ${APEX_STATIC_DIR}/
+  FILE_COPY_STATUS=$? 
   if [ $FILE_COPY_STATUS -eq 0 ]; then
   	echo "Static files copied successfully."
   else

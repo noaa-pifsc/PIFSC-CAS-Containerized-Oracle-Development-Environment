@@ -30,7 +30,7 @@ services:
     volumes:
       # This points to the new shared Docker volume instead 
       # of a local host folder.
-      - apex-static-vol/images:/opt/oracle/ords/static/i
+      - apex-static-vol:/opt/oracle/ords/static/i
     ports:
       - ${ORDS_HOST_PORT}:8080
     image: ${ORDS_IMAGE}
