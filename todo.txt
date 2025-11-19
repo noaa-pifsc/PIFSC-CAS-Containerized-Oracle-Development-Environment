@@ -9,6 +9,11 @@ _ create a new script to perform the actual custom db/apex deployments so it's e
 
 
 
+
+
+
+
+
 documentation:
 	X docker container configuration is defined in .env file
 		image names
@@ -25,12 +30,24 @@ documentation:
 	How to deploy
 		Clone the repo
 		
-		run the prepare script (to clone all dependencies within the working directory)
-			For custom data system repos add the folders (e.g. DSC, CAS, etc.) and add entries to .gitignore so they aren't added to version control
-			update the scripts so they use relative paths
 		
 		run the docker container (e.g. bash build_deploy_project_dev.sh)
+			automatically run the prepare script (to clone all dependencies within the working directory)
+				For custom data system repos add the folders (e.g. DSC, CAS, etc.) and add entries to .gitignore so they aren't added to version control
+
+		_ identify all custom scripts that will change for custom projects
+			custom_prepare_docker_project.sh
+			custom_project_config.sh
+			custom_db_app_deploy.sh
+			custom_container_config.sh
+			.env
+				
 		
+
+
+
+
+
 		
 		
 	X update the configuration documentation for new projects (fork and customize)
