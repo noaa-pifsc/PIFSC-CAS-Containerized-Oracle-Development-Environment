@@ -1,6 +1,12 @@
-Credentials:
-	APEX:
-		http://localhost:8181/ords/apex
-		Workspace: internal
-		User:      ADMIN
-		Password:  Welcome_1 
+
+
+_ merge upstream changes from branch_implement_upgradable_ords_apex
+	_ test new functionality 
+		ords
+		apex
+		database
+
+	_ update .gitignore
+
+	_ update documentation
+	
