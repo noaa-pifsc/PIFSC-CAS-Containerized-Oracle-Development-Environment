@@ -3,6 +3,9 @@
 # change to the directory of the currently running script
 cd "$(dirname "$(realpath "$0")")"
 
+# define the SYS credentials for use in deployment scripts based on environment variables:
+SYS_CREDENTIALS="SYS/${ORACLE_PWD}@${DBHOST}:${DBPORT}/${DBSERVICENAME} as SYSDBA"
+
 echo "Running the custom database/apex deployment process"
 
 # --- Validations ---
