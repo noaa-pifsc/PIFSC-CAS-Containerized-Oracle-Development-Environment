@@ -46,16 +46,15 @@ APEX_STATIC_DIR="/apex-static" # This is the mount path for our shared volume
 
 # Function to check if the database is initialized
 check_database_initialized() {
-    # --- REMINDER: Update [SCHEMA_NAME] ---
-    # Check if your custom schema (e.g., 'MY_APP_SCHEMA') exists
-    echo "SELECT COUNT(*) FROM DBA_USERS WHERE USERNAME = '${APP_SCHEMA_NAME}';" | sqlplus -s $SYS_CREDENTIALS | grep -q '1'
+	# Check if your custom schema (e.g., '${APP_SCHEMA_NAME}') exists
+	echo "SELECT COUNT(*) FROM DBA_USERS WHERE USERNAME = '${APP_SCHEMA_NAME}';" | sqlplus -s $SYS_CREDENTIALS | grep -q '1'
 }
 
 # Wait until the database is available
 echo "Waiting for Oracle Database to be ready..."
 until echo "exit" | sqlplus -s $SYS_CREDENTIALS > /dev/null; do
-    echo "Database not ready, waiting 5 seconds..."
-    sleep 5
+	echo "Database not ready, waiting 5 seconds..."
+	sleep 5
 done
 echo "Database is ready!"
 
@@ -80,13 +79,13 @@ if echo "${CURRENT_VERSION_CHECK}" | grep -q "${TARGET_APEX_VERSION}"; then
   # --- NEW CHECK ---
   # Check if static files are also in place
   if [ -f "${APEX_STATIC_DIR}/apex_version.js" ]; then
-    echo "Static files are in place. No upgrade needed."
-    SKIP_LOGIC_BLOCK=1
+	echo "Static files are in place. No upgrade needed."
+	SKIP_LOGIC_BLOCK=1
   else
-    echo "APEX DB is upgraded, but static files are missing."
-    echo "Will attempt to download/unzip/copy static files..."
-    # Set flag to skip DB install
-    SKIP_DB_INSTALL=1
+	echo "APEX DB is upgraded, but static files are missing."
+	echo "Will attempt to download/unzip/copy static files..."
+	# Set flag to skip DB install
+	SKIP_DB_INSTALL=1
   fi
   # --- END NEW CHECK ---
 else
@@ -100,22 +99,22 @@ if [[ $SKIP_LOGIC_BLOCK -ne 1 ]]; then
 
   # --- DYNAMIC DOWNLOAD ---
   if [ ! -f "${APEX_ZIP_PATH}" ]; then
-    echo "Downloading ${APEX_DOWNLOAD_URL}..."
-    curl -L -o ${APEX_ZIP_PATH} ${APEX_DOWNLOAD_URL}
-    if [ $? -ne 0 ]; then
-      echo "ERROR: Download of APEX zip file failed."
-      exit 1
-    fi
-    echo "Download complete."
+	echo "Downloading ${APEX_DOWNLOAD_URL}..."
+	curl -L -o ${APEX_ZIP_PATH} ${APEX_DOWNLOAD_URL}
+	if [ $? -ne 0 ]; then
+	  echo "ERROR: Download of APEX zip file failed."
+	  exit 1
+	fi
+	echo "Download complete."
   else
-    echo "APEX zip file already found at ${APEX_ZIP_PATH}."
+	echo "APEX zip file already found at ${APEX_ZIP_PATH}."
   fi
   
   echo "Unzipping ${APEX_ZIP_PATH}..."
   unzip -q ${APEX_ZIP_PATH} -d /tmp
   if [ $? -ne 0 ]; then
-    echo "ERROR: Failed to unzip APEX file."
-    exit 1
+	echo "ERROR: Failed to unzip APEX file."
+	exit 1
   fi
   cd /tmp/apex
   # --- END DYNAMIC DOWNLOAD ---
@@ -126,17 +125,17 @@ if [[ $SKIP_LOGIC_BLOCK -ne 1 ]]; then
   FILE_COPY_STATUS=0
   
   if [ $SKIP_DB_INSTALL -eq 0 ]; then
-    echo "Starting APEX DB installer (in background)..."
-    # Run the DB install in the background by adding '&'
-    sqlplus -s -l ${SYS_CREDENTIALS} <<EOF &
-      WHENEVER SQLERROR EXIT SQL.SQLCODE
-      ALTER SESSION SET CONTAINER = XEPDB1;
-      @apexins.sql SYSAUX SYSAUX TEMP /i/
-      exit;
+	echo "Starting APEX DB installer (in background)..."
+	# Run the DB install in the background by adding '&'
+	sqlplus -s -l ${SYS_CREDENTIALS} <<EOF &
+	  WHENEVER SQLERROR EXIT SQL.SQLCODE
+	  ALTER SESSION SET CONTAINER = XEPDB1;
+	  @apexins.sql SYSAUX SYSAUX TEMP /i/
+	  exit;
 EOF
-    DB_INSTALL_PID=$! # Save the Process ID of the background job
+	DB_INSTALL_PID=$! # Save the Process ID of the background job
   else
-    echo "Skipping database install as version is already correct."
+	echo "Skipping database install as version is already correct."
   fi
 
   # --- COPY TO SHARED VOLUME (Runs in foreground) ---
@@ -151,43 +150,73 @@ EOF
   if [ $FILE_COPY_STATUS -eq 0 ]; then
   	echo "Static files copied successfully."
   else
-    echo "ERROR: Static file copy failed."
+	echo "ERROR: Static file copy failed."
   fi
   # --- END COPY ---
 
   # --- Wait for background DB install to finish ---
   if [ $DB_INSTALL_PID -ne 0 ]; then
-    echo "Waiting for APEX DB install (PID: $DB_INSTALL_PID) to finish..."
-    wait $DB_INSTALL_PID
-    DB_INSTALL_STATUS=$?
-    if [ $DB_INSTALL_STATUS -eq 0 ]; then
-      echo "APEX database upgrade successful."
-      
-      # run this code only if the APEX upgrade just finished, unlock the APEX_PUBLIC_USER account
-      echo "Unlocking APEX accounts..."
-      sqlplus -s -l ${SYS_CREDENTIALS} <<EOF
-        WHENEVER SQLERROR EXIT SQL.SQLCODE
-        ALTER SESSION SET CONTAINER = XEPDB1;
-        -- Use the same password for all internal accounts for simplicity
-        ALTER USER APEX_PUBLIC_USER IDENTIFIED BY "${DB_PASSWORD}" ACCOUNT UNLOCK;
-        exit;
+	echo "Waiting for APEX DB install (PID: $DB_INSTALL_PID) to finish..."
+	wait $DB_INSTALL_PID
+	DB_INSTALL_STATUS=$?
+	if [ $DB_INSTALL_STATUS -eq 0 ]; then
+	  echo "APEX database upgrade successful."
+	  
+	  # run this code only if the APEX upgrade just finished, unlock the APEX_PUBLIC_USER account
+	  echo "Unlocking APEX accounts..."
+	  sqlplus -s -l ${SYS_CREDENTIALS} <<EOF
+		WHENEVER SQLERROR EXIT SQL.SQLCODE
+		ALTER SESSION SET CONTAINER = XEPDB1;
+		-- Use the same password for all internal accounts for simplicity
+		ALTER USER APEX_PUBLIC_USER IDENTIFIED BY "${DB_PASSWORD}" ACCOUNT UNLOCK;
+		
+		-- Disable Strong Password Requirement (For Dev Environment)
+		BEGIN
+		APEX_INSTANCE_ADMIN.SET_PARAMETER('STRONG_SITE_ADMIN_PASSWORD', 'N');
+		COMMIT;
+		END;
+		/
+
+		-- Set the ADMIN password for the INTERNAL workspace (based on DB_PASSWORD variable defined in .env file)
+		BEGIN
+			APEX_UTIL.set_security_group_id(10);
+			APEX_UTIL.create_user(
+				p_user_name => 'ADMIN',
+				p_email_address => 'admin@localhost',
+				p_web_password=> '${DB_PASSWORD}',
+				p_developer_privs => 'ADMIN:CREATE:DATA_LOADER:EDIT:HELP:MONITOR:SQL',
+				p_change_password_on_first_use => 'N' -- Ensure no forced change password
+			);
+			COMMIT;
+		EXCEPTION WHEN OTHERS THEN
+			-- If apex admin user already exists, just reset the password (based on DB_PASSWORD variable defined in .env file)
+			APEX_UTIL.reset_password(
+				p_user_name => 'ADMIN',
+				p_old_password => NULL,
+				p_new_password => '${DB_PASSWORD}',
+				p_change_password_on_first_use => FALSE -- Ensure no forced change password
+			);
+			COMMIT;
+		END;
+		/
+		exit;
 EOF
-      if [ $? -eq 0 ]; then
-        echo "APEX_PUBLIC_USER unlocked successfully."
-      else
-        echo "ERROR: Failed to unlock APEX_PUBLIC_USER."
-        exit 1
-      fi
-      
-    else
-      echo "ERROR: Background APEX database upgrade failed."
-    fi
+	  if [ $? -eq 0 ]; then
+		echo "APEX setup completed successfully."
+	  else
+		echo "ERROR: APEX setup failed."
+		exit 1
+	  fi
+	  
+	else
+	  echo "ERROR: Background APEX database upgrade failed."
+	fi
   fi
   
   # --- Final check for all parallel jobs ---
   if [ $DB_INSTALL_STATUS -ne 0 ] || [ $FILE_COPY_STATUS -ne 0 ]; then
-    echo "FATAL: One or more upgrade tasks failed. Halting."
-    exit 1
+	echo "ERROR: One or more upgrade tasks failed. Halting."
+	exit 1
   fi
   # --- PARALLEL EXECUTION END ---
 
@@ -204,22 +233,22 @@ $APEX_QUERY
 EXIT;
 EOF
 do
-    echo "APEX not in a VALID state, waiting 5 seconds..."
-    sleep 5
+	echo "APEX not in a VALID state, waiting 5 seconds..."
+	sleep 5
 done
 echo "APEX is installed and ready!"
 
 echo "Checking if the database has been initialized (schema: ${APP_SCHEMA_NAME})..."
 # Check if the database is initialized by querying DBA_USERS
 if ! check_database_initialized; then
-    echo "Database is not initialized. Running the SQL scripts..."
+	echo "Database is not initialized. Running the SQL scripts..."
 
 	# run each of the sqlplus scripts to deploy the schemas, objects for each schema, applications, etc.
-    # ... YOUR SCRIPT LOGIC HERE ...
+	# ... YOUR SCRIPT LOGIC HERE ...
 
-    echo "SQL scripts executed successfully!"
+	echo "SQL scripts executed successfully!"
 else
-    echo "Database already initialized. Skipping deployment script."
+	echo "Database already initialized. Skipping deployment script."
 fi
 
 echo "All deployment steps complete."

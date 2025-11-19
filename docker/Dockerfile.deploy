@@ -2,7 +2,7 @@
 FROM ghcr.io/oracle/oraclelinux8-instantclient:19
 
 # install required libraries
-RUN yum install dos2unix traceroute curl unzip \
+RUN yum install dos2unix curl unzip \
 && yum clean all
 
 # set the timezone of the linux container to UTC
