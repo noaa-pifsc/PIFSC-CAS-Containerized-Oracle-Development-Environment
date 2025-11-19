@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# change to the directory of the currently running script
+cd "$(dirname "$(realpath "$0")")"
+
 echo "Running the custom database/apex deployment process"
 
 # --- Validations ---
@@ -230,12 +233,11 @@ echo "APEX is installed and ready!"
 echo "Checking if the database has been initialized (schema: ${APP_SCHEMA_NAME})..."
 # Check if the database is initialized by querying DBA_USERS
 if ! check_database_initialized; then
-	echo "Database is not initialized. Running the SQL scripts..."
+	echo "Database is not initialized, run the custom database and/or application deployment scripts"
 
-	# run each of the sqlplus scripts to deploy the schemas, objects for each schema, applications, etc.
-	# ... YOUR SCRIPT LOGIC HERE ...
+	# run the custom database and/or application deployment scripts:
+	source ./custom_db_app_deploy.sh
 
-	echo "SQL scripts executed successfully!"
 else
 	echo "Database already initialized. Skipping deployment script."
 fi
