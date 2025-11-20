@@ -9,12 +9,12 @@ source ./sh_script_config/custom_project_config.sh
 
 	git clone $dsc_git_url ../tmp/pifsc-dsc
 
-	echo "copy the docker files from the repository to the docker subfolder"
+	echo "copy the docker files from the repository to the docker/src subfolder"
 
 	# copy the docker files from the repository to the docker/src subfolder
 	cp -r ../tmp/pifsc-dsc/SQL ../docker/src/DSC/SQL
 
-	echo "The DSC project's dependencies have been added to the $project_directory"
+	echo "The DSC project's dependencies have been added to the docker/src subfolder"
 
 
 echo "finished executing custom scripts to prepare the docker project"

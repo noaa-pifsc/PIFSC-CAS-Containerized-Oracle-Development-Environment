@@ -6,11 +6,11 @@ The DSC PIFSC Oracle Developer Environment (ODE) project was developed to provid
 ## Resources
 -   ### DSC ODE Version Control Information
     -   URL: https://picgitlab.nmfs.local/oracle-developer-environment/dsc-pifsc-oracle-developer-environment
-    -   Version: 1.0 (git tag: DSC_ODE_v1.0)
+    -   Version: 1.1 (git tag: DSC_ODE_v1.1)
     -   Upstream repository:
         -   ODE Version Control Information:
             -   URL: https://picgitlab.nmfs.local/oracle-developer-environment/pifsc-oracle-developer-environment
-            -   Version: 1.0 (git tag: ODE_v1.0)
+            -   Version: 1.1 (git tag: ODE_v1.1)
 -   ### DSC Version Control Information
     -   URL: https://picgitlab.nmfs.local/centralized-data-tools/pifsc-dsc
 
@@ -20,7 +20,7 @@ The DSC PIFSC Oracle Developer Environment (ODE) project was developed to provid
 ## Runtime Scenarios
 -   See the ODE [Prerequisites](https://picgitlab.nmfs.local/oracle-developer-environment/pifsc-oracle-developer-environment#runtime-scenarios) for details
 
-## Automated Preparation Process
+## Automated Deployment Process
 -   ### Prepare the folder structure
     -   See the ODE [Prerequisites](https://picgitlab.nmfs.local/oracle-developer-environment/pifsc-oracle-developer-environment#prepare-the-folder-structure) for details
     -   #### DSC Preparation
