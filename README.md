@@ -22,16 +22,16 @@ The DSC PIFSC Oracle Developer Environment (ODE) project was developed to provid
 
 ## Automated Preparation Process
 -   ### Prepare the folder structure
-	-   See the ODE [Prerequisites](https://picgitlab.nmfs.local/oracle-developer-environment/pifsc-oracle-developer-environment#prepare-the-folder-structure) for details
-	-   #### DSC Preparation
-		-   The [SQL](https://picgitlab.nmfs.local/centralized-data-tools/pifsc-dsc/-/tree/main/SQL?ref_type=heads) folder is copied into a new "DSC" folder within the [docker/src](./docker/src) folder
+    -   See the ODE [Prerequisites](https://picgitlab.nmfs.local/oracle-developer-environment/pifsc-oracle-developer-environment#prepare-the-folder-structure) for details
+    -   #### DSC Preparation
+        -   The [SQL](https://picgitlab.nmfs.local/centralized-data-tools/pifsc-dsc/-/tree/main/SQL?ref_type=heads) folder is copied into a new "DSC" folder within the [docker/src](./docker/src) folder
 -   ### Build and Run the Containers 
-	-   See the ODE [Prerequisites](https://picgitlab.nmfs.local/oracle-developer-environment/pifsc-oracle-developer-environment#build-and-run-the-containers) for details
-	-   #### DSC Database Deployment
-		-   [create_docker_schemas.sql](https://picgitlab.nmfs.local/centralized-data-tools/pifsc-dsc/-/blob/main/SQL/dev_container_setup/create_docker_schemas.sql?ref_type=heads) is executed by the SYS schema to create the DSC schema and grant the necessary privileges
-		-   [deploy_dev_container.sql](https://picgitlab.nmfs.local/centralized-data-tools/pifsc-dsc/-/blob/main/SQL/automated_deployments/deploy_dev_container.sql?ref_type=heads) is executed with the DSC schema to deploy the objects to the DSC schema
+    -   See the ODE [Prerequisites](https://picgitlab.nmfs.local/oracle-developer-environment/pifsc-oracle-developer-environment#build-and-run-the-containers) for details
+    -   #### DSC Database Deployment
+        -   [create_docker_schemas.sql](https://picgitlab.nmfs.local/centralized-data-tools/pifsc-dsc/-/blob/main/SQL/dev_container_setup/create_docker_schemas.sql?ref_type=heads) is executed by the SYS schema to create the DSC schema and grant the necessary privileges
+        -   [deploy_dev_container.sql](https://picgitlab.nmfs.local/centralized-data-tools/pifsc-dsc/-/blob/main/SQL/automated_deployments/deploy_dev_container.sql?ref_type=heads) is executed with the DSC schema to deploy the objects to the DSC schema
 
-## <mark>Customization Process
+## Customization Process
 -   \*Note: this process will fork the DSC ODE parent repository and repurpose it as a project-specific ODE
 -   Fork the [project](#dsc-ode-version-control-information)
     -   Update the name/description of the project to specify the data system that is implemented in DSC ODE
@@ -48,6 +48,15 @@ The DSC PIFSC Oracle Developer Environment (ODE) project was developed to provid
         -   ORDS_IMAGE is the path to the ORDS image used to build the ORDS/Apex container (ords container)
     -   Update the [custom_db_app_deploy.sh](./docker/src/deployment_scripts/custom_db_app_deploy.sh) bash script to execute a series of SQLPlus scripts in the correct order to create/deploy schemas, create Apex workspaces, and deploy Apex apps that were copied to the /src directory when the [prepare_docker_project.sh](./deployment_scripts/prepare_docker_project.sh) script is executed. This process can be customized for any Oracle data system.
         -   Update the [custom_container_config.sh](./docker/src/deployment_scripts/config/custom_container_config.sh) to specify the variables necessary to authenticate the corresponding SQLPlus scripts when the [custom_db_app_deploy.sh](./docker/src/deployment_scripts/custom_db_app_deploy.sh) bash script is executed
+    -   Create additional empty directories for any folders/files dynamically retrieved by [custom_prepare_docker_project.sh](./deployment_scripts/custom_prepare_docker_project.sh) (e.g. docker/src/CAS) and save .gitkeep files for them (e.g. docker/src/CAS/.gitkeep) so they can be added to version control
+        -   Update the [.gitignore](./.gitignore) file at the root of the repository to add entries for any empty directories that have content dynamically retrieved, for example:
+        ```
+        # Ignore all content in the CAS directory
+        docker/src/CAS/*
+
+        # Do not ignore the .gitkeep file for the DSC directory, so the directory itself is tracked.
+        !docker/src/CAS/.gitkeep
+        ```
 -   ### Implementation Examples
     -   Database and APEX app with a single database dependency: [Centralized Authorization System (CAS) ODE project](https://picgitlab.nmfs.local/oracle-developer-environment/cas-pifsc-oracle-developer-environment)
 
@@ -57,4 +66,4 @@ The DSC PIFSC Oracle Developer Environment (ODE) project was developed to provid
 ## Connection Information
 -   See the ODE [connection information documentation](https://picgitlab.nmfs.local/oracle-developer-environment/pifsc-oracle-developer-environment/-/blob/main/README.md?ref_type=heads#connection-information) for details
 -   ### DSC Database Connection Information
-	-   Connection information can be found in [create_docker_schemas.sql](https://picgitlab.nmfs.local/centralized-data-tools/pifsc-dsc/-/blob/main/SQL/dev_container_setup/create_docker_schemas.sql?ref_type=heads)
+    -   Connection information can be found in [create_docker_schemas.sql](https://picgitlab.nmfs.local/centralized-data-tools/pifsc-dsc/-/blob/main/SQL/dev_container_setup/create_docker_schemas.sql?ref_type=heads)
