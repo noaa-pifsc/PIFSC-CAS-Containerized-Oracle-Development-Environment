@@ -1,7 +1,8 @@
 #!/bin/bash
 
 # change to the directory of the currently running script
-cd "$(dirname "$(realpath "$0")")"
+CURRENT_DIR="$(dirname "$(realpath "$0")")"
+cd ${CURRENT_DIR}
 
 # define the SYS credentials for use in deployment scripts based on environment variables:
 SYS_CREDENTIALS="SYS/${ORACLE_PWD}@${DBHOST}:${DBPORT}/${DBSERVICENAME} as SYSDBA"
@@ -239,7 +240,7 @@ if ! check_database_initialized; then
 	echo "Database is not initialized, run the custom database and/or application deployment scripts"
 
 	# run the custom database and/or application deployment scripts:
-	source ./custom_db_app_deploy.sh
+	source ${CURRENT_DIR}/custom_db_app_deploy.sh
 
 else
 	echo "Database already initialized. Skipping deployment script."
