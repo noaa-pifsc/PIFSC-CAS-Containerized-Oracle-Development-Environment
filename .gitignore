@@ -1,0 +1,5 @@
+# Ignore all content in the static images directory...
+docker/src/DSC/*
+
+# ...but do NOT ignore the .gitkeep file, so the directory itself is tracked.
+!docker/src/DSC/.gitkeep

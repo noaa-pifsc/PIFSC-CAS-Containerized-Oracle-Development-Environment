@@ -10,3 +10,15 @@ _ merge upstream changes from branch_implement_upgradable_ords_apex
 
 	_ update documentation
 	
+
+
+git bash commands:
+
+	cd /c/Users/jesse.abdul/Documents/Version\ Control/Git/dsc-pifsc-oracle-developer-environment/deployment_scripts
+	
+	docker compose -f ../docker/docker-compose-dev.yml down
+	docker volume rm apex-static-vol
+	docker volume rm db-vol
+	
+
+	bash build_deploy_project_dev.sh
