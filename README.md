@@ -61,35 +61,46 @@ There are two different runtime scenarios implemented in this project:
             -   This scenario does not retain any Oracle data in the database so it can be used to deploy schemas and/or Apex applications to a blank database instance for a variety of test scenarios.    
 
 ## Customization Process
--   \*Note: this process will fork the ODE parent repository and repurpose it as a project-specific ODE
--   Fork the [project](#ode-version-control-information)
-    -   Update the name/description of the project to specify the data system that is implemented in ODE
--   Clone the forked project to a working directory
--   Update the forked project in the working directory
-    -   Update the [documentation](./README.md) to reference all of the repositories that are used to build the image and deploy the container
-    -   Update the [custom_prepare_docker_project.sh](./deployment_scripts/custom_prepare_docker_project.sh) bash script to retrieve DB/app files for all dependencies (if any) as well as the DB/app files for the given data system and place them in the appropriate subfolders in the [src folder](./docker/src)
-    -   Update the [custom_project_config.sh](./deployment_scripts/sh_script_config/custom_project_config.sh) bash script to specify variables for the respository URL(s) needed to clone the container dependencies
-    -   Update the [.env](./docker/.env) environment to specify the configuration values:
-        -   ORACLE_PWD is the password for the SYS, SYSTEM database schema passwords, the Apex administrator password, the ORDS administrator password
-        -   TARGET_APEX_VERSION is the version of Apex that will be installed
-        -   APP_SCHEMA_NAME is the database schema that will be used to check if the database schemas have been installed, this only applies to the [development runtime scenario](#development)
-        -   DB_IMAGE is the path to the database image used to build the database contianer (db container)
-        -   ORDS_IMAGE is the path to the ORDS image used to build the ORDS/Apex container (ords container)
-    -   Update the [custom_db_app_deploy.sh](./docker/src/deployment_scripts/custom_db_app_deploy.sh) bash script to execute a series of SQLPlus scripts in the correct order to create/deploy schemas, create Apex workspaces, and deploy Apex apps that were copied to the /src directory when the [prepare_docker_project.sh](./deployment_scripts/prepare_docker_project.sh) script is executed. This process can be customized for any Oracle data system.
-        -   Update the [custom_container_config.sh](./docker/src/deployment_scripts/config/custom_container_config.sh) to specify the variables necessary to authenticate the corresponding SQLPlus scripts when the [custom_db_app_deploy.sh](./docker/src/deployment_scripts/custom_db_app_deploy.sh) bash script is executed
-    -   Create empty directories for any folders/files dynamically retrieved by [custom_prepare_docker_project.sh](./deployment_scripts/custom_prepare_docker_project.sh) (e.g. docker/src/DSC) and save .gitkeep files for them (e.g. docker/src/DSC/.gitkeep) so they can be added to version control
-        -   Create a .gitignore file at the root of the repository to add entries for any empty directories that have content dynamically retrieved, for example a "DSC" folder:
-        ```
-        # Ignore all content in the DSC directory
-        docker/src/DSC/*
+-   ### Implementation
+    -   \*Note: this process will fork the ODE parent repository and repurpose it as a project-specific ODE
+    -   Fork the [project](#ode-version-control-information)
+        -   Update the name/description of the project to specify the data system that is implemented in ODE
+    -   Clone the forked project to a working directory
+    -   Update the forked project in the working directory
+        -   Update the [README.md](./README.md) to reference all of the repositories that are used to build the image and deploy the container
+        -   Update the [custom_prepare_docker_project.sh](./deployment_scripts/custom_prepare_docker_project.sh) bash script to retrieve DB/app files for all dependencies (if any) as well as the DB/app files for the given data system and place them in the appropriate subfolders in the [src folder](./docker/src)
+        -   Update the [custom_project_config.sh](./deployment_scripts/sh_script_config/custom_project_config.sh) bash script to specify variables for the respository URL(s) needed to clone the container dependencies
+        -   Update the [.env](./docker/.env) environment to specify the configuration values:
+            -   ORACLE_PWD is the password for the SYS, SYSTEM database schema passwords, the Apex administrator password, the ORDS administrator password
+            -   TARGET_APEX_VERSION is the version of Apex that will be installed
+            -   APP_SCHEMA_NAME is the database schema that will be used to check if the database schemas have been installed, this only applies to the [development runtime scenario](#development)
+            -   DB_IMAGE is the path to the database image used to build the database contianer (db container)
+            -   ORDS_IMAGE is the path to the ORDS image used to build the ORDS/Apex container (ords container)
+        -   Update the [custom_db_app_deploy.sh](./docker/src/deployment_scripts/custom_db_app_deploy.sh) bash script to execute a series of SQLPlus scripts in the correct order to create/deploy schemas, create Apex workspaces, and deploy Apex apps that were copied to the /src directory when the [prepare_docker_project.sh](./deployment_scripts/prepare_docker_project.sh) script is executed. This process can be customized for any Oracle data system.
+            -   Update the [custom_container_config.sh](./docker/src/deployment_scripts/config/custom_container_config.sh) to specify the variables necessary to authenticate the corresponding SQLPlus scripts when the [custom_db_app_deploy.sh](./docker/src/deployment_scripts/custom_db_app_deploy.sh) bash script is executed
+        -   Create empty directories for any folders/files dynamically retrieved by [custom_prepare_docker_project.sh](./deployment_scripts/custom_prepare_docker_project.sh) (e.g. docker/src/DSC) and save .gitkeep files for them (e.g. docker/src/DSC/.gitkeep) so they can be added to version control
+            -   Create a .gitignore file at the root of the repository to add entries for any empty directories that have content dynamically retrieved, for example a "DSC" folder:
+            ```
+            # Ignore all content in the DSC directory
+            docker/src/DSC/*
 
-        # Do not ignore the .gitkeep file for the DSC directory, so the directory itself is tracked.
-        !docker/src/DSC/.gitkeep
-        ```
--   ### Implementation Examples
-    -   Single database with no dependencies: [DSC ODE project](https://picgitlab.nmfs.local/oracle-developer-environment/dsc-pifsc-oracle-developer-environment)
-    -   Database and Apex app with a single database dependency: [Centralized Authorization System (CAS) ODE project](https://picgitlab.nmfs.local/oracle-developer-environment/cas-pifsc-oracle-developer-environment)
-    -   Database and Apex app with two levels of database dependencies and an application dependency: [PARR Tools ODE project](https://picgitlab.nmfs.local/oracle-developer-environment/parr-tools-pifsc-oracle-developer-environment)
+            # Do not ignore the .gitkeep file for the DSC directory, so the directory itself is tracked.
+            !docker/src/DSC/.gitkeep
+            ```
+    -   ### Implementation Examples
+        -   Single database with no dependencies: [DSC ODE project](https://picgitlab.nmfs.local/oracle-developer-environment/dsc-pifsc-oracle-developer-environment)
+        -   Database and Apex app with a single database dependency: [Centralized Authorization System (CAS) ODE project](https://picgitlab.nmfs.local/oracle-developer-environment/cas-pifsc-oracle-developer-environment)
+        -   Database and Apex app with two levels of database dependencies and an application dependency: [PARR Tools ODE project](https://picgitlab.nmfs.local/oracle-developer-environment/parr-tools-pifsc-oracle-developer-environment)
+-   ### Upstream Updates
+    -   Most upstream file updates can be accepted without changes, except for the following files that should be merged (to integrate any appropriate upstream updates) or rejected (Keep HEAD revision) based on their function:
+        -   Merge:
+            -   [README.md](./README.md) to reference any changes in the upstream README.md that are relevant
+            -   [.env](./docker/.env) to retain the APP_SCHEMA_NAME or any other project-specific information (e.g. TARGET_APEX_VERSION)
+        -   Reject:
+            -   [custom_prepare_docker_project.sh](./deployment_scripts/custom_prepare_docker_project.sh)
+            -   [custom_project_config.sh](./deployment_scripts/sh_script_config/custom_project_config.sh)
+            -   [custom_db_app_deploy.sh](./docker/src/deployment_scripts/custom_db_app_deploy.sh)
+            -   [custom_container_config.sh](./docker/src/deployment_scripts/config/custom_container_config.sh)
 
 ## Container Architecture
 -   The db container is built from an official Oracle database image (defined by DB_IMAGE in [.env](./docker/.env)) maintained in the Oracle container registry
