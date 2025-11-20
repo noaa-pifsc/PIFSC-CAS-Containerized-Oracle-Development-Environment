@@ -8,3 +8,6 @@ DB_DSC_PASSWORD="[CONTAINER_PW]"
 
 # define DSC connection string
 DSC_CREDENTIALS="$DB_DSC_USER/$DB_DSC_PASSWORD@${DBHOST}:${DBPORT}/${DBSERVICENAME}"
+
+# define the DSC database folder path
+DSC_FOLDER_PATH="/usr/src/DSC/SQL"
