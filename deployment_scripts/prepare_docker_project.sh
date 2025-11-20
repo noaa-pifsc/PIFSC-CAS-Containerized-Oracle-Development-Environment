@@ -2,7 +2,8 @@
 
 echo "running container preparation script"
 
-# create a temporary directory to load the files into from the root folder of the repository
+# clean out the tmp folder (if it exists) and then recreate the tmp folder to dynamically load the files into 
+rm -rf ../tmp
 mkdir ../tmp
 
 # This is where the project dependencies are cloned and added to the development container's file system so they are available when the docker container is built and executed

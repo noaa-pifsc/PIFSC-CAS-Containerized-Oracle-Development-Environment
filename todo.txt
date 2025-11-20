@@ -35,12 +35,12 @@ documentation:
 			automatically run the prepare script (to clone all dependencies within the working directory)
 				For custom data system repos add the folders (e.g. DSC, CAS, etc.) and add entries to .gitignore so they aren't added to version control
 
-		_ identify all custom scripts that will change for custom projects
-			custom_prepare_docker_project.sh
-			custom_project_config.sh
-			custom_db_app_deploy.sh
-			custom_container_config.sh
-			.env
+		X identify all custom scripts that will change for custom projects
+			X custom_prepare_docker_project.sh
+			X custom_project_config.sh
+			X custom_db_app_deploy.sh
+			X custom_container_config.sh
+			X .env
 				
 		
 
@@ -109,7 +109,6 @@ git bash commands:
 	cd /c/Users/jesse.abdul/Documents/Version\ Control/Git/pifsc-oracle-developer-environment/deployment_scripts
 	
 	docker compose -f ../docker/docker-compose-dev.yml down
-	
 	docker volume rm apex-static-vol
 	docker volume rm db-vol
 	
