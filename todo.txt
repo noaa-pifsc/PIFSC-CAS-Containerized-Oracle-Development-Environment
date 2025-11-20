@@ -1,6 +1,93 @@
-Credentials:
-	APEX:
-		http://localhost:8181/ords/apex
-		Workspace: internal
-		User:      ADMIN
-		Password:  Welcome_1 
+
+
+_ merge upstream changes from branch_implement_upgradable_ords_apex
+	_ test new functionality 
+		ords
+		apex
+		database
+
+	_ update .gitignore
+
+	_ update documentation
+	
+
+
+git bash commands:
+
+	cd /c/Users/jesse.abdul/Documents/Version\ Control/Git/dsc-pifsc-oracle-developer-environment/deployment_scripts
+	
+	docker compose -f ../docker/docker-compose-dev.yml down
+	docker volume rm apex-static-vol
+	docker volume rm db-vol
+	
+
+	bash build_deploy_project_dev.sh
+
+
+need ITS to allow container-registry.oracle.com
+
+
+
+DSC -> 
+	started at 6:08 AM
+	ended at 6:20 AM
+
+	started at 6:30 AM
+	
+	
+
+X prepare_docker_project.sh:
+
+	echo "clone the CAS project's dependencies"
+
+	git clone $cas_git_url $project_directory/tmp/authorization-application-module
+
+	echo "copy the docker files from the repository to the docker subfolder"
+
+	# create the docker CAS folder
+	mkdir $project_directory/docker/src/CAS
+
+	# create the docker SAM folder (contains CAS dependencies)
+	mkdir $project_directory/docker/src/SAM
+
+
+
+	# copy the docker files from the repository to the docker subfolder
+	cp -r $project_directory/tmp/authorization-application-module/CAS/application_code $project_directory/docker/src/CAS/application_code
+
+	# copy the docker files from the repository to the docker subfolder
+	cp -r $project_directory/tmp/authorization-application-module/CAS/SQL $project_directory/docker/src/CAS/SQL
+
+	# copy the docker files from the repository to the docker subfolder
+	cp -r $project_directory/tmp/authorization-application-module/SAM/SQL $project_directory/docker/src/SAM/SQL
+
+	echo "The CAS project's dependencies have been added to the $project_directory"
+
+
+
+
+X script_config.sh:
+
+	ode_git_url="git@picgitlab.nmfs.local:oracle-developer-environment/cas-pifsc-oracle-developer-environment.git"
+
+	dsc_git_url="git@picgitlab.nmfs.local:centralized-data-tools/pifsc-dsc.git"
+
+	cas_git_url="git@picgitlab.nmfs.local:centralized-data-tools/authorization-application-module.git"
+
+
+
+run_db_app_deployment:
+
+# define CAS schema credentials
+DB_CAS_USER="CAS"
+DB_CAS_PASSWORD="[CONTAINER_PW]"
+
+# define CAS connection string
+CAS_CREDENTIALS="$DB_CAS_USER/$DB_CAS_PASSWORD@$DB_HOST:$DB_PORT/$DB_SID"
+
+# define CAS_APX_APP schema credentials
+DB_CAS_APP_USER="CAS_APX_APP"
+DB_CAS_APP_PASSWORD="[CONTAINER_PW]"
+
+# define CAS connection string
+CAS_APP_CREDENTIALS="$DB_CAS_APP_USER/$DB_CAS_APP_PASSWORD@$DB_HOST:$DB_PORT/$DB_SID"
