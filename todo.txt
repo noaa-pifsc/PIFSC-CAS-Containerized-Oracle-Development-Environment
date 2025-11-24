@@ -1,3 +1,21 @@
+To do:
+	_ ** Update all repositories to add "containerized" to the name and use CODE as the acronym
+
+	Update the repo paths
+	
+	Migrate to github and maintain forks
+		Pull upstream changes
+	
+	Update documentation URLs
+	
+	Test containers
+	
+	Implement the ORDS functionality and determine what code is necessary to define ORDS endpoints
+	
+
+
+
+
 _ rename the docker image to have a pifsc prefix instead of a noaa prefix
 	_ rename the container names:
 		X auto_db_app_deploy

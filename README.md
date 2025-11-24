@@ -1,15 +1,15 @@
-# PIFSC Oracle Developer Environment
+# PIFSC Containerized Oracle Developer Environment
 
 ## Overview
-The PIFSC Oracle Developer Environment (ODE) project was developed to provide a containerized Oracle development environment for PIFSC software developers.  The project can be extended to automatically create/deploy database schemas and applications to allow data systems with dependencies to be developed and tested using the ODE.  This repository can be forked to customize ODE for a specific software project.  
+The PIFSC Containerized Oracle Developer Environment (CODE) project was developed to provide a containerized Oracle development environment for PIFSC software developers.  The project can be extended to automatically create/deploy database schemas and applications to allow data systems with dependencies to be developed and tested using the CODE.  This repository can be forked to customize CODE for a specific software project.  
 
 ## Resources
--   ### ODE Version Control Information
+-   ### CODE Version Control Information
     -   URL: https://picgitlab.nmfs.local/oracle-developer-environment/pifsc-oracle-developer-environment
-    -   Version: 1.1 (git tag: ODE_v1.1)
--   [ODE Demonstration Outline](./docs/demonstration_outline.md)
--   [ODE Repository Fork Diagram](./docs/ODE_fork_diagram.drawio.png)
-    -   [ODE Repository Fork Diagram source code](./docs/ODE_fork_diagram.drawio)
+    -   Version: 1.1 (git tag: CODE_v1.1)
+-   [CODE Demonstration Outline](./docs/demonstration_outline.md)
+-   [CODE Repository Fork Diagram](./docs/CODE_fork_diagram.drawio.png)
+    -   [CODE Repository Fork Diagram source code](./docs/CODE_fork_diagram.drawio)
 
 # Prerequisites
 -   Docker 
@@ -29,15 +29,15 @@ The PIFSC Oracle Developer Environment (ODE) project was developed to provide a 
     ```
 
 ## Repository Fork Diagram
--   The ODE repository is intended to be forked for specific data systems
--   The [ODE Repository Fork Diagram](./docs/ODE_fork_diagram.drawio.png) shows the different example and actual forked repositories that could be part of the suite of ODE repositories for different data systems
+-   The CODE repository is intended to be forked for specific data systems
+-   The [CODE Repository Fork Diagram](./docs/CODE_fork_diagram.drawio.png) shows the different example and actual forked repositories that could be part of the suite of CODE repositories for different data systems
     -   The implemented repositories are shown in blue:
-        -   [ODE](https://picgitlab.nmfs.local/oracle-developer-environment/pifsc-oracle-developer-environment)
-            -   The ODE is the first repository shown at the top of the diagram and serves as the basis for all forked repositories for specific data systems
-        -   [DSC ODE](https://picgitlab.nmfs.local/oracle-developer-environment/dsc-pifsc-oracle-developer-environment)
-        -   [Centralized Authorization System (CAS) ODE](https://picgitlab.nmfs.local/oracle-developer-environment/cas-pifsc-oracle-developer-environment)
+        -   [CODE](https://picgitlab.nmfs.local/oracle-developer-environment/pifsc-oracle-developer-environment)
+            -   The CODE is the first repository shown at the top of the diagram and serves as the basis for all forked repositories for specific data systems
+        -   [DSC CODE](https://picgitlab.nmfs.local/oracle-developer-environment/dsc-pifsc-oracle-developer-environment)
+        -   [Centralized Authorization System (CAS) CODE](https://picgitlab.nmfs.local/oracle-developer-environment/cas-pifsc-oracle-developer-environment)
     -   The examples or repositories that have not been implemented yet are shown in orange  
-![ODE Repository Fork Diagram](./docs/ODE_fork_diagram.drawio.png)
+![CODE Repository Fork Diagram](./docs/CODE_fork_diagram.drawio.png)
 
 ## Runtime Scenarios
 There are two different runtime scenarios implemented in this project:
@@ -52,7 +52,7 @@ There are two different runtime scenarios implemented in this project:
 ## Automated Deployment Process
 -   ### Prepare the folder structure
     -   The [prepare_docker_project.sh](./deployment_scripts/prepare_docker_project.sh) bash script is automatically executed when the deployment script for either [runtime scenario](#runtime-scenario) is executed.  
-    -   The script prepares the working copy of the repository by dynamically retrieving the DB/app files for all dependencies (if any) as well as the DB/app files for the given data system which will be used to build and run the ODE container
+    -   The script prepares the working copy of the repository by dynamically retrieving the DB/app files for all dependencies (if any) as well as the DB/app files for the given data system which will be used to build and run the CODE container
 -   ### Build and Run the container 
     -   Choose a runtime scenario:
         -   [Development](#development): The [build_deploy_project_dev.sh](./deployment_scripts/build_deploy_project_dev.sh) bash script is intended for development purposes   
@@ -62,9 +62,9 @@ There are two different runtime scenarios implemented in this project:
 
 ## Customization Process
 -   ### Implementation
-    -   \*Note: this process will fork the ODE parent repository and repurpose it as a project-specific ODE
-    -   Fork the [project](#ode-version-control-information)
-        -   Update the name/description of the project to specify the data system that is implemented in ODE
+    -   \*Note: this process will fork the CODE parent repository and repurpose it as a project-specific CODE
+    -   Fork the [project](#code-version-control-information)
+        -   Update the name/description of the project to specify the data system that is implemented in CODE
     -   Clone the forked project to a working directory
     -   Update the forked project in the working directory
         -   Update the [README.md](./README.md) to reference all of the repositories that are used to build the image and deploy the container
@@ -88,9 +88,9 @@ There are two different runtime scenarios implemented in this project:
             !docker/src/DSC/.gitkeep
             ```
     -   ### Implementation Examples
-        -   Single database with no dependencies: [DSC ODE project](https://picgitlab.nmfs.local/oracle-developer-environment/dsc-pifsc-oracle-developer-environment)
-        -   Database and Apex app with a single database dependency: [Centralized Authorization System (CAS) ODE project](https://picgitlab.nmfs.local/oracle-developer-environment/cas-pifsc-oracle-developer-environment)
-        -   Database and Apex app with two levels of database dependencies and an application dependency: [PARR Tools ODE project](https://picgitlab.nmfs.local/oracle-developer-environment/parr-tools-pifsc-oracle-developer-environment)
+        -   Single database with no dependencies: [DSC CODE project](https://picgitlab.nmfs.local/oracle-developer-environment/dsc-pifsc-oracle-developer-environment)
+        -   Database and Apex app with a single database dependency: [Centralized Authorization System (CAS) CODE project](https://picgitlab.nmfs.local/oracle-developer-environment/cas-pifsc-oracle-developer-environment)
+        -   Database and Apex app with two levels of database dependencies and an application dependency: [PARR Tools CODE project](https://picgitlab.nmfs.local/oracle-developer-environment/parr-tools-pifsc-oracle-developer-environment)
 -   ### Upstream Updates
     -   Most upstream file updates can be accepted without changes, except for the following files that should be merged (to integrate any appropriate upstream updates) or rejected (Keep HEAD revision) based on their function:
         -   Merge:
