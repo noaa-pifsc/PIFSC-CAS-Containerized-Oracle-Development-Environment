@@ -1,4 +1,4 @@
-# DSC PIFSC Oracle Developer Environment
+# PIFSC DSC Oracle Developer Environment
 
 ## Overview
 The PIFSC DSC Oracle Developer Environment (DCODE) project was developed to provide a custom containerized Oracle development environment (CODE) for the DSC.  This repository can be forked to extend the existing functionality to any data systems that depend on the DSC for both development and testing purposes.  
