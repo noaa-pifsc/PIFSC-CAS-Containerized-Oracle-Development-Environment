@@ -1,6 +1,4 @@
-
-
-X merge upstream changes from branch_implement_upgradable_ords_apex
+X merge upstream changes from Branch_apex_upgrade
 	X test new functionality 
 		X ords
 		X apex
@@ -23,15 +21,3 @@ git bash commands:
 	
 	# build and deploy the development scenario of the CODE
 	bash build_deploy_project_dev.sh
-
-
-need ITS to allow container-registry.oracle.com
-
-
-
-DSC -> 
-	started at 6:08 AM
-	ended at 6:20 AM
-
-	started at 6:30 AM
-	
