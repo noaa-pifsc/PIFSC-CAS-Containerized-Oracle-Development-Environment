@@ -1,93 +1,56 @@
+X merge upstream changes from branch_implement_upgradable_ords_apex
+	_ test the different deployment/restart scenarios
+		_ dev
+			_ new deployment
+				_ CAS DB schema works
+				_ login to workspace
+				_ CAS APEX app works
+				_ ords
+					_ configure CAS for ORDS
+					_ publish AUTH_APP_USERS as an endpoint
+					_ confirm records can be retrieved
+				_apex app can be imported to/from docker (version 23.0) and OCI (version 23.4 [dev] and 23.6 [test])
+			_ restart
+				_ Does not redeploy DB 
+					CAS DB schema works
+				_ Does not redeploy APEX workspaces/apps
+					_ login to workspace
+					_ CAS APEX app works
+				_ change APEX version (increase only)
+					_ ** add to documentation (can't downgrade)
+					_ APEX upgrade
+				_ ords
+					_ configure CAS for ORDS
+					_ publish AUTH_APP_USERS as an endpoint
+					_ confirm records can be retrieved
+		_ test (does not save database volume)
+			_ new deployment
+				_ CAS DB schema works
+				_ login to workspace
+				_ CAS APEX app works
+				_apex app can be imported to/from docker (version 23.0) and OCI (version 23.4 [dev] and 23.6 [test])
+			_ ords
+				_ configure CAS for ORDS
+				_ publish AUTH_APP_USERS as an endpoint
+				_ confirm records can be retrieved
+		
+		_ ensure that we can save an APEX app and then import to OCI instances successfully
+			_ test vice versa (OCI app imported into workspace)
 
+	X apex version can be imported to/from docker (version 23.0) and OCI (version 23.4 [dev] and 23.6 [test])
 
-_ merge upstream changes from branch_implement_upgradable_ords_apex
-	_ test new functionality 
-		ords
-		apex
-		database
+	X update .gitignore
 
-	_ update .gitignore
-
-	_ update documentation
-	
-
+	X update documentation
 
 git bash commands:
 
-	cd /c/Users/jesse.abdul/Documents/Version\ Control/Git/dsc-pifsc-oracle-developer-environment/deployment_scripts
+	# stop and remove CODE containers and delete volumes
+	cd /c/Users/jesse.abdul/Documents/Version\ Control/Git/PIFSC-CAS-Containerized-Oracle-Development-Environment/deployment_scripts
 	
 	docker compose -f ../docker/docker-compose-dev.yml down
 	docker volume rm apex-static-vol
 	docker volume rm db-vol
 	
-
+	# build and deploy the development scenario of the CODE
 	bash build_deploy_project_dev.sh
-
-
-need ITS to allow container-registry.oracle.com
-
-
-
-DSC -> 
-	started at 6:08 AM
-	ended at 6:20 AM
-
-	started at 6:30 AM
-	
-	
-
-X prepare_docker_project.sh:
-
-	echo "clone the CAS project's dependencies"
-
-	git clone $cas_git_url $project_directory/tmp/authorization-application-module
-
-	echo "copy the docker files from the repository to the docker subfolder"
-
-	# create the docker CAS folder
-	mkdir $project_directory/docker/src/CAS
-
-	# create the docker SAM folder (contains CAS dependencies)
-	mkdir $project_directory/docker/src/SAM
-
-
-
-	# copy the docker files from the repository to the docker subfolder
-	cp -r $project_directory/tmp/authorization-application-module/CAS/application_code $project_directory/docker/src/CAS/application_code
-
-	# copy the docker files from the repository to the docker subfolder
-	cp -r $project_directory/tmp/authorization-application-module/CAS/SQL $project_directory/docker/src/CAS/SQL
-
-	# copy the docker files from the repository to the docker subfolder
-	cp -r $project_directory/tmp/authorization-application-module/SAM/SQL $project_directory/docker/src/SAM/SQL
-
-	echo "The CAS project's dependencies have been added to the $project_directory"
-
-
-
-
-X script_config.sh:
-
-	ode_git_url="git@picgitlab.nmfs.local:oracle-developer-environment/cas-pifsc-oracle-developer-environment.git"
-
-	dsc_git_url="git@picgitlab.nmfs.local:centralized-data-tools/pifsc-dsc.git"
-
-	cas_git_url="git@picgitlab.nmfs.local:centralized-data-tools/authorization-application-module.git"
-
-
-
-run_db_app_deployment:
-
-# define CAS schema credentials
-DB_CAS_USER="CAS"
-DB_CAS_PASSWORD="[CONTAINER_PW]"
-
-# define CAS connection string
-CAS_CREDENTIALS="$DB_CAS_USER/$DB_CAS_PASSWORD@$DB_HOST:$DB_PORT/$DB_SID"
-
-# define CAS_APX_APP schema credentials
-DB_CAS_APP_USER="CAS_APX_APP"
-DB_CAS_APP_PASSWORD="[CONTAINER_PW]"
-
-# define CAS connection string
-CAS_APP_CREDENTIALS="$DB_CAS_APP_USER/$DB_CAS_APP_PASSWORD@$DB_HOST:$DB_PORT/$DB_SID"
