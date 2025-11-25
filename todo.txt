@@ -8,11 +8,12 @@ To do:
 	
 	X Update documentation URLs
 	
-	_ Test containers
+	X Test containers
 	
 	X Implement the ORDS functionality and determine what code is necessary to define ORDS endpoints
 	
 
+	_ look into the DB/APEX configuration files from DBA
 
 
 
@@ -57,13 +58,6 @@ documentation:
 			X .env
 				
 		
-
-
-
-
-
-		
-		
 	X update the configuration documentation for new projects (fork and customize)
 	
 	
@@ -77,26 +71,8 @@ X ** document the upstream pull process in the customization section of the docu
 	
 	X Also document how the changes must be propagated through the fork dependency hierarchy
 	
-	_ look into how to implement the fork network in github (this can be transferred, but it is additional work)
-		It's early on so it might be best to do this sooner than later -> this could be shared with other FMCs if they are interested in a similar generalized solution
-
-
-
-
-_ test the different deployment/restart scenarios
-
-	_ dev
-		_ new deployment
-		_ restart
-		_ ords works (do a simple API setup and confirm we can pull the data)
-	_ test (does not save database volume)
-		_ new deployment
-		_ ords works (do a simple API setup and confirm we can pull the data)
-	
-	_ ensure that we can save an APEX app and then import to OCI instances successfully
-		_ test vice versa (OCI app imported into workspace)
-	
-	_ test with CAS or other app to ensure that the schemas are created successfully and the apex app is run successfully
+X implement the fork network in github
+	It's early on so it might be best to do this sooner than later -> this could be shared with other FMCs if they are interested in a similar generalized solution
 		
 
 X update the documentation to reference the authorization key instead of logging in to oracle container registry with the username/password
@@ -107,7 +83,6 @@ X Update the versions of Oracle XE and ORDS in this repo and then allow the down
 
 
 
-_ look into the DB/APEX configuration files from DBA
 
 
 X VS Code can be used for markdown
@@ -124,12 +99,13 @@ X pull the upstream README.md changes into the repo
 
 
 
-_ ** ORDS_PWD environment variable for ORDS configuration?
+X ** ORDS_PWD environment variable for ORDS configuration?
 	** Ensure that ORDS is setup correctly for those types of projects (e.g. ORDS API for web app)
 	"INFO : ORDS_PWD env var is not set, using generated value"
 
 git bash commands:
 
+	# stop and remove CODE containers and delete volumes
 	cd /c/Users/jesse.abdul/Documents/Version\ Control/Git/PIFSC-Containerized-Oracle-Development-Environment/deployment_scripts
 	
 	docker compose -f ../docker/docker-compose-dev.yml down
