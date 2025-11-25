@@ -1,26 +1,23 @@
 To do:
-	_ ** Update all repositories to add "containerized" to the name and use CODE as the acronym
+	X ** Update all repositories to add "containerized" to the name and use CODE as the acronym
 
-	Update the repo paths
+	X Update the repo paths
 	
-	Migrate to github and maintain forks
-		Pull upstream changes
+	X Migrate to github and maintain forks
+		X Pull upstream changes
 	
-	Update documentation URLs
+	X Update documentation URLs
 	
-	Test containers
+	_ Test containers
 	
-	Implement the ORDS functionality and determine what code is necessary to define ORDS endpoints
+	X Implement the ORDS functionality and determine what code is necessary to define ORDS endpoints
 	
-
-
 
 
-_ rename the docker image to have a pifsc prefix instead of a noaa prefix
-	_ rename the container names:
-		X auto_db_app_deploy
-		X db_container
-		X ords_apex
+
+
+X rename the docker image to have a pifsc prefix
+	X pifsc/db_ords_deploy
 
 X create a new script (custom_ prefix) to perform the actual custom db/apex deployments so it's easier to pull changes from upstream (it won't cause a conflict in the run_db_app_deployment.sh each time)
 
@@ -133,13 +130,13 @@ _ ** ORDS_PWD environment variable for ORDS configuration?
 
 git bash commands:
 
-	cd /c/Users/jesse.abdul/Documents/Version\ Control/Git/pifsc-oracle-developer-environment/deployment_scripts
+	cd /c/Users/jesse.abdul/Documents/Version\ Control/Git/PIFSC-Containerized-Oracle-Development-Environment/deployment_scripts
 	
 	docker compose -f ../docker/docker-compose-dev.yml down
 	docker volume rm apex-static-vol
 	docker volume rm db-vol
 	
-
+	# build and deploy the development scenario of the CODE
 	bash build_deploy_project_dev.sh
 
 troubleshooting tips:
@@ -152,8 +149,8 @@ troubleshooting tips:
 		
 
 
-	_ Issue with the image not being able to download from the container registry
-		_ submit SCR to allow PIFSC network (hardwired and VPN) to access container-registry.oracle.com
+	X Issue with the image not being able to download from the container registry
+		X submit SCR to allow PIFSC network (hardwired and VPN) to access container-registry.oracle.com
 
 
 
