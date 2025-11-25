@@ -1,32 +1,32 @@
 # DSC PIFSC Oracle Developer Environment
 
 ## Overview
-The DSC PIFSC Oracle Developer Environment (ODE) project was developed to provide a custom containerized Oracle development environment for the DSC.  This repository can be forked to extend the existing functionality to any data systems that depend on the DSC for both development and testing purposes.  
+The PIFSC DSC Oracle Developer Environment (DCODE) project was developed to provide a custom containerized Oracle development environment (CODE) for the DSC.  This repository can be forked to extend the existing functionality to any data systems that depend on the DSC for both development and testing purposes.  
 
 ## Resources
--   ### DSC ODE Version Control Information
-    -   URL: https://picgitlab.nmfs.local/oracle-developer-environment/dsc-pifsc-oracle-developer-environment
-    -   Version: 1.1 (git tag: DSC_ODE_v1.1)
+-   ### DCODE Version Control Information
+    -   URL: https://github.com/noaa-pifsc/PIFSC-DSC-Containerized-Oracle-Development-Environment
+    -   Version: 1.1 (git tag: DSC_CODE_v1.1)
     -   Upstream repository:
-        -   ODE Version Control Information:
-            -   URL: https://picgitlab.nmfs.local/oracle-developer-environment/pifsc-oracle-developer-environment
-            -   Version: 1.1 (git tag: ODE_v1.1)
+        -   CODE Version Control Information:
+            -   URL: https://github.com/noaa-pifsc/PIFSC-Containerized-Oracle-Development-Environment?tab=readme-ov-file
+            -   Version: 1.1 (git tag: CODE_v1.1)
 -   ### DSC Version Control Information
     -   URL: https://picgitlab.nmfs.local/centralized-data-tools/pifsc-dsc
 
 ## Prerequisites
--   See the ODE [Prerequisites](https://picgitlab.nmfs.local/oracle-developer-environment/pifsc-oracle-developer-environment#prerequisites) for details
+-   See the ODE [Prerequisites](https://github.com/noaa-pifsc/PIFSC-Containerized-Oracle-Development-Environment?tab=readme-ov-file#prerequisites) for details
 
 ## Runtime Scenarios
--   See the ODE [Prerequisites](https://picgitlab.nmfs.local/oracle-developer-environment/pifsc-oracle-developer-environment#runtime-scenarios) for details
+-   See the ODE [Runtime Scenarios](https://github.com/noaa-pifsc/PIFSC-Containerized-Oracle-Development-Environment?tab=readme-ov-file#runtime-scenarios) for details
 
 ## Automated Deployment Process
 -   ### Prepare the folder structure
-    -   See the ODE [Prerequisites](https://picgitlab.nmfs.local/oracle-developer-environment/pifsc-oracle-developer-environment#prepare-the-folder-structure) for details
+    -   See the ODE [Prepare the folder structure](https://github.com/noaa-pifsc/PIFSC-Containerized-Oracle-Development-Environment?tab=readme-ov-file#prepare-the-folder-structure) for details
     -   #### DSC Preparation
         -   The [SQL](https://picgitlab.nmfs.local/centralized-data-tools/pifsc-dsc/-/tree/main/SQL?ref_type=heads) folder is copied into a new "DSC" folder within the [docker/src](./docker/src) folder
 -   ### Build and Run the Containers 
-    -   See the ODE [Prerequisites](https://picgitlab.nmfs.local/oracle-developer-environment/pifsc-oracle-developer-environment#build-and-run-the-containers) for details
+    -   See the ODE [Build and Run the Containers](https://github.com/noaa-pifsc/PIFSC-Containerized-Oracle-Development-Environment?tab=readme-ov-file#build-and-run-the-containers) for details
     -   #### DSC Database Deployment
         -   [create_docker_schemas.sql](https://picgitlab.nmfs.local/centralized-data-tools/pifsc-dsc/-/blob/main/SQL/dev_container_setup/create_docker_schemas.sql?ref_type=heads) is executed by the SYS schema to create the DSC schema and grant the necessary privileges
         -   [deploy_dev_container.sql](https://picgitlab.nmfs.local/centralized-data-tools/pifsc-dsc/-/blob/main/SQL/automated_deployments/deploy_dev_container.sql?ref_type=heads) is executed with the DSC schema to deploy the objects to the DSC schema
@@ -58,12 +58,12 @@ The DSC PIFSC Oracle Developer Environment (ODE) project was developed to provid
         !docker/src/CAS/.gitkeep
         ```
 -   ### Implementation Examples
-    -   Database and APEX app with a single database dependency: [Centralized Authorization System (CAS) ODE project](https://picgitlab.nmfs.local/oracle-developer-environment/cas-pifsc-oracle-developer-environment)
+    -   Database and APEX app with a single database dependency: [Centralized Authorization System (CAS) ODE project](https://github.com/noaa-pifsc/PIFSC-DSC-Containerized-Oracle-Development-Environment)
 
 ## Container Architecture
--   See the ODE [container architecture documentation](https://picgitlab.nmfs.local/oracle-developer-environment/pifsc-oracle-developer-environment/-/blob/main/README.md?ref_type=heads#container-architecture) for details
+-   See the ODE [container architecture documentation](https://github.com/noaa-pifsc/PIFSC-Containerized-Oracle-Development-Environment?tab=readme-ov-file/-/blob/main/README.md?ref_type=heads#container-architecture) for details
 
 ## Connection Information
--   See the ODE [connection information documentation](https://picgitlab.nmfs.local/oracle-developer-environment/pifsc-oracle-developer-environment/-/blob/main/README.md?ref_type=heads#connection-information) for details
+-   See the ODE [connection information documentation](https://github.com/noaa-pifsc/PIFSC-Containerized-Oracle-Development-Environment?tab=readme-ov-file/-/blob/main/README.md?ref_type=heads#connection-information) for details
 -   ### DSC Database Connection Information
     -   Connection information can be found in [create_docker_schemas.sql](https://picgitlab.nmfs.local/centralized-data-tools/pifsc-dsc/-/blob/main/SQL/dev_container_setup/create_docker_schemas.sql?ref_type=heads)
