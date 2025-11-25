@@ -49,6 +49,7 @@ services:
       # set the password for the ODS_PUBLIC_USER database account to be the same as the SYS password defined in .env file
       - ORDS_PWD=${ORACLE_PWD}
   db-ords-deploy:
+    image: pifsc/db-ords-deploy:latest
     build:
       context: .
       dockerfile: Dockerfile.deploy
