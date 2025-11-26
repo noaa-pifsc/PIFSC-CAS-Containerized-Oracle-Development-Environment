@@ -46,6 +46,8 @@ There are two different runtime scenarios implemented in this project:
 -   ### Development:
     -   This scenario retains the database across container restarts, this is intended for database and application development purposes
     -   This scenario implements a docker volume for the database files (db-vol) to retain the database data across container restarts
+    -   \*Note: If the [.env](./docker/.env) file is updated to increase the value of the TARGET_APEX_VERSION environment variable and the containers are restarted then the Apex upgrade will be performed and the admin Apex account will have its password reset to the ORACLE_PWD environment variable
+        -   \*Note: The TARGET_APEX_VERSION variable can only be increased once an apex container is upgraded, it can't be used to downgrade an existing Apex version.  If a downgrade is required the database volume (db-vol) needs to be deleted and then the container must be run again.  
 -   ### Test:
     -   This scenario does not retain the database across container restarts, this is intended to test the deployment process of schemas and applications
 
