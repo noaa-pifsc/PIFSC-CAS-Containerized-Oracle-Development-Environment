@@ -15,9 +15,16 @@ To do:
 
 	_ look into the DB/APEX configuration files from DBA
 
-	_ update the db_app_deploy.sh code to check if the TARGET_APEX_VERSION is < the installed version and print out an error message and exit with a code = 1
+	X check if the given apex version is actually available (e.g. 23.0), if not then print an error mesasge and exit with code = 1
+
+	X update the db_app_deploy.sh code to check if the TARGET_APEX_VERSION is < the installed version and print out an error message and exit with a code = 1
 
 
+_ troubleshoot error on downgrade (23.2 to 23.1)
+	2025-11-26 08:38:51 db-ords-deploy  | Checking database for APEX version...
+	2025-11-26 08:38:51 db-ords-deploy  | /usr/src/deployment_scripts/db_app_deploy.sh: line 97: [[: 2.0: syntax error: invalid arithmetic operator (error token is ".0")
+	2025-11-26 08:38:51 db-ords-deploy  | APEX version mismatch. Found: '23.2.0'
+	2025-11-26 08:38:51 db-ords-deploy  | Starting APEX upgrade to 23.1...
 
 
 X rename the docker image to have a pifsc prefix
@@ -26,7 +33,25 @@ X rename the docker image to have a pifsc prefix
 X create a new script (custom_ prefix) to perform the actual custom db/apex deployments so it's easier to pull changes from upstream (it won't cause a conflict in the run_db_app_deployment.sh each time)
 
 
-
+Testing:
+	_ test the different deployment/restart scenarios
+		_ dev
+			_ new deployment
+				X apex
+					X TARGET_APEX_VERSION invalid version (e.g. 24.0, 99.99)
+					X valid APEX (successful and reset admin password to ${ORACLE_PWD}
+						X login to workspace
+			_ restart
+				_ apex
+					_ (error message) downgrade (e.g. 23.1)
+					_ (error message) TARGET_APEX_VERSION invalid version (e.g. 24.0, 99.99)
+					_ APEX upgrade (successful and reset admin password to ${ORACLE_PWD}
+		_ test (does not save database volume)
+			_ new deployment
+				apex
+					_ TARGET_APEX_VERSION invalid version (e.g. 24.0, 99.99)
+					_ valid APEX (successful upgrade and reset admin password to ${ORACLE_PWD}
+						_ login to workspace
 
 
 
@@ -119,9 +144,6 @@ git bash commands:
 	bash build_deploy_project_dev.sh
 
 troubleshooting tips:
-	If the project is not working as expected when it is prepared using prepare_docker_project.sh:
-		for dev: is the correct branch being specified in the ODE or resource (e.g. DSC, CAS) URL?
-		Is the branch spelled correctly?
 	Is the project_config.sh correct?
 		Does it point at a different project_folder_name than the prepared directory?
 		
