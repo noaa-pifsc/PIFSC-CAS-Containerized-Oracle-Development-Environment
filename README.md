@@ -64,9 +64,9 @@ There are two different runtime scenarios implemented in this project:
 
 ## Customization Process
 -   ### Implementation
-    -   \*Note: this process will fork the CODE parent repository and repurpose it as a project-specific CODE
-    -   Fork the [project](#code-version-control-information)
-        -   Update the name/description of the project to specify the data system that is implemented in CODE
+    -   \*Note: this process will fork a given CODE repository and repurpose it as a project-specific CODE
+        -   Fork the desired CODE repository (e.g. [CODE](#code-version-control-information)
+    -   Update the name/description of the project to specify the data system that is implemented in CODE
     -   Clone the forked project to a working directory
     -   Update the forked project in the working directory
         -   Update the [README.md](./README.md) to reference all of the repositories that are used to build the image and deploy the container
@@ -75,6 +75,8 @@ There are two different runtime scenarios implemented in this project:
         -   Update the [.env](./docker/.env) environment to specify the configuration values:
             -   ORACLE_PWD is the password for the SYS, SYSTEM database schema passwords, the Apex administrator password, the ORDS administrator password
             -   TARGET_APEX_VERSION is the version of Apex that will be installed
+                -   \*Note: If the value is less than the currently installed version of APEX the db_app_deploy container will print an error message and exit the container.  
+                -   \*Note: If the value is not a valid APEX version available on the Oracle download site the db_app_deploy container will print an error message and exit the container.  
             -   APP_SCHEMA_NAME is the database schema that will be used to check if the database schemas have been installed, this only applies to the [development runtime scenario](#development)
             -   DB_IMAGE is the path to the database image used to build the database contianer (db container)
             -   ORDS_IMAGE is the path to the ORDS image used to build the ORDS/Apex container (ords container)
@@ -89,10 +91,10 @@ There are two different runtime scenarios implemented in this project:
             # Do not ignore the .gitkeep file for the DSC directory, so the directory itself is tracked.
             !docker/src/DSC/.gitkeep
             ```
-    -   ### Implementation Examples
-        -   Single database with no dependencies: [DSC CODE project](https://github.com/noaa-pifsc/PIFSC-DSC-Containerized-Oracle-Development-Environment)
-        -   Database and Apex app with a single database dependency: [Centralized Authorization System (CAS) CODE project](https://github.com/noaa-pifsc/PIFSC-CAS-Containerized-Oracle-Development-Environment)
-        -   Database and Apex app with two levels of database dependencies and an application dependency: [PARR Tools CODE project](https://github.com/noaa-pifsc/PIFSC-PARR-Tools-Containerized-Oracle-Development-Environment)
+-   ### Implementation Examples
+    -   Single database with no dependencies: [DSC CODE project](https://github.com/noaa-pifsc/PIFSC-DSC-Containerized-Oracle-Development-Environment)
+    -   Database and Apex app with a single database dependency: [Centralized Authorization System (CAS) CODE project](https://github.com/noaa-pifsc/PIFSC-CAS-Containerized-Oracle-Development-Environment)
+    -   Database and Apex app with two levels of database dependencies and an application dependency: [PARR Tools CODE project](https://github.com/noaa-pifsc/PIFSC-PARR-Tools-Containerized-Oracle-Development-Environment)
 -   ### Upstream Updates
     -   Most upstream file updates can be accepted without changes, except for the following files that should be merged (to integrate any appropriate upstream updates) or rejected (Keep HEAD revision) based on their function:
         -   Merge:

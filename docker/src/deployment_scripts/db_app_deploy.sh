@@ -34,7 +34,7 @@ echo "The value of APEX_QUERY is: $APEX_QUERY"
 # === APEX UPGRADE CONFIGURATION ===
 # Reads the version from the environment variable set in docker-compose.yml
 # Defaults to 24.2 if not set
-TARGET_APEX_VERSION=${TARGET_APEX_VERSION:-"24.2"}
+TARGET_APEX_VERSION=${TARGET_APEX_VERSION:-"23.2"}
 
 # Define paths for the dynamic download
 APEX_ZIP_FILE_NAME="apex_${TARGET_APEX_VERSION}.zip"
@@ -63,6 +63,20 @@ echo "STEP 1: Checking APEX Version"
 echo "========================================="
 echo "Target version: ${TARGET_APEX_VERSION}"
 
+# Validate if the version actually exists on Oracle's site ---
+echo "Verifying existence of version ${TARGET_APEX_VERSION} on Oracle download site..."
+# Use curl -I (head request) to check headers only.
+# -f causes curl to fail on HTTP errors (like 404).
+# -s is silent mode.
+if ! curl --output /dev/null --silent --head --fail "${APEX_DOWNLOAD_URL}"; then
+  echo "ERROR: APEX version ${TARGET_APEX_VERSION} does not exist at URL: ${APEX_DOWNLOAD_URL}"
+  echo "Please check the version number and try again."
+  exit 1
+else
+  echo "The APEX version ${TARGET_APEX_VERSION} confirmed valid and available for download."
+fi
+
+
 echo "Checking database for APEX version..."
 CURRENT_VERSION_CHECK=$(sqlplus -s -l ${SYS_CREDENTIALS} <<EOF
   set heading off feedback off pagesize 0
@@ -71,6 +85,21 @@ CURRENT_VERSION_CHECK=$(sqlplus -s -l ${SYS_CREDENTIALS} <<EOF
 EOF
 )
 CURRENT_VERSION_CHECK=$(echo $CURRENT_VERSION_CHECK | xargs)
+
+# Extract major and minor versions for comparison
+# Current installed version
+IFS='.' read -r CURR_MAJOR CURR_MINOR <<< "${CURRENT_VERSION_CHECK}"
+# Target version
+IFS='.' read -r TARGET_MAJOR TARGET_MINOR <<< "${TARGET_APEX_VERSION}"
+
+# Validate if target version is lower than current version
+if [[ ${TARGET_MAJOR} -lt ${CURR_MAJOR} ]] || \
+   [[ ${TARGET_MAJOR} -eq ${CURR_MAJOR} && ${TARGET_MINOR} -lt ${CURR_MINOR} ]]; then
+  echo "ERROR: Downgrade detected! Current APEX version is ${CURRENT_VERSION_CHECK}, but target is ${TARGET_APEX_VERSION}."
+  echo "Automated downgrading of APEX is not supported during container restarts, you must remove the database volume and run the container again to install the desired version of APEX. Exiting."
+  exit 1
+fi
+
 
 if echo "${CURRENT_VERSION_CHECK}" | grep -q "${TARGET_APEX_VERSION}"; then
   echo "APEX is already at the target version (${CURRENT_VERSION_CHECK})."
@@ -128,7 +157,7 @@ if [[ $SKIP_LOGIC_BLOCK -ne 1 ]]; then
 	# Run the DB install in the background by adding '&'
 	sqlplus -s -l ${SYS_CREDENTIALS} <<EOF &
 	  WHENEVER SQLERROR EXIT SQL.SQLCODE
-	  ALTER SESSION SET CONTAINER = XEPDB1;
+	  ALTER SESSION SET CONTAINER = ${DBSERVICENAME};
 	  @apexins.sql SYSAUX SYSAUX TEMP /i/
 	  exit;
 EOF
