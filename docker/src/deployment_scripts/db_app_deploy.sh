@@ -165,7 +165,7 @@ EOF
 	  echo "Unlocking APEX accounts..."
 	  sqlplus -s -l ${SYS_CREDENTIALS} <<EOF
 		WHENEVER SQLERROR EXIT SQL.SQLCODE
-		ALTER SESSION SET CONTAINER = XEPDB1;
+		ALTER SESSION SET CONTAINER = ${DBSERVICENAME};
 		-- Use the same password for all internal accounts for simplicity
 		ALTER USER APEX_PUBLIC_USER IDENTIFIED BY "${ORACLE_PWD}" ACCOUNT UNLOCK;
 		
@@ -178,7 +178,10 @@ EOF
 
 		-- Set the ADMIN password for the INTERNAL workspace (based on ORACLE_PWD variable defined in .env file)
 		BEGIN
+			--set the security group to the INTERNAL workspace
 			APEX_UTIL.set_security_group_id(10);
+
+			--create the new admin user in the INTERNAL workspace with the ORACLE_PWD variable defined in .env file
 			APEX_UTIL.create_user(
 				p_user_name => 'ADMIN',
 				p_email_address => 'admin@localhost',
@@ -189,12 +192,12 @@ EOF
 			COMMIT;
 		EXCEPTION WHEN OTHERS THEN
 			-- If apex admin user already exists, just reset the password (based on ORACLE_PWD variable defined in .env file)
-			APEX_UTIL.reset_password(
-				p_user_name => 'ADMIN',
-				p_old_password => NULL,
-				p_new_password => '${ORACLE_PWD}',
-				p_change_password_on_first_use => FALSE -- Ensure no forced change password
-			);
+
+			APEX_INSTANCE_ADMIN.UNLOCK_USER (
+			p_workspace => 'INTERNAL',
+			p_username => 'ADMIN',
+			p_password => '${ORACLE_PWD}');
+
 			COMMIT;
 		END;
 		/
