@@ -1,28 +1,26 @@
 X merge upstream changes from Branch_apex_upgrade
 	_ test the different deployment/restart scenarios
 		_ dev
-			_ new deployment
-				_ CAS DB schema works
-				_ login to workspace
-				_ CAS APEX app works
-				_ ords
-					_ configure CAS for ORDS
-					_ publish AUTH_APP_USERS as an endpoint
-					_ confirm records can be retrieved
-				_apex app can be imported to/from docker (version 23.0) and OCI (version 23.4 [dev] and 23.6 [test])
+			X new deployment
+				X CAS DB schema works
+				X login to workspace
+				X CAS APEX app works
+				X ords
+					X configure CAS for ORDS
+					X publish AUTH_APP_USERS as an endpoint
+					X confirm records can be retrieved
+				X apex app can be imported to/from docker (version 23.0) and OCI (version 23.4 [dev] and 23.6 [test])
 			_ restart
-				_ Does not redeploy DB 
-					CAS DB schema works
-				_ Does not redeploy APEX workspaces/apps
-					_ login to workspace
-					_ CAS APEX app works
+				X Does not redeploy DB 
+					X CAS DB schema works
+				X Does not redeploy APEX workspaces/apps
+					X login to workspace
+					X CAS APEX app works
 				_ change APEX version (increase only)
 					_ ** add to documentation (can't downgrade)
 					_ APEX upgrade
-				_ ords
-					_ configure CAS for ORDS
-					_ publish AUTH_APP_USERS as an endpoint
-					_ confirm records can be retrieved
+				X ords
+					X confirm records can be retrieved
 		_ test (does not save database volume)
 			_ new deployment
 				_ CAS DB schema works
