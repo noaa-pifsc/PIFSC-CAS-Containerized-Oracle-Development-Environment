@@ -1,5 +1,21 @@
 #!/bin/bash
 
+
+# Helper function to compare versions
+# Returns 0 (true) if $1 > $2
+version_gt() {
+    # We use 'test' to check if the first argument ($1) is NOT the lowest value
+    # when the arguments are sorted naturally (-V)
+    test "$(printf '%s\n' "$@" | sort -V | head -n 1)" != "$1"
+}
+
+# Function to check if the database is initialized
+check_database_initialized() {
+	# Check if your custom schema (e.g., '${APP_SCHEMA_NAME}') exists
+	echo "SELECT COUNT(*) FROM DBA_USERS WHERE USERNAME = '${APP_SCHEMA_NAME}';" | sqlplus -s $SYS_CREDENTIALS | grep -q '1'
+}
+
+
 # change to the directory of the currently running script
 CURRENT_DIR="$(dirname "$(realpath "$0")")"
 cd ${CURRENT_DIR}
@@ -43,12 +59,6 @@ APEX_DOWNLOAD_URL="https://download.oracle.com/otn_software/apex/${APEX_ZIP_FILE
 APEX_STATIC_DIR="/apex-static" # This is the mount path for our shared volume
 # === END APEX UPGRADE CONFIGURATION ===
 
-# Function to check if the database is initialized
-check_database_initialized() {
-	# Check if your custom schema (e.g., '${APP_SCHEMA_NAME}') exists
-	echo "SELECT COUNT(*) FROM DBA_USERS WHERE USERNAME = '${APP_SCHEMA_NAME}';" | sqlplus -s $SYS_CREDENTIALS | grep -q '1'
-}
-
 # Wait until the database is available
 echo "Waiting for Oracle Database to be ready..."
 until echo "exit" | sqlplus -s $SYS_CREDENTIALS > /dev/null; do
@@ -62,6 +72,12 @@ echo "========================================="
 echo "STEP 1: Checking APEX Version"
 echo "========================================="
 echo "Target version: ${TARGET_APEX_VERSION}"
+
+# Validate APEX version format (e.g., 23.2, 24.1)
+if [[ ! "${TARGET_APEX_VERSION}" =~ "^[0-9]+\.[0-9]+$" ]]; then
+  echo "ERROR: Invalid APEX version format: '${TARGET_APEX_VERSION}'. Expected format: XX.X (e.g., 23.2)"
+  exit 1
+fi
 
 # Validate if the version actually exists on Oracle's site ---
 echo "Verifying existence of version ${TARGET_APEX_VERSION} on Oracle download site..."
@@ -86,21 +102,16 @@ EOF
 )
 CURRENT_VERSION_CHECK=$(echo $CURRENT_VERSION_CHECK | xargs)
 
-# Extract major and minor versions for comparison
-# Current installed version
-IFS='.' read -r CURR_MAJOR CURR_MINOR <<< "${CURRENT_VERSION_CHECK}"
-# Target version
-IFS='.' read -r TARGET_MAJOR TARGET_MINOR <<< "${TARGET_APEX_VERSION}"
+echo "The current version of APEX is: ${CURRENT_VERSION_CHECK}"
 
-# Validate if target version is lower than current version
-if [[ ${TARGET_MAJOR} -lt ${CURR_MAJOR} ]] || \
-   [[ ${TARGET_MAJOR} -eq ${CURR_MAJOR} && ${TARGET_MINOR} -lt ${CURR_MINOR} ]]; then
+# Check for APEX downgrade (Target < Current)
+if version_gt "$CURRENT_VERSION_CHECK" "$TARGET_APEX_VERSION"; then
   echo "ERROR: Downgrade detected! Current APEX version is ${CURRENT_VERSION_CHECK}, but target is ${TARGET_APEX_VERSION}."
-  echo "Automated downgrading of APEX is not supported during container restarts, you must remove the database volume and run the container again to install the desired version of APEX. Exiting."
+  echo "Downgrading APEX via this automation is not supported. Exiting."
   exit 1
 fi
 
-
+# check if the current version of APEX is the same as the specified TARGET_APEX_VERSION
 if echo "${CURRENT_VERSION_CHECK}" | grep -q "${TARGET_APEX_VERSION}"; then
   echo "APEX is already at the target version (${CURRENT_VERSION_CHECK})."
   

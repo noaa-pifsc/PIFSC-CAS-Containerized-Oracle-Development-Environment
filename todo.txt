@@ -37,21 +37,31 @@ Testing:
 	_ test the different deployment/restart scenarios
 		_ dev
 			_ new deployment
-				X apex
-					X TARGET_APEX_VERSION invalid version (e.g. 24.0, 99.99)
-					X valid APEX (successful and reset admin password to ${ORACLE_PWD}
-						X login to workspace
+				_ apex
+					X TARGET_APEX_VERSION invalid version (regexp validation - e.g. 24.0.0)
+					_ TARGET_APEX_VERSION invalid version (oracle site does not have the intaller - e.g. 24.0, 9.99)
+					_ valid APEX (successful and reset admin password to ${ORACLE_PWD}
+						_ login to workspace
+				_ db
+					_ login to SYS
+					_ login to SYSTEM
 			_ restart
 				_ apex
 					_ (error message) downgrade (e.g. 23.1)
 					_ (error message) TARGET_APEX_VERSION invalid version (e.g. 24.0, 99.99)
 					_ APEX upgrade (successful and reset admin password to ${ORACLE_PWD}
+				_ db
+					_ login to SYS
+					_ login to SYSTEM
 		_ test (does not save database volume)
 			_ new deployment
-				apex
+				_ apex
 					_ TARGET_APEX_VERSION invalid version (e.g. 24.0, 99.99)
 					_ valid APEX (successful upgrade and reset admin password to ${ORACLE_PWD}
 						_ login to workspace
+				_ db
+					_ login to SYS
+					_ login to SYSTEM
 
 
 
