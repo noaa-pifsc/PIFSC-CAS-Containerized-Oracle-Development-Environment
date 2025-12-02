@@ -65,7 +65,7 @@ There are two different runtime scenarios implemented in this project:
 ## Customization Process
 -   ### Implementation
     -   \*Note: this process will fork a given CODE repository and repurpose it as a project-specific CODE
-        -   Fork the desired CODE repository (e.g. [CODE](#code-version-control-information)
+    -   Fork the desired CODE repository (e.g. [CODE](#code-version-control-information)
     -   Update the name/description of the project to specify the data system that is implemented in CODE
     -   Clone the forked project to a working directory
     -   Update the forked project in the working directory

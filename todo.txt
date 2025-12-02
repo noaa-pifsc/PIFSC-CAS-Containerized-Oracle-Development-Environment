@@ -35,8 +35,8 @@ X create functions for validating the required environment variables
 
 
 Testing:
-	_ test the different deployment/restart scenarios
-		X dev (tested 12/1/25)
+	X test the different deployment/restart scenarios
+		X dev (tested 12/2/25)
 			X new deployment
 				X apex
 					X (error message) TARGET_APEX_VERSION invalid version (regexp validation - e.g. 24.0.0)
@@ -47,7 +47,7 @@ Testing:
 					X login to SYS
 					X login to SYSTEM
 			X restart
-				X change apex version
+				X change APEX version
 					X TARGET_APEX_VERSION invalid version (regexp validation - e.g. 24.0.0)
 					X (error message) downgrade (e.g. 23.1, 22.1)
 					X (error message) TARGET_APEX_VERSION invalid version (oracle site does not have the intaller - e.g. 24.0, 9.99)
@@ -56,20 +56,20 @@ Testing:
 						X db
 							X login to SYS
 							X login to SYSTEM
-				X leave apex version unchanged
+				X leave APEX version unchanged
 					X login to workspace (password unchanged)
 					X db
 						X login to SYS
 						X login to SYSTEM
-		_ test (does not save database volume)
-			_ apex
-				_ (error message) TARGET_APEX_VERSION invalid version (regexp validation - e.g. 24.0.0)
+		X test (does not save database volume) (tested 12/2/25)
+			X apex
+				X (error message) TARGET_APEX_VERSION invalid version (regexp validation - e.g. 24.0.0)
 				X (error message) TARGET_APEX_VERSION invalid version (oracle site does not 
-				_ valid APEX (successful upgrade and reset admin password to ${ORACLE_PWD}
-					_ login to workspace
-			_ db
-				_ login to SYS
-				_ login to SYSTEM
+				X valid APEX (successful upgrade and reset admin password to ${ORACLE_PWD}
+					X login to workspace
+			X db
+				X login to SYS
+				X login to SYSTEM
 
 
 
@@ -151,15 +151,29 @@ X ** ORDS_PWD environment variable for ORDS configuration?
 
 git bash commands:
 
-	# stop and remove CODE containers and delete volumes
-	cd /c/Users/jesse.abdul/Documents/Version\ Control/Git/PIFSC-Containerized-Oracle-Development-Environment/deployment_scripts
+	# Dev:
+
+		# stop and remove CODE containers and delete volumes
+		cd /c/Users/jesse.abdul/Documents/Version\ Control/Git/PIFSC-Containerized-Oracle-Development-Environment/deployment_scripts
+		
+		docker compose -f ../docker/docker-compose-dev.yml down
+		docker volume rm apex-static-vol
+		docker volume rm db-vol
+		
+		# build and deploy the development scenario of the CODE
+		bash build_deploy_project_dev.sh
 	
-	docker compose -f ../docker/docker-compose-dev.yml down
-	docker volume rm apex-static-vol
-	docker volume rm db-vol
-	
-	# build and deploy the development scenario of the CODE
-	bash build_deploy_project_dev.sh
+	# Test:
+
+		# stop and remove CODE containers and delete volumes
+		cd /c/Users/jesse.abdul/Documents/Version\ Control/Git/PIFSC-Containerized-Oracle-Development-Environment/deployment_scripts
+		
+		docker compose -f ../docker/docker-compose-test.yml down
+		docker volume rm apex-static-vol
+
+		# build and deploy the test scenario of the CODE
+		bash build_deploy_project_test.sh
+
 
 troubleshooting tips:
 	Is the project_config.sh correct?
