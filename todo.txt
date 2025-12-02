@@ -12,12 +12,25 @@ X merge upstream changes from branch_implement_upgradable_ords_apex
 
 git bash commands:
 
-	# stop and remove CODE containers and delete volumes
-	cd /c/Users/jesse.abdul/Documents/Version\ Control/Git/PIFSC-DSC-Containerized-Oracle-Development-Environment/deployment_scripts
+	# Dev:
+
+		# stop and remove CODE containers and delete volumes
+		cd /c/Users/jesse.abdul/Documents/Version\ Control/Git/PIFSC-DSC-Containerized-Oracle-Development-Environment/deployment_scripts
+		
+		docker compose -f ../docker/docker-compose-dev.yml down
+		docker volume rm apex-static-vol
+		docker volume rm db-vol
+		
+		# build and deploy the development scenario of the CODE
+		bash build_deploy_project_dev.sh
 	
-	docker compose -f ../docker/docker-compose-dev.yml down
-	docker volume rm apex-static-vol
-	docker volume rm db-vol
-	
-	# build and deploy the development scenario of the CODE
-	bash build_deploy_project_dev.sh
+	# Test:
+
+		# stop and remove CODE containers and delete volumes
+		cd /c/Users/jesse.abdul/Documents/Version\ Control/Git/PIFSC-DSC-Containerized-Oracle-Development-Environment/deployment_scripts
+		
+		docker compose -f ../docker/docker-compose-test.yml down
+		docker volume rm apex-static-vol
+
+		# build and deploy the test scenario of the CODE
+		bash build_deploy_project_test.sh
