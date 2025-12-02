@@ -45,31 +45,10 @@ The PIFSC Centralized Authorization System (CAS) Containerized Oracle Developer 
         -   [deploy_apex_dev_container.sql](https://picgitlab.nmfs.local/centralized-data-tools/authorization-application-module/-/blob/master/CAS/SQL/automated_deployments/deploy_apex_dev_container.sql?ref_type=heads) is executed with the CAS_APX_APP schema to deploy the objects to the CAS_APX_APP schema and the app to the CAS_APX_APP APEX workspace
 
 ## Customization Process
--   \*Note: this process will fork the CCODE parent repository and repurpose it as a project-specific CCODE
--   Fork the [project](#cas-ode-version-control-information)
-    -   Update the name/description of the project to specify the data system that is implemented in CCODE
--   Clone the forked project to a working directory
--   Update the forked project in the working directory
-    -   Update the [documentation](./README.md) to reference all of the repositories that are used to build the image and deploy the container
-    -   Update the [custom_prepare_docker_project.sh](./deployment_scripts/custom_prepare_docker_project.sh) bash script to retrieve DB/app files for all dependencies (if any) as well as the DB/app files for the given data system and place them in the appropriate subfolders in the [src folder](./docker/src)
-    -   Update the [custom_project_config.sh](./deployment_scripts/sh_script_config/custom_project_config.sh) bash script to specify variables for the respository URL(s) needed to clone the container dependencies
-    -   Update the [.env](./docker/.env) environment to specify the configuration values:
-        -   ORACLE_PWD is the password for the SYS, SYSTEM database schema passwords, the Apex administrator password, the ORDS administrator password
-        -   TARGET_APEX_VERSION is the version of Apex that will be installed
-        -   APP_SCHEMA_NAME is the database schema that will be used to check if the database schemas have been installed, this only applies to the [development runtime scenario](#development)
-        -   DB_IMAGE is the path to the database image used to build the database contianer (db container)
-        -   ORDS_IMAGE is the path to the ORDS image used to build the ORDS/Apex container (ords container)
-    -   Update the [custom_db_app_deploy.sh](./docker/src/deployment_scripts/custom_db_app_deploy.sh) bash script to execute a series of SQLPlus scripts in the correct order to create/deploy schemas, create Apex workspaces, and deploy Apex apps that were copied to the /src directory when the [prepare_docker_project.sh](./deployment_scripts/prepare_docker_project.sh) script is executed. This process can be customized for any Oracle data system.
-        -   Update the [custom_container_config.sh](./docker/src/deployment_scripts/config/custom_container_config.sh) to specify the variables necessary to authenticate the corresponding SQLPlus scripts when the [custom_db_app_deploy.sh](./docker/src/deployment_scripts/custom_db_app_deploy.sh) bash script is executed
-    -   Create additional empty directories for any folders/files dynamically retrieved by [custom_prepare_docker_project.sh](./deployment_scripts/custom_prepare_docker_project.sh) (e.g. docker/src/parr-tools) and save .gitkeep files for them (e.g. docker/src/parr-tools/.gitkeep) so they can be added to version control
-        -   Update the [.gitignore](./.gitignore) file at the root of the repository to add entries for any empty directories that have content dynamically retrieved, for example:
-        ```
-        # Ignore all content in the parr-tools directory
-        docker/src/parr-tools/*
-
-        # Do not ignore the .gitkeep file for the parr-tools directory, so the directory itself is tracked.
-        !docker/src/parr-tools/.gitkeep
-        ```
+-   ### Implementation
+    -   \*Note: this process will fork the CCODE parent repository and repurpose it as a project-specific CODE
+    -   Fork [this repository](#ccode-version-control-information)
+    -   See the CODE [Implementation](https://github.com/noaa-pifsc/PIFSC-Containerized-Oracle-Development-Environment?tab=readme-ov-file#implementation) for details
 -   ### Implementation Examples
     -   Database and APEX app with a single database dependency: [PARR Tools CODE project](https://github.com/noaa-pifsc/PIFSC-PARR-Tools-Containerized-Oracle-Development-Environment)
 -   ### Upstream Updates
