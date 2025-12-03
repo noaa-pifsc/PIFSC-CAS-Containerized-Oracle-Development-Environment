@@ -1,4 +1,4 @@
-# PIFSC CAS Oracle Developer Environment
+# PIFSC CAS Containerized Oracle Developer Environment
 
 ## Overview
 The PIFSC Centralized Authorization System (CAS) Containerized Oracle Developer Environment (CCODE) project was developed to provide a custom containerized Oracle development environment (CODE) for the CAS.  This repository can be forked to extend the existing functionality to any data systems that depend on the CAS for both development and testing purposes.  
@@ -61,3 +61,5 @@ The PIFSC Centralized Authorization System (CAS) Containerized Oracle Developer 
 -   See the CODE [connection information documentation](https://github.com/noaa-pifsc/PIFSC-Containerized-Oracle-Development-Environment?tab=readme-ov-file/-/blob/main/README.md?ref_type=heads#connection-information) for details
 -   ### CAS Database Connection Information
     -   Connection information can be found in [create_docker_schemas.sql](https://picgitlab.nmfs.local/centralized-data-tools/authorization-application-module/-/blob/master/CAS/SQL/dev_container_setup/create_docker_schemas.sql?ref_type=heads)
+-   ### DSC Database Connection Information
+    -   Connection information can be found in [create_docker_schemas.sql](https://picgitlab.nmfs.local/centralized-data-tools/pifsc-dsc/-/blob/main/SQL/dev_container_setup/create_docker_schemas.sql?ref_type=heads)
