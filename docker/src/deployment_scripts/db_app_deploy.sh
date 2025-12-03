@@ -36,7 +36,6 @@ echo "Database is ready!"
 # install or upgrade the apex container installation:
 install_or_upgrade_apex
 
-
 echo "Checking if the database has been initialized (schema: ${APP_SCHEMA_NAME})..."
 # Check if the database is initialized by querying DBA_USERS
 if ! check_database_initialized; then
