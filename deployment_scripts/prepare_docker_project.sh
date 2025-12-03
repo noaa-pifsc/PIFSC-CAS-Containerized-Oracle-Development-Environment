@@ -17,4 +17,3 @@ echo "remove all temporary files"
 rm -rf ../tmp
 
 echo "the docker project files are now ready for configuration and image building/running"
-
