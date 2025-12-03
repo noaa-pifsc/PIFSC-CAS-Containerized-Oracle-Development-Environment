@@ -9,6 +9,59 @@ X merge upstream changes from branch_implement_upgradable_ords_apex
 	X update documentation
 	
 
+X test the different deployment/restart scenarios
+	X dev
+		X new deployment
+			X apex
+				X (error message) TARGET_APEX_VERSION invalid version (regexp validation - e.g. 24.0.0)
+				X (error message) TARGET_APEX_VERSION invalid version (oracle site does not have the intaller - e.g. 24.0, 9.99)
+				X valid APEX (successful and reset admin password to ${ORACLE_PWD}
+					X login to workspace
+					X db
+						X DSC DB schema works
+						X login to SYS
+						X login to SYSTEM
+					X ords
+						X configure DSC for ORDS
+						X publish DSC_SYS_PARAMS as an endpoint
+						X confirm records can be retrieved
+		X restart
+			X change APEX version
+				X TARGET_APEX_VERSION invalid version (regexp validation - e.g. 24.0.0)
+				X (error message) downgrade (e.g. 23.1, 22.1)
+				X (error message) TARGET_APEX_VERSION invalid version (oracle site does not have the intaller - e.g. 24.0, 9.99)
+				X APEX upgrade (successful and reset admin password to ${ORACLE_PWD}
+					X Does not redeploy DB 
+					X login to workspace
+					X db
+						X DSC DB schema works
+						X login to SYS
+						X login to SYSTEM
+					X ords
+						X confirm records can be retrieved
+			X leave APEX version unchanged
+				X Does not redeploy DB 
+				X login to workspace (password unchanged)
+				X db
+					X CAS DB schema works
+					X login to SYS
+					X login to SYSTEM
+					X ords
+						X confirm records can be retrieved
+	X test (does not save database volume)
+		X apex
+			X (error message) TARGET_APEX_VERSION invalid version (regexp validation - e.g. 24.0.0)
+			X (error message) TARGET_APEX_VERSION invalid version (oracle site does not have the intaller - e.g. 24.0, 9.99)
+			X valid APEX (successful upgrade and reset admin password to ${ORACLE_PWD}
+				X login to workspace
+				X db
+					X DSC DB schema works
+					X login to SYS
+					X login to SYSTEM
+				X ords
+					X configure DSC for ORDS
+					X publish DSC_SYS_PARAMS as an endpoint
+					X confirm records can be retrieved
 
 git bash commands:
 

@@ -35,3 +35,18 @@ echo "Database is ready!"
 
 # install or upgrade the apex container installation:
 install_or_upgrade_apex
+
+
+echo "Checking if the database has been initialized (schema: ${APP_SCHEMA_NAME})..."
+# Check if the database is initialized by querying DBA_USERS
+if ! check_database_initialized; then
+	echo "Database is not initialized, run the custom database and/or application deployment scripts"
+
+	# run the custom database and/or application deployment scripts:
+	source ${CURRENT_DIR}/custom_db_app_deploy.sh
+
+else
+	echo "Database already initialized. Skipping deployment script."
+fi
+
+echo "All deployment steps complete."
