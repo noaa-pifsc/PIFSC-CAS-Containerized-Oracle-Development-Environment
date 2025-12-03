@@ -1,76 +1,81 @@
 X merge upstream changes from Branch_apex_upgrade
 
 
-_ test the different deployment/restart scenarios
-	_ dev
-		_ new deployment
-			_ apex
-				_ (error message) TARGET_APEX_VERSION invalid version (regexp validation - e.g. 24.0.0)
-				_ (error message) TARGET_APEX_VERSION invalid version (oracle site does not have the intaller - e.g. 24.0, 9.99)
-				_ valid APEX (successful and reset admin password to ${ORACLE_PWD}
-					_ login to workspace
-					_ apex app can be imported to/from docker (version 23.2) and OCI (version 23.2.4 [dev] and 23.2.6 [test])
-					_ CAS APEX app works
-					_ db
-						_ CAS DB schema works
-						_ CAS_APX_APP DB schema works
-						_ DSC DB schema works
-						_ login to SYS
-						_ login to SYSTEM
-					_ ords
-						_ configure CAS for ORDS
-						_ publish AUTH_APP_USERS as an endpoint
-						_ confirm records can be retrieved
-		_ restart
-			_ change APEX version
-				_ TARGET_APEX_VERSION invalid version (regexp validation - e.g. 24.0.0)
-				_ (error message) downgrade (e.g. 23.1, 22.1)
-				_ (error message) TARGET_APEX_VERSION invalid version (oracle site does not have the intaller - e.g. 24.0, 9.99)
-				_ APEX upgrade (successful and reset admin password to ${ORACLE_PWD}
-					_ login to workspace
-					_ Does not redeploy APEX workspaces/apps
-						_ CAS APEX app works
-					_ db (does not redeploy DB) 
-						_ CAS DB schema works
-						_ CAS_APX_APP DB schema works
-						_ DSC DB schema works
-						_ login to SYS
-						_ login to SYSTEM
-					_ ords
-						_ confirm records can be retrieved
-			_ leave APEX version unchanged
-				_ Does not redeploy APEX workspaces/apps
-					_ CAS APEX app works
-				_ login to workspace (password unchanged)
-				_ db (does not redeploy DB) 
-					_ CAS DB schema works
-					_ CAS_APX_APP DB schema works
-					_ DSC DB schema works
-					_ login to SYS
-					_ login to SYSTEM
-				_ ords
-					_ confirm records can be retrieved
-	_ test (does not save database volume)
-		_ new deployment
-			_ CAS DB schema works
-			_ CAS APEX app works
-		_ apex
-			_ (error message) TARGET_APEX_VERSION invalid version (regexp validation - e.g. 24.0.0)
-			_ (error message) TARGET_APEX_VERSION invalid version (oracle site does not 
-			_ valid APEX (successful upgrade and reset admin password to ${ORACLE_PWD}
-				_ login to workspace
-				_ apex app can be imported to/from docker (version 23.2) and OCI (version 23.2.4 [dev] and 23.2.6 [test])
-				_ CAS APEX app works
-				_ db
-					_ CAS DB schema works
-					_ CAS_APX_APP DB schema works
-					_ DSC DB schema works
-					_ login to SYS
-					_ login to SYSTEM
-				_ ords
-					_ configure CAS for ORDS
-					_ publish AUTH_APP_USERS as an endpoint
-					_ confirm records can be retrieved
+X test the different deployment/restart scenarios (tested on 12/2/25)
+	X dev
+		X new deployment
+			X apex
+				X (error message) TARGET_APEX_VERSION invalid version (regexp validation - e.g. 24.0.0)
+				X (error message) TARGET_APEX_VERSION invalid version (oracle site does not have the intaller - e.g. 24.0, 9.99)
+				X valid APEX (successful and reset admin password to ${ORACLE_PWD}
+					X login to workspace
+						X internal
+						X CAS_APX_APP
+					X apex app can be imported to/from docker (version 23.2) and OCI (version 23.2.4 [dev] and 23.2.6 [test])
+					X CAS APEX app works
+					X db
+						X CAS DB schema works
+						X CAS_APX_APP DB schema works
+						X DSC DB schema works
+						X login to SYS
+						X login to SYSTEM
+					X ords
+						X configure CAS for ORDS
+						X publish AUTH_APP_USERS as an endpoint
+						X confirm records can be retrieved
+		X restart
+			X change APEX version
+				X TARGET_APEX_VERSION invalid version (regexp validation - e.g. 24.0.0)
+				X (error message) downgrade (e.g. 23.1, 22.1)
+				X (error message) TARGET_APEX_VERSION invalid version (oracle site does not have the intaller - e.g. 24.0, 9.99)
+				X APEX upgrade (successful and reset admin password to ${ORACLE_PWD}
+					X login to workspace
+						X internal
+						X CAS_APX_APP
+					X Does not redeploy APEX workspaces/apps
+						X CAS APEX app works
+					X db (does not redeploy DB) 
+						X CAS DB schema works
+						X CAS_APX_APP DB schema works
+						X DSC DB schema works
+						X login to SYS
+						X login to SYSTEM
+					X ords
+						X confirm records can be retrieved
+			X leave APEX version unchanged
+				X Does not redeploy APEX workspaces/apps
+					X CAS APEX app works
+				X login to workspace (password unchanged)
+					X internal
+					X CAS_APX_APP
+				X db (does not redeploy DB) 
+					X CAS DB schema works
+					X CAS_APX_APP DB schema works
+					X DSC DB schema works
+					X login to SYS
+					X login to SYSTEM
+				X ords
+					X confirm records can be retrieved
+	X test (does not save database volume)
+		X apex
+			X (error message) TARGET_APEX_VERSION invalid version (regexp validation - e.g. 24.0.0)
+			X (error message) TARGET_APEX_VERSION invalid version (oracle site does not have the intaller - e.g. 24.0, 9.99) 
+			X valid APEX (successful upgrade and reset admin password to ${ORACLE_PWD}
+				X login to workspace
+					X internal
+					X CAS_APX_APP
+				X apex app can be imported to/from docker (version 23.2) and OCI (version 23.2.4 [dev] and 23.2.6 [test])
+				X CAS APEX app works
+				X db
+					X CAS DB schema works
+					X CAS_APX_APP DB schema works
+					X DSC DB schema works
+					X login to SYS
+					X login to SYSTEM
+				X ords
+					X configure CAS for ORDS
+					X publish AUTH_APP_USERS as an endpoint
+					X confirm records can be retrieved
 
 git bash commands:
 
