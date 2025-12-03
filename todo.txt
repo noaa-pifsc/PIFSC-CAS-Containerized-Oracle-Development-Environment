@@ -1,54 +1,99 @@
 X merge upstream changes from Branch_apex_upgrade
-	_ test the different deployment/restart scenarios
-		_ dev
-			X new deployment
-				X CAS DB schema works
-				X login to workspace
-				X CAS APEX app works
-				X ords
-					X configure CAS for ORDS
-					X publish AUTH_APP_USERS as an endpoint
-					X confirm records can be retrieved
-				X apex app can be imported to/from docker (version 23.0) and OCI (version 23.4 [dev] and 23.6 [test])
-			_ restart
-				X Does not redeploy DB 
-					X CAS DB schema works
-				X Does not redeploy APEX workspaces/apps
-					X login to workspace
-					X CAS APEX app works
-				_ change APEX version (increase only)
-					_ ** add to documentation (can't downgrade)
-					_ APEX upgrade
-				X ords
-					X confirm records can be retrieved
-		_ test (does not save database volume)
-			_ new deployment
-				_ CAS DB schema works
+
+
+_ test the different deployment/restart scenarios
+	_ dev
+		_ new deployment
+			_ apex
+				_ (error message) TARGET_APEX_VERSION invalid version (regexp validation - e.g. 24.0.0)
+				_ (error message) TARGET_APEX_VERSION invalid version (oracle site does not have the intaller - e.g. 24.0, 9.99)
+				_ valid APEX (successful and reset admin password to ${ORACLE_PWD}
+					_ login to workspace
+					_ apex app can be imported to/from docker (version 23.2) and OCI (version 23.2.4 [dev] and 23.2.6 [test])
+					_ CAS APEX app works
+					_ db
+						_ CAS DB schema works
+						_ CAS_APX_APP DB schema works
+						_ DSC DB schema works
+						_ login to SYS
+						_ login to SYSTEM
+					_ ords
+						_ configure CAS for ORDS
+						_ publish AUTH_APP_USERS as an endpoint
+						_ confirm records can be retrieved
+		_ restart
+			_ change APEX version
+				_ TARGET_APEX_VERSION invalid version (regexp validation - e.g. 24.0.0)
+				_ (error message) downgrade (e.g. 23.1, 22.1)
+				_ (error message) TARGET_APEX_VERSION invalid version (oracle site does not have the intaller - e.g. 24.0, 9.99)
+				_ APEX upgrade (successful and reset admin password to ${ORACLE_PWD}
+					_ login to workspace
+					_ Does not redeploy APEX workspaces/apps
+						_ CAS APEX app works
+					_ db (does not redeploy DB) 
+						_ CAS DB schema works
+						_ CAS_APX_APP DB schema works
+						_ DSC DB schema works
+						_ login to SYS
+						_ login to SYSTEM
+					_ ords
+						_ confirm records can be retrieved
+			_ leave APEX version unchanged
+				_ Does not redeploy APEX workspaces/apps
+					_ CAS APEX app works
+				_ login to workspace (password unchanged)
+				_ db (does not redeploy DB) 
+					_ CAS DB schema works
+					_ CAS_APX_APP DB schema works
+					_ DSC DB schema works
+					_ login to SYS
+					_ login to SYSTEM
+				_ ords
+					_ confirm records can be retrieved
+	_ test (does not save database volume)
+		_ new deployment
+			_ CAS DB schema works
+			_ CAS APEX app works
+		_ apex
+			_ (error message) TARGET_APEX_VERSION invalid version (regexp validation - e.g. 24.0.0)
+			_ (error message) TARGET_APEX_VERSION invalid version (oracle site does not 
+			_ valid APEX (successful upgrade and reset admin password to ${ORACLE_PWD}
 				_ login to workspace
+				_ apex app can be imported to/from docker (version 23.2) and OCI (version 23.2.4 [dev] and 23.2.6 [test])
 				_ CAS APEX app works
-				_apex app can be imported to/from docker (version 23.0) and OCI (version 23.4 [dev] and 23.6 [test])
-			_ ords
-				_ configure CAS for ORDS
-				_ publish AUTH_APP_USERS as an endpoint
-				_ confirm records can be retrieved
-		
-		_ ensure that we can save an APEX app and then import to OCI instances successfully
-			_ test vice versa (OCI app imported into workspace)
-
-	X apex version can be imported to/from docker (version 23.0) and OCI (version 23.4 [dev] and 23.6 [test])
-
-	X update .gitignore
-
-	X update documentation
+				_ db
+					_ CAS DB schema works
+					_ CAS_APX_APP DB schema works
+					_ DSC DB schema works
+					_ login to SYS
+					_ login to SYSTEM
+				_ ords
+					_ configure CAS for ORDS
+					_ publish AUTH_APP_USERS as an endpoint
+					_ confirm records can be retrieved
 
 git bash commands:
 
-	# stop and remove CODE containers and delete volumes
-	cd /c/Users/jesse.abdul/Documents/Version\ Control/Git/PIFSC-CAS-Containerized-Oracle-Development-Environment/deployment_scripts
+	# Dev:
+
+		# stop and remove CODE containers and delete volumes
+		cd /c/Users/jesse.abdul/Documents/Version\ Control/Git/PIFSC-CAS-Containerized-Oracle-Development-Environment/deployment_scripts
+		
+		docker compose -f ../docker/docker-compose-dev.yml down
+		docker volume rm apex-static-vol
+		docker volume rm db-vol
+		
+		# build and deploy the development scenario of the CODE
+		bash build_deploy_project_dev.sh
 	
-	docker compose -f ../docker/docker-compose-dev.yml down
-	docker volume rm apex-static-vol
-	docker volume rm db-vol
-	
-	# build and deploy the development scenario of the CODE
-	bash build_deploy_project_dev.sh
+	# Test:
+
+		# stop and remove CODE containers and delete volumes
+		cd /c/Users/jesse.abdul/Documents/Version\ Control/Git/PIFSC-CAS-Containerized-Oracle-Development-Environment/deployment_scripts
+		
+		docker compose -f ../docker/docker-compose-test.yml down
+		docker volume rm apex-static-vol
+
+		# build and deploy the test scenario of the CODE
+		bash build_deploy_project_test.sh
+
