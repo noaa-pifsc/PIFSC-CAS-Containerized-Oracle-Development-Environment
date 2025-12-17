@@ -6,11 +6,11 @@ The PIFSC Centralized Authorization System (CAS) Containerized Oracle Developer 
 ## Resources
 -   ### CCODE Version Control Information
     -   URL: https://github.com/noaa-pifsc/PIFSC-CAS-Containerized-Oracle-Development-Environment
-    -   Version: 1.1 (git tag: CAS_CODE_v1.1)
+    -   Version: 1.2 (git tag: CAS_CODE_v1.2)
     -   Upstream repository:
         -   DSC CODE (DCODE) Version Control Information:
             -   URL: https://github.com/noaa-pifsc/PIFSC-DSC-Containerized-Oracle-Development-Environment
-            -   Version: 1.1 (git tag: DSC_CODE_v1.1)
+            -   Version: 1.2 (git tag: DSC_CODE_v1.2)
 -   ### CAS Version Control Information
     -   URL: https://picgitlab.nmfs.local/centralized-data-tools/authorization-application-module
 -   ### DSC Version Control Information
