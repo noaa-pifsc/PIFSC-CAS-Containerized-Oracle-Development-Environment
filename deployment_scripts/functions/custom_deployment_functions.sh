@@ -17,6 +17,9 @@ build_deploy_dev_environment ()
 		COMPOSE_FILES+=("-f" "docker/CODE-db-named-volume.yml")
 	fi
 
+	# include the ords service
+	COMPOSE_FILES+=("-f" "docker/CODE-ords.yml")
+
 	# add custom docker compose to integrate additional services and/or map project-specific resources for the db-ords-deploy service to automatically deploy
 	COMPOSE_FILES+=("-f" "docker/custom-docker-compose.yml")
 

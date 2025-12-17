@@ -11,10 +11,21 @@ The PIFSC Centralized Authorization System (CAS) Containerized Oracle Developer 
         -   DSC CODE (DCODE) Version Control Information:
             -   URL: https://github.com/noaa-pifsc/PIFSC-DSC-Containerized-Oracle-Development-Environment
             -   Version: 1.2 (git tag: DSC_CODE_v1.2)
+
+## Dependencies
+\* Note: all dependencies are implemented as git submodules in the [modules](./modules) folder
 -   ### CAS Version Control Information
-    -   URL: https://picgitlab.nmfs.local/centralized-data-tools/authorization-application-module
+    -   Version Control Information:
+        -   URL: <https://picgitlab.nmfs.local/centralized-data-tools/authorization-application-module>
+        -   Database: 1.2 (Git tag: central_auth_app_db_v1.2)
 -   ### DSC Version Control Information
-    -   URL: https://picgitlab.nmfs.local/centralized-data-tools/pifsc-dsc
+    -   Version Control Information:
+        -   URL: <git@picgitlab.nmfs.local:centralized-data-tools/pifsc-dsc.git>
+        -   Database: 1.1 (Git tag: dsc_db_v1.1)
+-   ### Container Deployment Scripts (CDS) Version Control Information
+    -   Version Control Information:
+        -   URL: <git@picgitlab.nmfs.local:centralized-data-tools/pifsc-container-deployment-scripts.git>
+        -   Database: 1.1 (Git tag: pifsc_container_deployment_scripts_v1.1)
 
 ## Prerequisites
 -   See the CODE [Prerequisites](https://github.com/noaa-pifsc/PIFSC-Containerized-Oracle-Development-Environment?tab=readme-ov-file#prerequisites) for details
@@ -26,14 +37,8 @@ The PIFSC Centralized Authorization System (CAS) Containerized Oracle Developer 
 -   See the CODE [Runtime Scenarios](https://github.com/noaa-pifsc/PIFSC-Containerized-Oracle-Development-Environment?tab=readme-ov-file#runtime-scenarios) for details
 
 ## Automated Deployment Process
--   ### Prepare the folder structure
-    -   See the CODE [Prepare the folder structure](https://github.com/noaa-pifsc/PIFSC-Containerized-Oracle-Development-Environment?tab=readme-ov-file#prepare-the-folder-structure) for details
-    -   #### DSC Preparation
-        -   The [SQL](https://picgitlab.nmfs.local/centralized-data-tools/pifsc-dsc/-/tree/main/SQL?ref_type=heads) folder is copied into a new "DSC" folder within the [docker/src](./docker/src) folder
-    -   #### CAS Preparation
-        -   The [CAS/SQL](https://picgitlab.nmfs.local/centralized-data-tools/authorization-application-module/-/tree/master/CAS/SQL?ref_type=heads) folder is copied into the [CAS folder](./docker/src/CAS) folder
-        -   The [application_code](https://picgitlab.nmfs.local/centralized-data-tools/authorization-application-module/-/tree/master/CAS/application_code?ref_type=heads) folder is copied into the [CAS folder](./docker/src/CAS) folder
-        -   The [SAM/SQL](https://picgitlab.nmfs.local/centralized-data-tools/authorization-application-module/-/tree/master/SAM/SQL?ref_type=heads) folder is copied into the [SAM folder](./docker/src/SAM) folder
+-   ### Prepare the project
+    -   Recursively clone the [PCODE repository](#pcode-version-control-information) to a working directory
 -   ### Build and Run the Containers 
     -   See the CODE [Build and Run the Containers](https://github.com/noaa-pifsc/PIFSC-Containerized-Oracle-Development-Environment?tab=readme-ov-file#build-and-run-the-containers) for details
     -   #### DSC Database Deployment
@@ -49,17 +54,21 @@ The PIFSC Centralized Authorization System (CAS) Containerized Oracle Developer 
     -   \*Note: this process will fork the CCODE parent repository and repurpose it as a project-specific CODE
     -   Fork [this repository](#ccode-version-control-information)
     -   See the CODE [Implementation](https://github.com/noaa-pifsc/PIFSC-Containerized-Oracle-Development-Environment?tab=readme-ov-file#implementation) for details
--   ### Implementation Examples
-    -   Database and APEX app with a single database dependency: [PARR Tools CODE project](https://github.com/noaa-pifsc/PIFSC-PARR-Tools-Containerized-Oracle-Development-Environment)
 -   ### Upstream Updates
     -   See the CODE [Upstream Updates](https://github.com/noaa-pifsc/PIFSC-Containerized-Oracle-Development-Environment?tab=readme-ov-file#upstream-updates) for details
 
 ## Container Architecture
 -   See the CODE [container architecture documentation](https://github.com/noaa-pifsc/PIFSC-Containerized-Oracle-Development-Environment?tab=readme-ov-file/-/blob/main/README.md?ref_type=heads#container-architecture) for details
+-   ### CCODE Customizations:
+    -   [docker/.env](./docker/.env) was updated to define an appropriate APP_SCHEMA_NAME valu and to specify an TARGET_APEX_VERSION to re-enable Apex
+    -   [custom_deployment_functions.sh](./deployment_scripts/functions/custom_deployment_functions.sh) was updated to add the [CODE-ords.yml](./docker/CODE-ords.yml) configuration file to enable the ords container
+    -   [custom-docker-compose.yml](./docker/custom-docker-compose.yml) was updated to define CODE-specific mounted volume overrides for the database and application deployments
+    -   [custom_db_app_deploy.sh](./docker/src/deployment_scripts/custom_db_app_deploy.sh) was updated to deploy the CAS database schemas and the Apex app
+    -   [custom_container_config.sh](./docker/src/deployment_scripts/config/custom_container_config.sh) was updated to define DB credentials and mounted volume file paths for the CAS SQL scripts
 
 ## Connection Information
 -   See the CODE [connection information documentation](https://github.com/noaa-pifsc/PIFSC-Containerized-Oracle-Development-Environment?tab=readme-ov-file/-/blob/main/README.md?ref_type=heads#connection-information) for details
--   ### CAS Database Connection Information
-    -   Connection information can be found in [create_docker_schemas.sql](https://picgitlab.nmfs.local/centralized-data-tools/authorization-application-module/-/blob/master/CAS/SQL/dev_container_setup/create_docker_schemas.sql?ref_type=heads)
 -   ### DSC Database Connection Information
     -   Connection information can be found in [create_docker_schemas.sql](https://picgitlab.nmfs.local/centralized-data-tools/pifsc-dsc/-/blob/main/SQL/dev_container_setup/create_docker_schemas.sql?ref_type=heads)
+-   ### CAS Database Connection Information
+    -   Connection information can be found in [create_docker_schemas.sql](https://picgitlab.nmfs.local/centralized-data-tools/authorization-application-module/-/blob/master/CAS/SQL/dev_container_setup/create_docker_schemas.sql?ref_type=heads)
