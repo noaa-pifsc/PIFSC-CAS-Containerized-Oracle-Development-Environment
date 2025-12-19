@@ -113,5 +113,5 @@ git bash commands:
 
 
 		# build and deploy the test scenario of the CODE
-		bash ./deployment_scripts/build_deploy_project_test.sh
+		bash ./deployment_scripts/build_deploy_project.sh test
 

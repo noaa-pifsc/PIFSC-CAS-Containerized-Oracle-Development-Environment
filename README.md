@@ -42,7 +42,6 @@ The PIFSC Centralized Authorization System (CAS) Containerized Oracle Developer 
 ## Automated Deployment Process
 -   ### Prepare the project
     -   Recursively clone the [CCODE repository](#ccode-version-control-information) to a working directory
-        -   Initialize and update the submodules recursively (git submodule update --init --recursive) 
 -   ### Build and Run the Containers 
     -   See the CODE [Build and Run the Containers](https://github.com/noaa-pifsc/PIFSC-Containerized-Oracle-Development-Environment?tab=readme-ov-file#build-and-run-the-containers) for details
     -   #### DSC Database Deployment
