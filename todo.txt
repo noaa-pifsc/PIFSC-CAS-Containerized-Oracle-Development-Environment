@@ -84,7 +84,16 @@ git bash commands:
 		# stop and remove CODE containers and delete volumes
 		cd /c/Users/jesse.abdul/Documents/Version\ Control/Git/PIFSC-CAS-Containerized-Oracle-Development-Environment
 		
-		
+
+		docker compose \
+		  --env-file ./docker/.env \
+		  -f docker/CODE-db-deploy.yml \
+		  -f docker/CODE-db-named-volume.yml \
+		  -f docker/CODE-ords.yml \
+		  -f docker/custom-docker-compose.yml \
+		  down -v
+
+		  
 		# build and deploy the development scenario of the CODE
 		bash ./deployment_scripts/build_deploy_project.sh dev
 	
@@ -93,6 +102,15 @@ git bash commands:
 		# stop and remove CODE containers and delete volumes
 		cd /c/Users/jesse.abdul/Documents/Version\ Control/Git/PIFSC-CAS-Containerized-Oracle-Development-Environment
 		
+
+		docker compose \
+		  --env-file ./docker/.env \
+		  -f docker/CODE-db-deploy.yml \
+		  -f docker/CODE-db-named-volume.yml \
+		  -f docker/CODE-ords.yml \
+		  -f docker/custom-docker-compose.yml \
+		  down -v
+
 
 		# build and deploy the test scenario of the CODE
 		bash ./deployment_scripts/build_deploy_project_test.sh

@@ -6,6 +6,3 @@ services:
       - ../modules/AAM/CAS/application_code:/usr/src/CAS/application_code
       - ../modules/AAM/CAS/SQL:/usr/src/CAS/SQL
       - ../modules/AAM/SAM/SQL:/usr/src/SAM/SQL
-networks:
-  oracle-net:
-    name: oracle-net
