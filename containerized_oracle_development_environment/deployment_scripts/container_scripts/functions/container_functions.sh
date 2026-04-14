@@ -1,12 +1,22 @@
 #!/bin/bash
 
-# Function to compare versions numerically, this function accepts two parameters ($1 and $2) in the format: [0-9]+(\.[0-9]+)+
-# Returns 0 if $1 = $2
-# Returns 1 if $1 > $2
-# Returns 2 if $1 < $2
+# Function to compare versions numerically, this function accepts the following parameters:
+# 1: first version in the format: [0-9]+(\.[0-9]+)+ 
+# 2: second version in the format: [0-9]+(\.[0-9]+)+ 
+# 3: Name of the variable to store the result of the comparison: contains 0 if $1 = $2, contains 1 if $1 > $2, contains 2 if $1 < $2
 function proj_container_version_compare() {
-	echo "running proj_container_version_compare(${1}, ${2})"
+	echo "running proj_container_version_compare(${1}, ${2}, ${3})"
 
+	version1="${1}"
+	version2="${2}"
+	local -n out_compare_result_ref="${3}"
+
+	# validate the bash variable values
+	if ! cds_shared_validate_required_vars	"version1" "version2"; then
+        echo "Error: proj_container_version_compare() function required bash variable validation failed" >&2
+        return 1
+	fi
+	
 	# Split versions into arrays by '.' so the individual major/minor/patch numbers can be compared
 	IFS='.' read -ra VER1 <<< "$1"
 	IFS='.' read -ra VER2 <<< "$2"
@@ -24,16 +34,18 @@ function proj_container_version_compare() {
 		# if the v1 component is greater than the v2 component then $1 is greater
 		if (( ${v1} > ${v2} )); then
 			echo "v1 is greater"
-			
-			return 1 # $1 is greater
+			out_compare_result_ref=1
+			return 0 # $1 is greater
 		elif (( ${v1} < ${v2} )); then	# if the v2 component is greater than the v1 component then $1 is not greater
 			echo "v2 is greater"
-			return 2 # $2 is greater
+			out_compare_result_ref=2
+			return 0 # $2 is greater
 		fi
 	done
 
 	echo "v1 and v2 are equivalent"
 	# If none of the v1 or v2 components were greater/less than the versions are equal
+	out_compare_result_ref=0
 	return 0 # $1 and $2 are equivalent
 }
 
@@ -46,6 +58,12 @@ function proj_container_check_database_initialized() {
 # function to validate the apex version using a regular expression
 function proj_container_validate_apex_version_format() {
 	local target_version="$1"
+
+	# validate the bash variable values
+	if ! cds_shared_validate_required_vars	"target_version"; then
+        echo "Error: proj_container_validate_apex_version_format() function required bash variable validation failed" >&2
+        return 1
+	fi
 
 	# validate APEX version format (Strictly X.X, e.g., 23.2, 24.1)
 	# the regex ^[0-9]+\.[0-9]+$ ensures exactly one dot separating two integers.
@@ -132,10 +150,10 @@ proj_container_validate_env_vars() {
 function proj_container_install_or_upgrade_apex() {
 
 	# Define paths for the dynamic download
-	local APEX_ZIP_FILE_NAME="apex_${TARGET_APEX_VERSION}.zip"
-	local APEX_ZIP_PATH="/tmp/${APEX_ZIP_FILE_NAME}"
-	local APEX_DOWNLOAD_URL="https://download.oracle.com/otn_software/apex/${APEX_ZIP_FILE_NAME}"
-	local APEX_STATIC_DIR="/apex-static" # This is the mount path for the shared apex static files volume
+	local apex_zip_file_name="apex_${TARGET_APEX_VERSION}.zip"
+	local apex_zip_path="/tmp/${apex_zip_file_name}"
+	local apex_download_url="https://download.oracle.com/otn_software/apex/${apex_zip_file_name}"
+	local apex_static_dir="/apex-static" # This is the mount path for the shared apex static files volume
 
 	echo "Target Apex version: ${TARGET_APEX_VERSION}"
 
@@ -143,57 +161,32 @@ function proj_container_install_or_upgrade_apex() {
 	proj_container_validate_apex_version_format "${TARGET_APEX_VERSION}"
 
 	# validate if the specified TARGET_APEX_VERSION version actually exists on Oracle's site
-	proj_container_verify_apex_version_exists "${TARGET_APEX_VERSION}" "${APEX_DOWNLOAD_URL}"
+	proj_container_verify_apex_version_exists "${TARGET_APEX_VERSION}" "${apex_download_url}"
 
 	# retrieve the current version of Apex by querying the databae
-	local CURRENT_APEX_VERSION=$(proj_container_get_installed_apex_version)
+	local current_apex_version=$(proj_container_get_installed_apex_version)
 
-	echo "Current Apex version: ${CURRENT_APEX_VERSION}"
+	echo "Current Apex version: ${current_apex_version}"
 
-	# compare the current and target versions of apex and store the return value in VERSION_STATUS
-	local VERSION_STATUS=0
-	proj_container_version_compare "$TARGET_APEX_VERSION" "$CURRENT_APEX_VERSION" || VERSION_STATUS=$?
+	# compare the current and target versions of apex and store the return value in version_status
+	local version_status=""
+	proj_container_version_compare "${TARGET_APEX_VERSION}" "${current_apex_version}" "version_status"
 	
-	echo "The value of VERSION_STATUS is: ${VERSION_STATUS}"
+	echo "The value of version_status is: ${version_status}"
 
-	# initialize local variables to track if the Apex upgrade should be installed in the database (SKIP_DB_INSTALL) and if the static apex files should be updated (SKIP_FILE_INSTALL)
-	local SKIP_DB_INSTALL=0
-	local SKIP_FILE_INSTALL=0
+	# initialize local variables to track if the Apex upgrade should be installed in the database (skip_db_install) and if the static apex files should be updated (skip_file_install)
+	local skip_db_install=0
+	local skip_file_install=0
 
-	# check if the Apex installation should be upgraded or not
-	if [ $VERSION_STATUS -eq 2 ]; then
-		# downgrade attempt detected, the TARGET_APEX_VERSION is less than the CURRENT_APEX_VERSION
-		echo "ERROR: Downgrade detected! Current APEX version is ${CURRENT_APEX_VERSION}, but target is ${TARGET_APEX_VERSION}."
-		echo "Downgrading APEX via this automation is not supported. Exiting."
-		exit 1
+	# check the current/target version to determine if the DB and/or file apex installations should be executed
+	proj_container_check_apex_version_status "${version_status}" "${current_apex_version}" "${TARGET_APEX_VERSION}" "${apex_static_dir}" "skip_file_install" "skip_db_install"
 
-	elif [ $VERSION_STATUS -eq 0 ]; then
-		# do not upgrade, TARGET_APEX_VERSION and CURRENT_APEX_VERSION are equivalent
-		echo "APEX is already at the target version (${CURRENT_APEX_VERSION})."
-		
-		# Check if static files are also in place
-		if [ -f "${APEX_STATIC_DIR}/apex_version.js" ]; then
-			echo "Static files are in place. No upgrade needed."
-			SKIP_FILE_INSTALL=1
-		else
-			echo "APEX DB is upgraded, but static files are missing."
-			echo "Will attempt to download/unzip/copy static files..."
-			# Set flag to skip DB install
-			SKIP_DB_INSTALL=1
-		fi
-
-	else
-		# upgrade the apex version, TARGET_APEX_VERSION is greater than the CURRENT_APEX_VERSION
-		echo "APEX version mismatch. Found: '${CURRENT_APEX_VERSION}'"
-		echo "Starting APEX upgrade to ${TARGET_APEX_VERSION}..."
-		SKIP_DB_INSTALL=0
-	fi
 	# check if the static Apex files should be installed
-	if [[ $SKIP_FILE_INSTALL -ne 1 ]]; then
+	if [[ $skip_file_install -ne 1 ]]; then
 
 		# the apex package does not dynamically download and install the apex installation package
-		echo "Downloading ${APEX_DOWNLOAD_URL}..."
-		curl -L -o ${APEX_ZIP_PATH} ${APEX_DOWNLOAD_URL}
+		echo "Downloading ${apex_download_url}..."
+		curl -L -o ${apex_zip_path} ${apex_download_url}
 		if [ $? -ne 0 ]; then
 			echo "ERROR: Download of APEX zip file failed."
 			exit 1
@@ -201,8 +194,8 @@ function proj_container_install_or_upgrade_apex() {
 
 		echo "Apex upgrade package download complete."
 		
-		echo "Unzipping ${APEX_ZIP_PATH}..."
-		unzip -q ${APEX_ZIP_PATH} -d /tmp
+		echo "Unzipping ${apex_zip_path}..."
+		unzip -q ${apex_zip_path} -d /tmp
 		if [ $? -ne 0 ]; then
 			echo "ERROR: Failed to unzip APEX file."
 			exit 1
@@ -212,12 +205,12 @@ function proj_container_install_or_upgrade_apex() {
 		cd /tmp/apex
 
 		# initialize the local variables to support the parallel installation of Apex in the DB and the file system (docker volume)
-		local DB_INSTALL_PID=0
-		local DB_INSTALL_STATUS=0
-		local FILE_COPY_STATUS=0
+		local db_install_pid=0
+		local db_install_status=0
+		local file_copy_status=0
 
 		# check if the Apex database installation should proceed
-		if [ $SKIP_DB_INSTALL -eq 0 ]; then
+		if [ $skip_db_install -eq 0 ]; then
 			echo "Starting APEX DB installer (in background)..."
 
 			# Run the DB install in the background by adding '&'
@@ -227,7 +220,7 @@ function proj_container_install_or_upgrade_apex() {
 				@apexins.sql SYSAUX SYSAUX TEMP /i/
 				exit;
 EOF
-			DB_INSTALL_PID=$! # Save the Process ID of the background job
+			db_install_pid=$! # Save the Process ID of the background job
 		else
 			echo "Skipping Apex database installation since the version is already the same"
 		fi
@@ -236,36 +229,36 @@ EOF
 		echo "Copying APEX static images to shared volume (in foreground)..."
 		
 		# Clear out any old static Apex files 
-		rm -rf ${APEX_STATIC_DIR}/*
+		rm -rf ${apex_static_dir}/*
 
 		# Move the contents of the images folder to the root of the volume
-		mv /tmp/apex/images/* ${APEX_STATIC_DIR}/
+		mv /tmp/apex/images/* ${apex_static_dir}/
 
-		# store the results of the file move process in FILE_COPY_STATUS so the result can be checked
-		local FILE_COPY_STATUS=$? 
-		if [ $FILE_COPY_STATUS -eq 0 ]; then
+		# store the results of the file move process in file_copy_status so the result can be checked
+		local file_copy_status=$? 
+		if [ $file_copy_status -eq 0 ]; then
 			echo "Static files copied successfully."
 			
 			# update owner permissions on the docker volume to the oracle account so the static Apex files can be used by the ords container
-			chown -R 54321:0 ${APEX_STATIC_DIR}/
+			chown -R 54321:0 ${apex_static_dir}/
 		else
 			echo "ERROR: Static file copy failed."
 		fi
 
 		# wait for background DB install to finish
-		if [ $DB_INSTALL_PID -ne 0 ]; then
-			echo "Waiting for APEX DB install (PID: $DB_INSTALL_PID) to finish..."
-			wait $DB_INSTALL_PID
-				local DB_INSTALL_STATUS=$?	# store the result of the Apex database installation in a new variable
+		if [ $db_install_pid -ne 0 ]; then
+			echo "Waiting for APEX DB install (PID: $db_install_pid) to finish..."
+			wait $db_install_pid
+				local db_install_status=$?	# store the result of the Apex database installation in a new variable
 
 			# check if the database installation 
-			if [ $DB_INSTALL_STATUS -eq 0 ]; then
+			if [ $db_install_status -eq 0 ]; then
 				echo "APEX database upgrade successful."
 				
 				# check if the target apex version is less than 23.2
-				proj_container_version_compare "${TARGET_APEX_VERSION}" "23.2" || VERSION_STATUS=$?
+				proj_container_version_compare "${TARGET_APEX_VERSION}" "23.2" "version_status"
 				
-				if [ $VERSION_STATUS -eq 2 ]; then 
+				if [ $version_status -eq 2 ]; then 
 					# apex version is 23.1 or older
 
 					# define a PL/SQL block to unlock the apex admin using the APEX_UTIL.RESET_PASSWORD procedure
@@ -373,14 +366,14 @@ EOF
 		fi
 		
 		# Check the results of the background and foreground jobs 
-		if [ $DB_INSTALL_STATUS -ne 0 ] || [ $FILE_COPY_STATUS -ne 0 ]; then
+		if [ $db_install_status -ne 0 ] || [ $file_copy_status -ne 0 ]; then
 			echo "ERROR: One or more upgrade tasks failed. Halting."
 			exit 1
 		fi
 
 		# remove the apex installation files
 		echo "Cleaning up installer files..."
-		rm -rf /tmp/apex ${APEX_ZIP_PATH}
+		rm -rf /tmp/apex ${apex_zip_path}
 	fi
 
 }
@@ -393,7 +386,7 @@ function proj_container_check_apex_version_status()
 	local version_status="${1}"
 	local current_apex_version="${2}"
 	local target_apex_version="${3}"
-	local APEX_STATIC_DIR="${4}"
+	local apex_static_dir="${4}"
 	local out_skip_file_install_var_name="${5}"
 	local out_skip_db_install_var_name="${6}"
 	
@@ -403,7 +396,7 @@ function proj_container_check_apex_version_status()
 	if [ ${version_status} -eq 2 ]; then
 		# downgrade attempt detected, the target_apex_version is less than the current_apex_version
 		echo "ERROR: Downgrade detected! Current APEX version is ${current_apex_version}, but target is ${target_apex_version}."
-		echo "Downgrading APEX via this automation is not supported. Exiting."
+		echo "Downgrading APEX via this method is not supported. Exiting."
 		exit 1
 
 	elif [ ${version_status} -eq 0 ]; then
@@ -411,7 +404,7 @@ function proj_container_check_apex_version_status()
 		echo "APEX is already at the target version (${current_apex_version})."
 		
 		# Check if static files are also in place
-		if [ -f "${APEX_STATIC_DIR}/apex_version.js" ]; then
+		if [ -f "${apex_static_dir}/apex_version.js" ]; then
 			echo "Static files are in place. No upgrade needed."
 			out_skip_file_install_ref=1
 		else
@@ -433,7 +426,6 @@ function proj_container_check_apex_version_status()
 # this includes upgrading apex to the specified version and executing database scripts when the database has not been initialized yet
 function proj_container_deploy_database_scripts ()
 {
-
 	# validate all required environment variables:
 	proj_container_validate_env_vars
 
@@ -454,7 +446,7 @@ function proj_container_deploy_database_scripts ()
 	echo "Database is ready!"
 
 	# install or upgrade the apex container installation (if TARGET_APEX_VERSION is defined):
-	if [ -n "$TARGET_APEX_VERSION" ]; then
+	if [ -n "${TARGET_APEX_VERSION}" ]; then
 		echo "TARGET_APEX_VERSION is defined, install/upgrade apex"
 		proj_container_install_or_upgrade_apex
 	else
