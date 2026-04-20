@@ -13,11 +13,14 @@ The PIFSC Containerized Oracle Developer Environment (CODE) project was develope
 
 ## Dependencies
 \* Note: all dependencies are implemented as git submodules in the [modules](./modules) folder
--   ### Container Deployment Scripts (CDS) Version Control Information
-    -   folder path: [modules/CDS](./modules/CDS)
+-   ### Container Database Deployment (CDD) Module Version Control Information
+    -   folder path: [modules/CDD](./modules/CDD)
     -   Version Control Information:
-        -   URL: <git@github.com:noaa-pifsc/PIFSC-Container-Deployment-Scripts.git>
-        -   Scripts: 1.1 (Git tag: pifsc_container_deployment_scripts_v1.1)
+        -   URL: <git@github.com:noaa-pifsc/PIFSC-Container-Database-Deployments.git>
+    -   ### Container Deployment System (CDS) Module Version Control Information
+        -   folder path: [modules/CDD/modules/CDS](./modules/CDD/modules/CDS)
+        -   Version Control Information:
+            -   URL: <git@github.com:noaa-pifsc/PIFSC-Container-Deployment-Scripts.git>
 
 # Prerequisites
 -   Docker 

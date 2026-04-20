@@ -12,6 +12,14 @@ to do:
 		
 		
 		
+	_ try to reuse CAD for server deployments
+		
+	_ try to get CODE running on a linux host
+	
+	_ how to guarantee unique container naming so multiple CODE projects can run on the same server at the same time
+		_ need to also change the port number to avoid conflicts
+		
+		
 	X use array arguments for CODE functions
 		_ passthrough the argument arrays to functions from within functions when appropriate
 		
@@ -42,8 +50,8 @@ git bash commands:
 		  -f CODE-db-named-volume.yml \
 		  -f custom-docker-compose.yml \
 		  down
-		docker volume rm apex-static-vol
-		docker volume rm db-vol
+		docker volume rm code-apex-static-vol
+		docker volume rm code-db-vol
 
 
 
