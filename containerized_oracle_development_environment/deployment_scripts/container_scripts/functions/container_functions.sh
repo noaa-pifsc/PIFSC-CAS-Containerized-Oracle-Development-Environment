@@ -185,7 +185,7 @@ function proj_container_install_or_upgrade_apex() {
 	# define the function arguments for proj_container_process_apex_install()
 	local -A install_upgrade_func_args=(
 			["skip_file_install"]="${skip_file_install}"
-			["skip_db_install"]="${skip_file_install}"
+			["skip_db_install"]="${skip_db_install}"
 			["apex_zip_path"]="${apex_zip_path}"
 			["apex_download_url"]="${apex_download_url}"
 			["apex_static_dir"]="${apex_static_dir}"
@@ -439,7 +439,7 @@ function proj_container_process_apex_install()
 		local file_move_status=0
 
 		# check if the Apex database installation should proceed
-		if [ $skip_db_install -eq 0 ]; then
+		if [ "$(cds_shared_get_array_val "${arg_array}" "skip_db_install")" -eq 0 ]; then
 			echo "Starting APEX DB installer (in background)..."
 
 			# Run the DB install in the background by adding '&'
