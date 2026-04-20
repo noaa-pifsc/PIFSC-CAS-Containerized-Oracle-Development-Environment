@@ -272,7 +272,7 @@ function proj_container_deploy_database_scripts ()
 	fi
 
 	# validate that the required function argument array elements exist
-	if ! cds_shared_validate_required_array_vals "${parsed_secrets_ref}" "sys_password"; then
+	if ! cds_shared_validate_required_array_vals "${parsed_secrets_var_name}" "sys_password"; then
 		echo "Error: proj_container_deploy_database_scripts() function required secure array validation failed" >&2
 		return 1
 	fi
