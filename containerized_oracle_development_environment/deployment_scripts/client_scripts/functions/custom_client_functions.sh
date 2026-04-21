@@ -22,7 +22,7 @@ function proj_client_build_deploy_dev_environment ()
 	# construct the COMPOSE_FILE value of included .yml files
 	proj_construct_compose_file_string "compose_file" "${env_name}" "${deploy_dest}" "${ORDS_ENABLED}"
 	
-	echo "the value of COMPOSE_FILE is: ${COMPOSE_FILE}"
+	echo "the value of COMPOSE_FILE is: ${compose_file}"
 
 	# check if this is a local or server deployment:
 	if [[ "${deploy_dest}" == "local" ]]; then
@@ -55,6 +55,8 @@ function proj_client_build_deploy_dev_environment ()
 				["secret_map"]="${SECRET_MAPPING_VAR_NAME}"
 				["process_secrets"]="yes"
 			)
+		
+		echo "deploy the database to the remote server by running cds_client_execute_remote_deployment()"
 		
 		# deploy the database to the remote server
 		cds_client_execute_remote_deployment "remote_deploy_args"

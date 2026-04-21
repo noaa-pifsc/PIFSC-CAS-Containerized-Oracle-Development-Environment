@@ -4,6 +4,8 @@
 # This function accepts no parameters
 function proj_host_deploy_container()
 {
+	echo "running proj_host_deploy_container()"
+
 	if ! cds_shared_validate_required_vars "PRIV_USER" "HOST_SOURCE_PATH" "SECRET_DATA_VAR_NAME" "ENV_NAME" "COMPOSE_FILE" "SECRET_MAPPING_VAR_NAME"; then 
         echo "Error: proj_host_deploy_container() function argument validation failed" >&2
         return 1
@@ -28,6 +30,8 @@ function proj_host_deploy_container()
 # This function accepts no parameters
 function proj_host_deploy_container_elev_privs()
 {
+	echo "running proj_host_deploy_container_elev_privs()"
+
 	if ! cds_shared_validate_required_vars "ENV_NAME" "COMPOSE_FILE" "SECRET_DATA_VAR_NAME" "SECRET_MAPPING_VAR_NAME" "BUILD_PATH"; then 
         echo "Error: proj_host_deploy_container_elev_privs() function argument validation failed" >&2
         return 1
