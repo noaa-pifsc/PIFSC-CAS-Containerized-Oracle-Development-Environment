@@ -63,21 +63,20 @@ function proj_client_build_deploy_dev_environment ()
 		docker compose --env-file ./.env up -d --build
 	else
 		echo "This is a server deployment"
-
-		# For Server Deployments, we route through the CDS Engine.
-		local target_host=""
-		read -rp "Enter target container hostname: " target_host < /dev/tty
+		
+		# load the server deploy configuration file (defines the HOSTNAME variable)
+		source "${CONFIG_DIR}/server_deploy_config.sh"
 
 		# Define array for remote deployment using the CDS standard vocabulary
 		local -A remote_deploy_args=(
-			["container_hostname"]="${target_host}"
-			["container_host_project_path"]="${CONTAINER_HOST_SOURCE_PATH:-/opt/code-deployment}"
-			["container_git_url"]="${GIT_URL:-git@github.com:your-repo.git}"
+			["container_hostname"]="${HOSTNAME}"
+			["container_host_project_path"]="${CONTAINER_HOST_SOURCE_PATH}"
+			["container_git_url"]="${GIT_URL}"
 			["config_data_var_name"]="CONFIG_DATA"
 			["secret_mapping_var_name"]="${SECRET_MAPPING_VAR_NAME}"
 			["parse_config_data"]="yes"
-			# Inject the COMPOSE_FILE variable to the remote host natively
-			["remote_ssh_cmd"]="export COMPOSE_FILE='${COMPOSE_FILE}'; bash deployment_scripts/host_scripts/host_deploy_CODE.sh"
+			# include the COMPOSE_FILE variable to the remote host natively
+			["remote_ssh_cmd"]="export COMPOSE_FILE='${COMPOSE_FILE}'; bash ${CONTAINER_HOST_SOURCE_PATH}/containerized_oracle_development_environment/deployment_scripts/host_scripts/host_deploy_CODE.sh"
 		)
 
 		# Route to the remote deployment engine

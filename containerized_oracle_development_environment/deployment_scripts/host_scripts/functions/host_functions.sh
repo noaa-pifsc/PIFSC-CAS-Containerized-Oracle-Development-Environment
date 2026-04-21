@@ -1,0 +1,54 @@
+#!/bin/bash
+
+# function that begins the container deployment process on a given container host with an unprivileged account
+# This function accepts no parameters
+function proj_host_deploy_container()
+{
+	if ! cds_shared_validate_required_vars "PRIV_USER" "HOST_SOURCE_PATH" "SECRET_DATA_VAR_NAME" "ENV_NAME" "COMPOSE_FILE" "SECRET_MAPPING_VAR_NAME"; then 
+        echo "Error: proj_host_deploy_container() function argument validation failed" >&2
+        return 1
+    fi
+
+	# declare the function arguments as a local variable
+	local -A func_args=(
+			["target_user"]="${PRIV_USER}" 
+			["source_path"]="${HOST_SOURCE_PATH}"
+			["secret_var"]="${SECRET_DATA_VAR_NAME}"
+			["deploy_script_path"]="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/../host_deploy_CODE_elev_privs.sh"
+			["env_block"]="$(proj_shared_define_env_vars_block "${ENV_NAME}" "${COMPOSE_FILE}")"
+			["secret_map"]="${SECRET_MAPPING_VAR_NAME}"
+			["process_secrets"]="yes"
+		)
+
+	# initialize and build/run the container on the host machine with the specified function arguments:
+	cds_host_deploy_container "func_args"	
+}
+
+# function that executes the container deployment process on a given container host with a privileged account
+# This function accepts no parameters
+function proj_host_deploy_container_elev_privs()
+{
+	if ! cds_shared_validate_required_vars "ENV_NAME" "COMPOSE_FILE" "SECRET_DATA_VAR_NAME" "SECRET_MAPPING_VAR_NAME" "BUILD_PATH"; then 
+        echo "Error: proj_host_deploy_container_elev_privs() function argument validation failed" >&2
+        return 1
+    fi
+
+	# process the stdin configuration data: parse and store in variables, construct the formatted variable identified by $SECRET_DATA_VAR_NAME
+	cds_host_process_stdin_secret_data "${SECRET_MAPPING_VAR_NAME}" "${SECRET_DATA_VAR_NAME}"
+
+	# change to the designated build path so the containers can be stopped (if running) and started
+	cd "${BUILD_PATH}"
+
+	# remove the containers if they are already running
+	docker compose --env-file ./.env down
+
+	# declare COMPOSE_FILE as an environment variable
+	export COMPOSE_FILE
+	
+	echo "the value of COMPOSE_FILE is: ${COMPOSE_FILE}"
+
+	# Execute natively for local Desktop Deployments using the injected COMPOSE_FILE
+	docker compose --env-file ./.env up -d --build
+
+	echo "The containers have been started"
+}
