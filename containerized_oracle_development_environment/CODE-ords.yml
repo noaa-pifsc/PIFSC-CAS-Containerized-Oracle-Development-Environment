@@ -10,8 +10,8 @@ services:
     networks:
       - oracle-net
     build:
-      context: .
-      dockerfile: Dockerfile.ords
+      context: ..
+      dockerfile: containerized_oracle_development_environment/Dockerfile.ords
       args:
         ORDS_IMAGE: ${ORDS_IMAGE}
     volumes:
