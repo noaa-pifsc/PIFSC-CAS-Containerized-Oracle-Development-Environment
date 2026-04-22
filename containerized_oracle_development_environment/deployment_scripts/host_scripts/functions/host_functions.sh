@@ -6,10 +6,15 @@ function proj_host_deploy_container()
 {
 	echo "running proj_host_deploy_container()"
 
-	if ! cds_shared_validate_required_vars "PRIV_USER" "HOST_SOURCE_PATH" "SECRET_DATA_VAR_NAME" "ENV_NAME" "COMPOSE_FILE" "SECRET_MAPPING_VAR_NAME"; then 
+	if ! cds_shared_validate_required_vars "PRIV_USER" "HOST_SOURCE_PATH" "SECRET_DATA_VAR_NAME" "ENV_NAME" "COMPOSE_FILE" "SECRET_MAPPING_VAR_NAME" "BUILD_PATH"; then 
         echo "Error: proj_host_deploy_container() function argument validation failed" >&2
         return 1
     fi
+
+	# grant write permissions to the ords-config folder
+	chmod -R 777 "${BUILD_PATH}/ords-config"
+
+	ls -l "${BUILD_PATH}"
 
 	# declare the function arguments as a local variable
 	local -A func_args=(
