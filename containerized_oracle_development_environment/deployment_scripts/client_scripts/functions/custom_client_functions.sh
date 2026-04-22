@@ -22,8 +22,6 @@ function proj_client_build_deploy_dev_environment ()
 	# construct the COMPOSE_FILE value of included .yml files
 	proj_construct_compose_file_string "compose_file" "${env_name}" "${deploy_dest}" "${ORDS_ENABLED}"
 	
-	echo "the value of COMPOSE_FILE is: ${compose_file}"
-
 	# check if this is a local or server deployment:
 	if [[ "${deploy_dest}" == "local" ]]; then
 		echo "This is a local deployment"
@@ -45,8 +43,6 @@ function proj_client_build_deploy_dev_environment ()
 			return 1
 		fi
 
-		echo "The value of HOST_SCRIPTS_PATH is: ${HOST_SCRIPTS_PATH}"
-
 		# declare the function arguments
 		local -A remote_deploy_args=(
 				["target_host"]="${HOSTNAME}"
@@ -58,9 +54,7 @@ function proj_client_build_deploy_dev_environment ()
 				["process_secrets"]="yes"
 			)
 			
-		echo "the function arguments are: $(cds_shared_dump_array_vals "remote_deploy_args")"
-		
-		echo "deploy the database to the remote server by running cds_client_execute_remote_deployment()"
+		echo "deploy the database to the host server"
 		
 		# deploy the database to the remote server
 		cds_client_execute_remote_deployment "remote_deploy_args"

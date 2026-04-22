@@ -9,8 +9,6 @@ function proj_container_version_compare() {
 	version2="${2}"
 	local -n out_compare_result_ref="${3}"
 
-	echo "running proj_container_version_compare (${version1}, ${version2}, ${3})"
-
 	# validate the bash variable values
 	if ! cds_shared_validate_required_vars	"version1" "version2"; then
 		echo "Error: proj_container_version_compare() function required bash variable validation failed" >&2
@@ -30,17 +28,17 @@ function proj_container_version_compare() {
 		
 		# if the v1 component is greater than the v2 component then $1 is greater
 		if (( ${v1} > ${v2} )); then
-			echo "v1 is greater"
+#			echo "v1 is greater"
 			out_compare_result_ref=1
 			return 0 # $1 is greater
 		elif (( ${v1} < ${v2} )); then	# if the v2 component is greater than the v1 component then $1 is not greater
-			echo "v2 is greater"
+#			echo "v2 is greater"
 			out_compare_result_ref=2
 			return 0 # $2 is greater
 		fi
 	done
 
-	echo "v1 and v2 are equivalent"
+#	echo "v1 and v2 are equivalent"
 	# If none of the v1 or v2 components were greater/less than the versions are equal
 	out_compare_result_ref=0
 	return 0 # $1 and $2 are equivalent

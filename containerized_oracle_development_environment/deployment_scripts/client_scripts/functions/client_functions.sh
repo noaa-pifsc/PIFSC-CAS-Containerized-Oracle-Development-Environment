@@ -11,7 +11,7 @@ function proj_client_deploy_container ()
 	local passed_env_value="${1:-}"
 	local passed_deploy_value="${2:-}"
 	
-	echo "running proj_client_deploy_container(${1}, ${2})"
+# 	echo "running proj_client_deploy_container(${1}, ${2})"
 	
 	# validate the bash variable values
 	if ! cds_shared_validate_required_vars	"env_var_name" "dest_var_name"; then
@@ -22,10 +22,13 @@ function proj_client_deploy_container ()
 	# save/prompt for environment name into the specified local variable
 	cds_client_set_env_name_var "${env_var_name}" "${passed_env_value}" 
 
-	echo "Deploy the containerized oracle development environment (${!env_var_name})"
-
 	# save/prompt for deployment destination (local, server) for Dual-Target capability
 	cds_client_set_deploy_dest_var "${dest_var_name}" "${passed_deploy_value}"
+
+	# notify the user of the user-defined runtime value
+	echo "Runtime Argument Values:"
+	echo "env_name: ${!env_var_name}"
+	echo "deploy_dest: ${!dest_var_name}"
 
 	# build/deploy the CODE container with the environment 
 	proj_client_build_deploy_dev_environment "${!env_var_name}" "${!dest_var_name}"
