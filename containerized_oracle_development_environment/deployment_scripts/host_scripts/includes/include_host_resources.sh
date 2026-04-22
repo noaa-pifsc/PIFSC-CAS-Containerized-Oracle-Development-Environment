@@ -14,9 +14,9 @@ source "${CURR_DIR}/../../../../modules/CDS/src/CDS_shared_functions.sh"
 source "${CURR_DIR}/../../../../modules/CDS/src/CDS_host_functions.sh"
 
 # include the container configuration variables
-source "${CURR_DIR}/../../config/container_config.sh"
+source "${CURR_DIR}/../../config/initial_container_config.sh"
 source "${CURR_DIR}/../../config/custom_container_config.sh"
-source "${CURR_DIR}/../../config/server_deploy_config.sh"
+source "${CURR_DIR}/../../config/container_config.sh"
 
 # include the host functions
 source "${CURR_DIR}/../../shared_scripts/functions/shared_functions.sh"

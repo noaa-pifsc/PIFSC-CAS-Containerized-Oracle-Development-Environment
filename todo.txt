@@ -7,6 +7,26 @@ to do:
 		_ create CODE core scripts that are reused across forks
 		
 		_ implement parameters for all feasible functions that don't change across project-specific implementations
+	
+
+		_ implement the secrets.sh file
+		
+		_ update the configuration.sh and custom_configuration.sh files
+
+		_ remove the .env file altogether
+			_ drawback is that we can't deploy directly from server
+		
+		
+		
+		_ create a script that shutsdown the docker container and optionally removes the volumes
+		
+		
+		
+		
+		
+	
+	document
+		**** _ clearly indicate this is only intended for development and testing purposes
 		
 		
 	
