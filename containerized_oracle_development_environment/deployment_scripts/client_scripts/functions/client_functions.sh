@@ -276,7 +276,7 @@ function proj_client_shutdown_dev_environment ()
 				["process_secrets"]="no"
 			)
 			
-		echo "deploy the containers to the host server"
+		echo "shutdown the containers on the host server"
 		
 		# deploy the containers to the remote server
 		cds_client_execute_remote_deployment "remote_deploy_args"

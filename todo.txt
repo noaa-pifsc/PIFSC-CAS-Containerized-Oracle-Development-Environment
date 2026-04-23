@@ -25,7 +25,7 @@ to do:
 		_ determine a more secure way to specify the ORACLE_PWD, exporting this is insecure and it will be available in the inspect for the ORDS and DB containers. 
 		
 		
-		
+		_ combine the deploy and shutdown commands with branching logic for local and server deployments, this will simplify the code management and reduce the amount of calling client and host scripts
 		
 		
 		
@@ -176,6 +176,12 @@ down
 		# shutdown the container (local) and remove volumes
 		bash ./deployment_scripts/client_scripts/client_shutdown_container.sh dev local yes
 
+		# shutdown the container (server) and retain volume
+		bash ./deployment_scripts/client_scripts/client_shutdown_container.sh dev server no
+
+
+		# shutdown the container (server) and remove volumes
+		bash ./deployment_scripts/client_scripts/client_shutdown_container.sh dev server yes
 
 
 	# Test:
