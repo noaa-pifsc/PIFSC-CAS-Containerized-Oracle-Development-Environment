@@ -4,5 +4,4 @@ services:
       - code-db-vol:/opt/oracle/oradata
 volumes:
   code-db-vol:
-    name: code-db-vol
     external: false

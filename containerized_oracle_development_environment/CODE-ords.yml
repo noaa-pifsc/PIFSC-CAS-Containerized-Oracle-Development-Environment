@@ -34,10 +34,8 @@ services:
 volumes:
   # Defines the new shared volume for the APEX static application files
   code-apex-static-vol:
-    name: code-apex-static-vol
     external: false
   code-ords-config-vol:
-    name: code-ords-config-vol
     external: false
 networks: 
   oracle-net:
