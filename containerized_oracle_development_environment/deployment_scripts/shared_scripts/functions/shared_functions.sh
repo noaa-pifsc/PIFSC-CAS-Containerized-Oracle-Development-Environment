@@ -10,7 +10,7 @@
 # the function accepts the following parameters:
 # 1: the build path for the container
 # 2: the formatted list of container compose files 
-function proj_deploy_CODE_containers ()
+function proj_shared_deploy_CODE_containers ()
 {
 	local build_path="${1}"
 	local compose_file="${2}"
@@ -40,13 +40,11 @@ function proj_deploy_CODE_containers ()
 	unset ORACLE_PWD
 }
 
-
-
 # function to shutdown the CODE containers
 # 1: the build path for the container
 # 2: the formatted list of container compose files 
 # 3: remove volume flag (yes, no)
-function proj_host_shutdown_CODE_containers ()
+function proj_shared_shutdown_CODE_containers ()
 {
 	local build_path="${1}"
 	local compose_file="${2}"

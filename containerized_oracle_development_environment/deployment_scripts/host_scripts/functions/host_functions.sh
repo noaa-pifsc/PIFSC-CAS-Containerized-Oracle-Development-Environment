@@ -17,7 +17,7 @@ function proj_host_deploy_container()
 			["source_path"]="${HOST_SOURCE_PATH}"
 			["secret_var"]="${SECRET_DATA_VAR_NAME}"
 			["deploy_script_path"]="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/../host_deploy_CODE_elev_privs.sh"
-			["env_block"]="$(cds_shared_generate_export_env_vars_block "DB_IMAGE" "DB_HOST_PORT" "DBPORT" "ORACLE_PWD" "DBHOST" "DBSERVICENAME" "TARGET_APEX_VERSION" "APP_SCHEMA_NAME" "ORDS_IMAGE" "COMPOSE_FILE" "COMPOSE_PROJECT_NAME" "ORDS_HOST_PORT")"
+			["env_block"]="$(cds_shared_generate_export_env_vars_block "COMPOSE_PROJECT_NAME" "DB_HOST_PORT" "ORDS_HOST_PORT" "DB_IMAGE" "ORDS_IMAGE" "TARGET_APEX_VERSION" "APP_SCHEMA_NAME" "ORACLE_PWD" "COMPOSE_FILE")"
 			["secret_map"]="${SECRET_MAPPING_VAR_NAME}"
 			["process_secrets"]="yes"
 			["persistent_container"]="yes"
@@ -42,8 +42,11 @@ function proj_host_deploy_container_elev_privs()
 	# process the stdin configuration data: parse and store in variables, construct the formatted variable identified by $SECRET_DATA_VAR_NAME
 	cds_host_process_stdin_secret_data "${SECRET_MAPPING_VAR_NAME}" "${SECRET_DATA_VAR_NAME}"
 
+	# export the environment variables used directly in the docker compose files:
+	cds_shared_export_env_vars "DBPORT" "DBHOST" "DBSERVICENAME"
+
 	# deploy the CODE containers to the host server
-	proj_deploy_CODE_containers "${BUILD_PATH}" "${COMPOSE_FILE}"
+	proj_shared_deploy_CODE_containers "${BUILD_PATH}" "${COMPOSE_FILE}"
 
 	echo "The containers have been started"
 }
@@ -66,7 +69,7 @@ function proj_host_shutdown_container()
 			["source_path"]="${HOST_SOURCE_PATH}"
 			["secret_var"]="${SECRET_DATA_VAR_NAME}"
 			["deploy_script_path"]="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/../host_shutdown_CODE_elev_privs.sh"
-			["env_block"]="$(cds_shared_generate_export_env_vars_block "DB_IMAGE" "DB_HOST_PORT" "DBPORT" "ORACLE_PWD" "DBHOST" "DBSERVICENAME" "TARGET_APEX_VERSION" "APP_SCHEMA_NAME" "ORDS_IMAGE" "COMPOSE_FILE" "COMPOSE_PROJECT_NAME" "ORDS_HOST_PORT" "REM_VOL")"
+			["env_block"]="$(cds_shared_generate_export_env_vars_block "COMPOSE_PROJECT_NAME" "DB_HOST_PORT" "ORDS_HOST_PORT" "DB_IMAGE" "ORDS_IMAGE" "TARGET_APEX_VERSION" "APP_SCHEMA_NAME" "ORACLE_PWD" "COMPOSE_FILE" "REM_VOL")"
 			["secret_map"]="${SECRET_MAPPING_VAR_NAME}"
 			["process_secrets"]="no"
 			["persistent_container"]="yes"
@@ -88,8 +91,11 @@ function proj_host_shutdown_container_elev_privs()
         return 1
     fi
 
-	# shutdown the CODE containers to the host server
-	proj_host_shutdown_CODE_containers "${BUILD_PATH}" "${COMPOSE_FILE}" "${REM_VOL}"
+	# export the environment variables used directly in the docker compose files:
+	cds_shared_export_env_vars "DBPORT" "DBHOST" "DBSERVICENAME"
 
-	echo "The containers have been started"
+	# shutdown the CODE containers to the host server
+	proj_shared_shutdown_CODE_containers "${BUILD_PATH}" "${COMPOSE_FILE}" "${REM_VOL}"
+
+	echo "The containers have been shutdown"
 }
