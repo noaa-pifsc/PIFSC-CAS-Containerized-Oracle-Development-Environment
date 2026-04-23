@@ -8,17 +8,23 @@ to do:
 		
 		_ implement parameters for all feasible functions that don't change across project-specific implementations
 	
-
-		_ implement the secrets.sh file
+		X implement the secrets.sh file
 		
-		_ update the configuration.sh and custom_configuration.sh files
+		X update the configuration.sh and custom_configuration.sh files
 
-		_ remove the .env file altogether
-			_ drawback is that we can't deploy directly from server
+		X remove the .env file altogether
+			X drawback is that we can't deploy directly from server
 		
 		
 		
 		_ create a script that shutsdown the docker container and optionally removes the volumes
+		
+		
+		export all variables that are in custom_configuration.sh 
+		
+		_ determine a more secure way to specify the ORACLE_PWD, exporting this is insecure and it will be available in the inspect for the ORDS and DB containers. 
+		
+		
 		
 		
 		

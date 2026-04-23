@@ -1,6 +1,5 @@
 services:
   code-ords:
-    container_name: code-ords
     restart: always
     depends_on:
       # Wait for the deploy container to finish to

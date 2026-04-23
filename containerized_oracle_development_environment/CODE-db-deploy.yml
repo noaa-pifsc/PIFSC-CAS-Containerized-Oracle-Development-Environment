@@ -1,6 +1,5 @@
 services:
   code-db:
-    container_name: code-db
     image: ${DB_IMAGE}
     ports: 
       - ${DB_HOST_PORT}:${DBPORT}
@@ -22,7 +21,6 @@ services:
     build:
       context: ..
       dockerfile: containerized_oracle_development_environment/Dockerfile.deploy
-    container_name: code-db-ords-deploy
     depends_on:
       code-db:
         condition: service_healthy
