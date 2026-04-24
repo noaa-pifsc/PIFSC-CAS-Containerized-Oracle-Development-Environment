@@ -17,18 +17,23 @@ to do:
 		
 		
 		
-		_ create a script that shutsdown the docker container and optionally removes the volumes
+		X create a script that shutsdown the docker container and optionally removes the volumes
 		
 		
-		export all variables that are in custom_configuration.sh 
+		X export all variables that are in custom_configuration.sh (for server deployments so the client's configuration is the one used for the build)
 		
-		_ determine a more secure way to specify the ORACLE_PWD, exporting this is insecure and it will be available in the inspect for the ORDS and DB containers. 
-		
+		X determine a more secure way to specify the ORACLE_PWD, exporting this is insecure and it will be available in the inspect for the ORDS and DB containers. 
+			X implement docker secrets for ORACLE_PWD and map to all the necessary containers
+				X confirm that the secrets are passed in to the container_deploy_database.sh successfully
 		
 		_ combine the deploy and shutdown commands with branching logic for local and server deployments, this will simplify the code management and reduce the amount of calling client and host scripts
 		
+		_ replace the get_array_val() calls with the simple arg_ref element references to simplify the code and make it more readable (global change)
 		
 		
+			
+		_ leverage the secret mapping variable and the DOCKER_COMPOSE files to create a parsed secrets local variable that can be used dynamically so we can generate the various connection strings
+			_ instead reference the secret value variable names since they provide the path to the secret
 		
 	
 	document
@@ -38,7 +43,7 @@ to do:
 		
 		_ the custom_container_config.sh configuration that is stored on the client machine is used when deploying to the server (passed via environment variables)
 		
-		
+		docker swarm init to initialize docker swarm
 	
 	_ update documentation
 		_ review the sections defined for CDD/CAD and implement the ones that are appropriate
@@ -78,7 +83,17 @@ to do:
 
 		_ test concurrent CODE instances on docker host
 		
+	_ implement secrets
+		X cds_shared_build_deploy_container_stack was migrated and some arguments were changed (build_path is new, should be blank for single image builds)
 		
+		
+		_ implement dynamic parsing of secrets into the parsed_secrets array so they can be used to generate the connection strings
+			_ update DSC create use SQL to parameterize the password in the create schema scripts
+			_ inject the password into the script
+		
+		
+		
+		_ avoid collisions with secrets (prefix with $COMPOSE_PROJECT)
 		
 	
 		
@@ -92,12 +107,15 @@ to do:
 			_ CDD:
 				_ general improvements:
 					_ use ${FUNCNAME[0]} instead of hardcoding the function names in error messages
+					_ update cds_host_deploy_container function calls to set persistent_container flag
+
 				_ LHP
 				_ PRI
 				_ LCE
 			_ CAD:
 				_ general improvements:
 					_ use ${FUNCNAME[0]} instead of hardcoding the function names in error messages
+					_ update cds_host_deploy_container function calls to set persistent_container flag
 				_ PRI
 				_ SIA
 				_ PLW

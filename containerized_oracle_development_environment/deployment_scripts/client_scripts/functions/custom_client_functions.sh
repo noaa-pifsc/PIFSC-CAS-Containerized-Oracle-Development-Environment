@@ -40,7 +40,7 @@ function proj_client_construct_compose_file_string ()
 	fi
 	
 	# append the custom docker compose file
-	out_compose_file_ref="${out_compose_file_ref}${compose_sep}./custom-docker-compose.yml"
+	# out_compose_file_ref="${out_compose_file_ref}${compose_sep}./custom-docker-compose.yml"
 	
 	# Add any additional custom docker compose configuration files:
 	

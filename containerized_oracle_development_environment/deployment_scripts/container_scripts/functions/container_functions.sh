@@ -269,14 +269,8 @@ function proj_container_deploy_database_scripts ()
 		return 1
 	fi
 
-	# validate that the required function argument array elements exist
-	if ! cds_shared_validate_required_array_vals "${parsed_secrets_var_name}" "sys_password"; then
-		echo "Error: ${FUNCNAME[0]}() function required secure array validation failed" >&2
-		return 1
-	fi
-
 	# store the oracle admin password in a local variable
-	local sys_password="${parsed_secrets_ref[sys_password]:-}"
+	local sys_password="$(cat ${ORACLE_PWD_FILE})"
 	
 	# define the SYS credentials for use in deployment scripts based on environment variables:
 	local sys_credentials="SYS/${sys_password}@${DBHOST}:${DBPORT}/${DBSERVICENAME} as SYSDBA"
@@ -300,8 +294,10 @@ function proj_container_deploy_database_scripts ()
 		proj_container_install_or_upgrade_apex "${sys_credentials}" "${sys_password}"
 	else
 		echo "TARGET_APEX_VERSION is not defined, skip apex install/upgrade process"
-
 	fi
+
+	# apex has finished installing, create the /apex-static/.deploy_ready file to indicate that the ords container can start now:
+	touch /apex-static/.deploy_ready
 
 #	echo "Checking if the database has been initialized (schema: ${APP_SCHEMA_NAME})..."
 	# Check if the database is initialized by querying DBA_USERS

@@ -36,3 +36,10 @@
 
 	# define the container server hostname configuration information
 	declare HOSTNAME="pifsc-dev-docker-01-as"
+
+	# define the name of the container stack
+	declare STACK_NAME="${COMPOSE_PROJECT_NAME}_stack"
+
+	# define the name of the container network
+	declare NETWORK_NAME="${STACK_NAME}_default"
+	

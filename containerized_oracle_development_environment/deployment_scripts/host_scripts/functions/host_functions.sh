@@ -17,7 +17,7 @@ function proj_host_deploy_container()
 			["source_path"]="${HOST_SOURCE_PATH}"
 			["secret_var"]="${SECRET_DATA_VAR_NAME}"
 			["deploy_script_path"]="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/../host_deploy_CODE_elev_privs.sh"
-			["env_block"]="$(cds_shared_generate_export_env_vars_block "COMPOSE_PROJECT_NAME" "DB_HOST_PORT" "ORDS_HOST_PORT" "DB_IMAGE" "ORDS_IMAGE" "TARGET_APEX_VERSION" "APP_SCHEMA_NAME" "ORACLE_PWD" "COMPOSE_FILE")"
+			["env_block"]="$(cds_shared_generate_export_env_vars_block "COMPOSE_PROJECT_NAME" "DB_HOST_PORT" "ORDS_HOST_PORT" "DB_IMAGE" "ORDS_IMAGE" "TARGET_APEX_VERSION" "APP_SCHEMA_NAME" "COMPOSE_FILE" "STACK_NAME" "NETWORK_NAME")"
 			["secret_map"]="${SECRET_MAPPING_VAR_NAME}"
 			["process_secrets"]="yes"
 			["persistent_container"]="yes"
@@ -34,19 +34,25 @@ function proj_host_deploy_container()
 function proj_host_deploy_container_elev_privs()
 {
 #	echo "running proj_host_deploy_container_elev_privs()"
-	if ! cds_shared_validate_required_vars "COMPOSE_FILE" "SECRET_DATA_VAR_NAME" "SECRET_MAPPING_VAR_NAME" "BUILD_PATH"; then 
+	if ! cds_shared_validate_required_vars "COMPOSE_FILE" "SECRET_MAPPING_VAR_NAME" "BUILD_PATH" "STACK_NAME" "NETWORK_NAME" "COMPOSE_PROJECT_NAME"; then 
         echo "Error: ${FUNCNAME[0]}() function argument validation failed" >&2
         return 1
     fi
 
-	# process the stdin configuration data: parse and store in variables, construct the formatted variable identified by $SECRET_DATA_VAR_NAME
-	cds_host_process_stdin_secret_data "${SECRET_MAPPING_VAR_NAME}" "${SECRET_DATA_VAR_NAME}"
+	# declare the function arguments
+	local -A host_deploy_stack_args=(
+			["stack_name"]="${STACK_NAME}"
+			["secret_map"]="${SECRET_MAPPING_VAR_NAME}"
+			["network_name"]="${NETWORK_NAME}"
+			["deploy_dest"]="server"
+			["build_image"]="yes"
+			["compose_path"]="${COMPOSE_FILE}"
+			["build_path"]="${BUILD_PATH}"
+			["secret_name_prefix"]="${COMPOSE_PROJECT_NAME}_"
+		)
 
-	# export the environment variables used directly in the docker compose files:
-	cds_shared_export_env_vars "DBPORT" "DBHOST" "DBSERVICENAME"
-
-	# deploy the CODE containers to the host server
-	proj_shared_deploy_CODE_containers "${BUILD_PATH}" "${COMPOSE_FILE}"
+	# execute the secret definitions and the container build/run process on the target folder using a privileged account
+	cds_shared_deploy_container_stack "host_deploy_stack_args"
 
 	echo "The containers have been started"
 }
@@ -69,7 +75,7 @@ function proj_host_shutdown_container()
 			["source_path"]="${HOST_SOURCE_PATH}"
 			["secret_var"]="${SECRET_DATA_VAR_NAME}"
 			["deploy_script_path"]="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/../host_shutdown_CODE_elev_privs.sh"
-			["env_block"]="$(cds_shared_generate_export_env_vars_block "COMPOSE_PROJECT_NAME" "DB_HOST_PORT" "ORDS_HOST_PORT" "DB_IMAGE" "ORDS_IMAGE" "TARGET_APEX_VERSION" "APP_SCHEMA_NAME" "COMPOSE_FILE" "REM_VOL")"
+			["env_block"]="$(cds_shared_generate_export_env_vars_block "COMPOSE_PROJECT_NAME" "DB_HOST_PORT" "ORDS_HOST_PORT" "DB_IMAGE" "ORDS_IMAGE" "TARGET_APEX_VERSION" "APP_SCHEMA_NAME" "COMPOSE_FILE" "REM_VOL" "STACK_NAME" "NETWORK_NAME")"
 			["secret_map"]="${SECRET_MAPPING_VAR_NAME}"
 			["process_secrets"]="no"
 			["persistent_container"]="yes"

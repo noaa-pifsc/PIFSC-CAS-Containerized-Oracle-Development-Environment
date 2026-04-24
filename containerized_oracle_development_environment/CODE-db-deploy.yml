@@ -3,27 +3,25 @@ services:
     image: ${DB_IMAGE}
     ports: 
       - ${DB_HOST_PORT}:${DBPORT}
-    environment:
-      # SYS password defined in .env file
-      - ORACLE_PWD=${ORACLE_PWD}
     hostname: ${DBHOST}
     networks:
       - oracle-net
-    restart: always
-    healthcheck:
-      # SYS password defined in .env file
-      test: ["CMD", "sqlplus", "-L", "sys/${ORACLE_PWD}@localhost:${DBPORT}/${DBSERVICENAME} as sysdba", "@?/sqlplus/admin/glogin.sql"]
-      interval: 10s
-      timeout: 5s
-      retries: 30
+    secrets:
+      - oracle_pwd
+    deploy:
+      replicas: 1 
+      restart_policy:
+        condition: on-failure 
+        delay: 15s             # Wait 15 seconds before trying again to avoid log spam
+        max_attempts: 30       # Allow up to 30 attempts
+        window: 600s           # Extend the failure window to 10 minutes
   code-db-ords-deploy:
     image: pifsc/code-db-ords-deploy:latest
     build:
       context: ..
       dockerfile: containerized_oracle_development_environment/Dockerfile.deploy
     depends_on:
-      code-db:
-        condition: service_healthy
+      - code-db
     networks:
       - oracle-net
     volumes:
@@ -31,18 +29,28 @@ services:
       # so the script can write the static files to it.
       - code-apex-static-vol:/apex-static
     environment:
-      # Both variables are defined in .env file
       - TARGET_APEX_VERSION=${TARGET_APEX_VERSION}
-      - ORACLE_PWD=${ORACLE_PWD}
+      - ORACLE_PWD_FILE=/run/secrets/oracle_pwd
       - DBHOST=${DBHOST}
       - DBPORT=${DBPORT}
       - DBSERVICENAME=${DBSERVICENAME}
       - APP_SCHEMA_NAME=${APP_SCHEMA_NAME}
-    restart: "no"
+    secrets:
+      - oracle_pwd
+    deploy:
+      replicas: 1 
+      restart_policy:
+        condition: on-failure 
+        delay: 15s             # Wait 15 seconds before trying again to avoid log spam
+        max_attempts: 30       # Allow up to 30 attempts
+        window: 600s           # Extend the failure window to 10 minutes
 volumes:
   # Defines the new shared volume for the APEX static application files
   code-apex-static-vol:
     external: false
 networks: 
   oracle-net:
-    driver: bridge
+secrets:
+  oracle_pwd:
+    name: ${COMPOSE_PROJECT_NAME}_oracle_pwd
+    external: true
