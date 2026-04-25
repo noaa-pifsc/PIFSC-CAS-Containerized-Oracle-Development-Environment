@@ -89,6 +89,8 @@ function proj_client_build_deploy_dev_environment ()
 			["secret_name_prefix"]="${COMPOSE_PROJECT_NAME}_"
 		)
 
+		echo "The argument array is: $(cds_shared_dump_array_vals "deploy_args")"
+
 		# deploy the containers locally:
 		cds_shared_deploy_container_stack "deploy_args"
 	else

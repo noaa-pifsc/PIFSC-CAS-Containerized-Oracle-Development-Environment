@@ -51,6 +51,8 @@ function proj_host_deploy_container_elev_privs()
 			["secret_name_prefix"]="${COMPOSE_PROJECT_NAME}_"
 		)
 
+	echo "The argument array is: $(cds_shared_dump_array_vals "host_deploy_stack_args")"
+
 	# execute the secret definitions and the container build/run process on the target folder using a privileged account
 	cds_shared_deploy_container_stack "host_deploy_stack_args"
 
