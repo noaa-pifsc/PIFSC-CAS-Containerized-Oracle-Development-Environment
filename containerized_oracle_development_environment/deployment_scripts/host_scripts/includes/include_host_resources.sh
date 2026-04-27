@@ -19,5 +19,4 @@ source "${CURR_DIR}/../../config/custom_secret_config.sh"
 source "${CURR_DIR}/../../config/container_config.sh"
 
 # include the host functions
-source "${CURR_DIR}/../../shared_scripts/functions/shared_functions.sh"
 source "${CURR_DIR}/../functions/host_functions.sh"

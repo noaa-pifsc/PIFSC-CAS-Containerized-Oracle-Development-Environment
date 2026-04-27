@@ -98,7 +98,7 @@ to do:
 		
 		
 		
-		_ avoid collisions with secrets (prefix with $COMPOSE_PROJECT)
+		X avoid collisions with secrets (prefix with $COMPOSE_PROJECT)
 		
 	
 		
@@ -120,7 +120,7 @@ to do:
 			_ CAD:
 				_ general improvements:
 					_ use ${FUNCNAME[0]} instead of hardcoding the function names in error messages
-					_ update cds_host_deploy_container function calls to set persistent_container flag
+					X update cds_host_deploy_container function calls to set persistent_container flag
 				_ PRI
 				_ SIA
 				_ PLW
