@@ -13,4 +13,4 @@ set -euo pipefail
 source "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/includes/include_host_resources.sh"
 
 # deploy the container on the container host using a privileged account
-proj_host_deploy_container_elev_privs
+proj_host_execute_container_scripts_elev_privs

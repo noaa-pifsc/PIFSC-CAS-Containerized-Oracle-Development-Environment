@@ -14,4 +14,4 @@ set -euo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/includes/include_host_resources.sh"
 
 # initialize and build/run the container on the host machine with the specified function arguments:
-proj_host_deploy_container
+proj_host_execute_container_scripts
