@@ -21,7 +21,7 @@ function proj_client_construct_compose_file_string ()
 	local compose_sep 
 
 	# store the compose separator character so it can be used to construct the formatted compose file list
-	proj_client_get_compose_separator "compose_sep" "${deploy_dest}"
+	code_client_get_compose_separator "compose_sep" "${deploy_dest}"
 	
 	# build the list of compose files using $compose_sep as the separator for the target deployment machine:
 	# include the code-db and code-db-ords-deploy services, and custom docker compose to integrate additional services
@@ -46,4 +46,37 @@ function proj_client_construct_compose_file_string ()
 	
 	
 	
+}
+
+# function that exports custom environment variable definitions
+function proj_client_custom_export_env_vars ()
+{
+	# export custom environment variables
+	
+	# example:
+	# cds_shared_export_env_vars "VAR1" "VAR2"
+
+}
+
+# function that returns a string with environment variable definition  
+function proj_client_custom_string_env_vars ()
+{
+    local output_str=""
+
+	# example:
+	#   output_str+="${var_name}=\"${!var_name}\" "
+    
+    # echo the result without the trailing space
+    echo " ${output_str% }"
+}
+
+# function that loads custom scripts that define configuration and/or secret values
+function proj_client_custom_load_scripts ()
+{
+	# load any files that contain required configuration and/or secret values 
+	
+	# examples:
+	# source "${BUILD_PATH}/custom_config.sh"
+	# source "${BUILD_PATH}/secrets/db_secrets.sh"
+
 }

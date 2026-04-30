@@ -19,6 +19,9 @@ source "${CURR_DIR}/../../config/custom_container_config.sh"
 source "${CURR_DIR}/../../config/custom_secret_config.sh"
 source "${CURR_DIR}/../../config/container_config.sh"
 
+# include the CODE core client functions
+source "${CURR_DIR}/../../../CODE_core_scripts/CODE_client_scripts.sh"
+
 # include the custom client function definitions
 source "${CURR_DIR}/../functions/client_functions.sh"
 source "${CURR_DIR}/../functions/custom_client_functions.sh"

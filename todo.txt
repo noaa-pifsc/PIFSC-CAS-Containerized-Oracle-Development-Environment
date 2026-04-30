@@ -32,12 +32,7 @@ to do:
 		
 		X check if --ignore-pull-failures is necessary for the docker compose pull execution
 			--ignore-buildable was used instead to ignore the custom images that need to be built when pulling images
-			
-		_ cds_shared_remove_container_stack was updated to accept a third argument: remove_volumes
-			_ this needs to be updated in CAD, CDD implementations
-		
-		
-			
+
 		_ leverage the secret mapping variable and the DOCKER_COMPOSE files to create a parsed secrets local variable that can be used dynamically so we can generate the various connection strings
 			_ instead reference the secret value variable names since they provide the path to the secret
 		
@@ -119,6 +114,8 @@ to do:
 					_ update cds_host_deploy_container function calls to set persistent_container flag
 					_ cds_host_cleanup_container_source_folder() accepts two parameters now (source_dir, target_user)
 					_ update the cds_shared_get_array_val() function calls to use the arg_ref approach
+					_ cds_shared_remove_container_stack() was updated to accept a third argument: remove_volumes
+						_ could use this for the LCE to remove the verification volumes
 
 				_ LHP
 				_ PRI
@@ -131,6 +128,8 @@ to do:
 					X ** check cds_shared_deploy_container_stack -> added rem_vol argument
 					X cds_shared_shutdown_container_compose -> rem_vol argument
 					_ update the cds_shared_get_array_val() function calls to use the arg_ref approach
+					_ cds_shared_remove_container_stack() was updated to accept a third argument: remove_volumes
+						_ this should be implemented as an option to allow volumes to be easily removed
 				_ PRI
 				_ SIA
 				_ PLW

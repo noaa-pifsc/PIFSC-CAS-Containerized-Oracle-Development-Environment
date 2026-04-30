@@ -47,20 +47,24 @@ function proj_container_version_compare() {
 # function to check if the database is initialized, by checking if the specified APP_SCHEMA_NAME exists in the database
 # the function accepts the following parameters:
 # 1: the formatted system credentials for the container oracle database instance
+# 2: app_schema_name - the schema name that is checked for existence on the database to determine if the database has already been initialized
 function proj_container_check_database_initialized() {
 	local sys_credentials="${1}"
+	local app_schema_name="${2}"
 
 	# validate the bash variable values
-	if ! cds_shared_validate_required_vars	"sys_credentials" "APP_SCHEMA_NAME"; then
+	if ! cds_shared_validate_required_vars	"sys_credentials" "app_schema_name"; then
 		echo "Error: ${FUNCNAME[0]}() function required bash variable validation failed" >&2
 		return 1
 	fi
 
-	# Check if your custom schema (e.g., '${APP_SCHEMA_NAME}') exists
-	echo "SELECT COUNT(*) FROM DBA_USERS WHERE USERNAME = '${APP_SCHEMA_NAME}';" | sqlplus -s "${sys_credentials}" | grep -q '1'
+	# Check if your custom schema (e.g., '${app_schema_name}') exists
+	echo "SELECT COUNT(*) FROM DBA_USERS WHERE USERNAME = '${app_schema_name}';" | sqlplus -s "${sys_credentials}" | grep -q '1'
 }
 
 # function to validate the apex version using a regular expression
+# the function accepts the following parameters:
+# 1: target_version that is being validated using a regular expression
 function proj_container_validate_apex_version_format() {
 	local target_version="$1"
 
@@ -79,6 +83,8 @@ function proj_container_validate_apex_version_format() {
 }
 
 # function to retrieve the currently installed apex version
+# the function accepts the following parameters:
+# 1: the formatted system credentials for the container oracle database instance
 function proj_container_get_installed_apex_version() {
 	local sys_credentials="${1}"
 	
@@ -111,7 +117,6 @@ EOF
 	fi
 }
 
-
 # function to validate if the apex version actually exists on Oracle's site
 # the function accepts the following arguments:
 # 1: is the target apex version
@@ -140,28 +145,32 @@ function proj_container_verify_apex_version_exists() {
 	fi
 }
 
-# function to install or upgrade apex based on the current installed version and the TARGET_APEX_VERSION environment variable
+# function to install or upgrade apex based on the current installed version and the target_apex_version environment variable
 # this function accepts the following parameters:
 # 1: sys_credentials: formatted system database credentials
 # 2: sys_password: oracle admin password
+# 3: target_apex_version: the specified apex version for the ords container
+# 4: dbservicename: the service name for the database container
 function proj_container_install_or_upgrade_apex() {
 
 	local sys_credentials="${1}"
 	local sys_password="${2}"
+	local target_apex_version="${3}"
+	local dbservicename="${4}"
 	
 	# validate the bash variable values
-	if ! cds_shared_validate_required_vars "sys_credentials" "sys_password"; then
+	if ! cds_shared_validate_required_vars "sys_credentials" "sys_password" "target_apex_version" "dbservicename"; then
 		echo "Error: ${FUNCNAME[0]}() function required bash variable validation failed" >&2
 		return 1
 	fi
 
 	# Define paths for the dynamic download
-	local apex_zip_file_name="apex_${TARGET_APEX_VERSION}.zip"
+	local apex_zip_file_name="apex_${target_apex_version}.zip"
 	local apex_zip_path="/tmp/${apex_zip_file_name}"
 	local apex_download_url="https://download.oracle.com/otn_software/apex/${apex_zip_file_name}"
 	local apex_static_dir="/apex-static" # This is the mount path for the shared apex static files volume
 
-	echo "Target Apex version: ${TARGET_APEX_VERSION}"
+	echo "Target Apex version: ${target_apex_version}"
 
 	# initialize local variables to track if the Apex upgrade should be installed in the database (skip_db_install) and if the static apex files should be updated (skip_file_install)
 	local skip_db_install=0
@@ -169,7 +178,7 @@ function proj_container_install_or_upgrade_apex() {
 
 	# define the function arguments for proj_process_apex_version()
 	local -A process_apex_func_args=(
-			["target_apex_version"]="${TARGET_APEX_VERSION}"
+			["target_apex_version"]="${target_apex_version}"
 			["apex_download_url"]="${apex_download_url}"
 			["apex_static_dir"]="${apex_static_dir}"
 			["skip_db_install_var_name"]="skip_db_install"
@@ -189,6 +198,8 @@ function proj_container_install_or_upgrade_apex() {
 			["apex_static_dir"]="${apex_static_dir}"
 			["sys_credentials"]="${sys_credentials}"
 			["sys_password"]="${sys_password}"
+			["dbservicename"]="${dbservicename}"
+			["target_apex_version"]="${target_apex_version}"
 		)
 
 	# process the apex install/upgrade
@@ -258,20 +269,38 @@ function proj_container_check_apex_version_status()
 
 # function that executes the container database deployment scripts
 # this includes upgrading apex to the specified version and executing database scripts when the database has not been initialized yet
-# the function accepts no arguments:
+# This function accepts the following parameters as elements in the specified array name (arg_array): 
+# dbhost: database hostname
+# dbport: database port
+# dbservicename: database service name
+# app_schema_name: the schema name that is checked for existence on the database to determine if the database has already been initialized
+# target_apex_version: target version of apex that is being used by the ords container
+# oracle_pwd_file: the file location for the oracle admin password secret
 function proj_container_deploy_database_scripts ()
 {
-	# validate the bash variable values
-	if ! cds_shared_validate_required_vars "DBHOST" "DBPORT" "DBSERVICENAME" "APP_SCHEMA_NAME"; then
-		echo "Error: ${FUNCNAME[0]}() function required bash variable validation failed" >&2
-		return 1
-	fi
+	# store the function array argument
+	local arg_array="${1}"
+
+    # Safety check: ensure the argument is a valid array
+    if [[ "$(declare -p "${arg_array}" 2>/dev/null)" != "declare -A"* ]]; then
+        echo "Error: ${FUNCNAME[0]}() function argument '${arg_array}' is not a valid associative array." >&2
+        return 1
+    fi
+
+	# input validation:
+	if ! cds_shared_validate_required_array_vals "${arg_array}" "dbhost" "dbport" "dbservicename" "app_schema_name" "oracle_pwd_file"; then 
+        echo "Error: ${FUNCNAME[0]}() function argument validation failed" >&2
+        return 1
+    fi
+
+	# create a pointer to the arg_array variable to make it easy to access the argument array values
+	local -n arg_ref="${arg_array}"
 
 	# store the oracle admin password in a local variable
-	local sys_password="$(cat ${ORACLE_PWD_FILE})"
+	local sys_password="$(cat ${arg_ref[oracle_pwd_file]})"
 	
 	# define the SYS credentials for use in deployment scripts based on environment variables:
-	local sys_credentials="SYS/${sys_password}@${DBHOST}:${DBPORT}/${DBSERVICENAME} as SYSDBA"
+	local sys_credentials="SYS/${sys_password}@${arg_ref[dbhost]}:${arg_ref[dbport]}/${arg_ref[dbservicename]} as SYSDBA"
 
 #	echo "Running the custom database/apex deployment process"
 
@@ -286,12 +315,12 @@ function proj_container_deploy_database_scripts ()
 	done
 	echo "Database is ready!"
 
-	# install or upgrade the apex container installation (if TARGET_APEX_VERSION is defined):
-	if [ -n "${TARGET_APEX_VERSION}" ]; then
-		echo "TARGET_APEX_VERSION is defined, install/upgrade apex"
-		proj_container_install_or_upgrade_apex "${sys_credentials}" "${sys_password}"
+	# install or upgrade the apex container installation (if target_apex_version is defined):
+	if [ -n "${arg_ref[target_apex_version]}" ]; then
+		echo "target_apex_version is defined, install/upgrade apex"
+		proj_container_install_or_upgrade_apex "${sys_credentials}" "${sys_password}" "${arg_ref[target_apex_version]}" "${arg_ref[dbservicename]}"
 	else
-		echo "TARGET_APEX_VERSION is not defined, skip apex install/upgrade process"
+		echo "target_apex_version is not defined, skip apex install/upgrade process"
 	fi
 
 	# apex has finished installing, create the /apex-static/.deploy_ready file to indicate that the ords container can start now:
@@ -299,13 +328,12 @@ function proj_container_deploy_database_scripts ()
 
 #	echo "Checking if the database has been initialized (schema: ${APP_SCHEMA_NAME})..."
 	# Check if the database is initialized by querying DBA_USERS
-	if ! proj_container_check_database_initialized "${sys_credentials}"; then
+	if ! proj_container_check_database_initialized "${sys_credentials}" "${arg_ref[app_schema_name]}"; then
 		echo "Database is not initialized, run the custom database and/or application deployment scripts"
 
 		# run the custom database deployment scripts:
 		# function that executes database scripts within the container
 		proj_container_database_deploy_custom_scripts
-
 	else
 		echo "Database already initialized. Skipping deployment script."
 	fi
@@ -382,16 +410,12 @@ function proj_process_apex_version()
 # apex_static_dir: the designated static apex application files directory
 # sys_credentials: formatted system database credentials
 # sys_password: oracle admin password
+# dbservicename: the database service name for the database container
+# target_apex_version: the specified apex version for the ords container
 function proj_container_process_apex_install()
 {
 	# store the function array argument
 	local arg_array="${1}"
-
-	# validate the bash variable values
-	if ! cds_shared_validate_required_vars	"DBSERVICENAME" "TARGET_APEX_VERSION"; then
-		echo "Error: ${FUNCNAME[0]}() function required function argument validation failed" >&2
-		return 1
-	fi
 
 	# Validation check: ensure the argument is a valid array
 	if [[ "$(declare -p "${arg_array}" 2>/dev/null)" != "declare -A"* ]]; then
@@ -400,7 +424,7 @@ function proj_container_process_apex_install()
 	fi
 
 	# validate that the required function argument array elements exist
-	if ! cds_shared_validate_required_array_vals "${arg_array}" "skip_file_install" "skip_db_install" "apex_zip_path" "apex_download_url" "apex_static_dir" "sys_credentials" "sys_password"; then
+	if ! cds_shared_validate_required_array_vals "${arg_array}" "skip_file_install" "skip_db_install" "apex_zip_path" "apex_download_url" "apex_static_dir" "sys_credentials" "sys_password" "dbservicename" "target_apex_version"; then
 		echo "Error: ${FUNCNAME[0]}() function required secure array validation failed" >&2
 		return 1
 	fi
@@ -443,7 +467,7 @@ function proj_container_process_apex_install()
 			# Run the DB install in the background by adding '&'
 			sqlplus -s -l "${arg_ref[sys_credentials]}" <<EOF &
 				WHENEVER SQLERROR EXIT SQL.SQLCODE
-				ALTER SESSION SET CONTAINER = ${DBSERVICENAME};
+				ALTER SESSION SET CONTAINER = ${arg_ref[dbservicename]};
 				@apexins.sql SYSAUX SYSAUX TEMP /i/
 				exit;
 EOF
@@ -486,7 +510,7 @@ EOF
 				local version_status
 				
 				# check if the target apex version is less than 23.2
-				proj_container_version_compare "${TARGET_APEX_VERSION}" "23.2" "version_status"
+				proj_container_version_compare "${arg_ref[target_apex_version]}" "23.2" "version_status"
 				
 				if [ "${version_status}" -eq 2 ]; then 
 					# apex version is 23.1 or older
@@ -534,7 +558,7 @@ EOF
 				
 				sqlplus -s -l "${arg_ref[sys_credentials]}" <<EOF
 				WHENEVER SQLERROR EXIT SQL.SQLCODE
-				ALTER SESSION SET CONTAINER = ${DBSERVICENAME};
+				ALTER SESSION SET CONTAINER = ${arg_ref[dbservicename]};
 				-- Use the same password for all internal accounts for simplicity
 				ALTER USER APEX_PUBLIC_USER IDENTIFIED BY "${arg_ref[sys_password]}" ACCOUNT UNLOCK;
 				SET SERVEROUTPUT ON
