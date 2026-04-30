@@ -8,6 +8,7 @@
 # script_action: passed script_action value (deploy, shutdown)
 # env_block: formatted string of environment variable definitions that are passed to the bash script executed as the privileged user (priv_user)
 # secret_mapping_var_name: the name of the configuration data variable that is passed via STDIN that contains secret values
+# host_scripts_path: path to the folder where the host bash scripts are contained
 function code_host_execute_container_scripts()
 {
 	# store the function array argument
@@ -20,7 +21,7 @@ function code_host_execute_container_scripts()
     fi
 
 	# input validation:
-	if ! cds_shared_validate_required_array_vals "${arg_array}" "priv_user" "host_source_path" "secret_data_var_name" "script_action" "env_block" "secret_mapping_var_name"; then
+	if ! cds_shared_validate_required_array_vals "${arg_array}" "priv_user" "host_source_path" "secret_data_var_name" "script_action" "env_block" "secret_mapping_var_name" "host_scripts_path"; then
         echo "Error: ${FUNCNAME[0]}() function argument validation failed" >&2
         return 1
     fi
@@ -46,7 +47,7 @@ function code_host_execute_container_scripts()
 			["target_user"]="${arg_ref[priv_user]}" 
 			["source_path"]="${arg_ref[host_source_path]}"
 			["secret_var"]="${arg_ref[secret_data_var_name]}"
-			["deploy_script_path"]="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/../host_execute_CODE_scripts_elev_privs.sh"
+			["deploy_script_path"]="${arg_ref[host_scripts_path]}/host_execute_CODE_scripts_elev_privs.sh"
 			["env_block"]="${env_block}"
 			["secret_map"]="${arg_ref[secret_mapping_var_name]}"
 			["process_secrets"]="${process_secrets}"

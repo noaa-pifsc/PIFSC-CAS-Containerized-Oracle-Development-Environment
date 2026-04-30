@@ -24,6 +24,7 @@ function main()
 		["build_path"]="${BUILD_PATH}"
 		["script_action"]="${SCRIPT_ACTION}"
 		["env_block"]="$(cds_shared_generate_export_env_vars_block "COMPOSE_PROJECT_NAME" "DB_HOST_PORT" "ORDS_HOST_PORT" "DB_IMAGE" "ORDS_IMAGE" "TARGET_APEX_VERSION" "APP_SCHEMA_NAME" "COMPOSE_FILE" "STACK_NAME" "NETWORK_NAME" "REM_VOL" "SCRIPT_ACTION")"
+		["host_scripts_path"]="${HOST_SCRIPTS_PATH}"
 	)
 
 	# initialize and build/run the container on the host machine with the specified function arguments:
