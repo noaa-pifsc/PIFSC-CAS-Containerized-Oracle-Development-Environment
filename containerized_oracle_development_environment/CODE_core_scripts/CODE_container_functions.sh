@@ -259,7 +259,7 @@ function proj_container_check_apex_version_status()
 		fi
 	else
 		# upgrade the apex version, target_apex_version is greater than the current_apex_version
-		echo "APEX version mismatch. Found: '${arg_ref[current_apex_version]}'"
+		# echo "DEBUG: APEX version mismatch. Found: '${arg_ref[current_apex_version]}'"
 		echo "Starting APEX upgrade to ${arg_ref[target_apex_version]}..."
 		
 		# update the variable to indicate the apex database upgrade should be installed
@@ -383,7 +383,7 @@ function proj_process_apex_version()
 
 	# retrieve the current version of Apex by querying the databae
 	local current_apex_version="$(proj_container_get_installed_apex_version "${arg_ref[sys_credentials]}")"
-	echo "Current Apex version: ${current_apex_version}"
+	# echo "DEBUG: Current Apex version: ${current_apex_version}"
 
 	# compare the current and target versions of apex and store the return value in version_status
 	local version_status=""
@@ -432,7 +432,7 @@ function proj_container_process_apex_install()
 	fi
 	
 	
-	echo "in proj_container_process_apex_install() the value of arg_array is: $(cds_shared_dump_array_vals ${arg_array})"
+	# echo "DEBUG: in proj_container_process_apex_install() the value of arg_array is: $(cds_shared_dump_array_vals ${arg_array})"
 	
 	# create a pointer to the arg_array variable to make it easy to access the argument array values
 	local -n arg_ref="${arg_array}"

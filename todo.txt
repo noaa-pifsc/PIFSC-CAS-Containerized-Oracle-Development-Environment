@@ -3,10 +3,12 @@ to do:
 	update the configuration so users can specify a unique container name so it won't conflict with other containers on the same server (could allow multiple people to use a different shared container host for development)
 		e.g. GCP shared compute instance running docker, but it will depend on performance
 
-	_ separate out the functionality into separate functions with defined naming convention
-		_ create CODE core scripts that are reused across forks
+	_ for server deployments, should we omit the mount volumes altogether?
+
+	X separate out the functionality into separate functions with defined naming convention
+		X create CODE core scripts that are reused across forks
 		
-		_ implement parameters for all feasible functions that don't change across project-specific implementations
+		X implement parameters for all feasible functions that don't change across project-specific implementations
 	
 		X implement the secrets.sh file
 		
@@ -28,7 +30,7 @@ to do:
 		
 		X combine the deploy and shutdown commands with branching logic for local and server deployments, this will simplify the code management and reduce the amount of calling client and host scripts
 		
-		_ replace the get_array_val() calls with the simple arg_ref element references to simplify the code and make it more readable (global change)
+		X replace the get_array_val() calls with the simple arg_ref element references to simplify the code and make it more readable (global change)
 		
 		X check if --ignore-pull-failures is necessary for the docker compose pull execution
 			--ignore-buildable was used instead to ignore the custom images that need to be built when pulling images
@@ -39,8 +41,8 @@ to do:
 		_ ** re-examine restart policy for the code-db-ords-deploy container - it should probably retry on failure (5 times?)
 		
 		
-		_ created a new cds_shared_export_array_keys() function that exports environment variables from an array of values based on the list of fields
-			cds_shared_export_env_vars may be obsolete, but this needs to be determined after reviewing CDD and CAD functions
+		X created a new cds_shared_export_array_keys() function that exports environment variables from an array of values based on the list of fields
+			_ cds_shared_export_env_vars may be obsolete, but this needs to be determined after reviewing CDD and CAD functions
 		
 		_ check the volume deletion functionality on host server
 			shutdown with volume purge
