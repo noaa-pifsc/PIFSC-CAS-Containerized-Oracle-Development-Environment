@@ -243,6 +243,9 @@ troubleshooting tips:
 
 
 
+Key:
+	L => laptop
+	V => Virtual Machine
 
 testing:
 	server:
@@ -261,7 +264,7 @@ testing:
 					_ no
 
 			dev
-				installs db, ords, apex from scratch
+				_ installs db, ords, apex from scratch
 					_ verify ORDS/Apex login
 					_ verify DB connectivity
 						_ Create temp table and insert data
@@ -276,10 +279,15 @@ testing:
 				ORDS_ENABLED:
 					_ yes
 						validation:
-							_ decrease TARGET_APEX_VERSION
+							_X decrease TARGET_APEX_VERSION
 							_ invalid TARGET_APEX_VERSION (format fails - 24.3.1)
 							_ incorrect TARGET_APEX_VERSION (does not exist - 24.6)
 					_ no
+				REM_VOL
+					X yes - remove all volumes
+						X verify ORDS/Apex login
+						X verify DB connectivity
+							X Create temp table and insert data
 	
 	local:
 		deploy
@@ -295,25 +303,40 @@ testing:
 					_ decrease TARGET_APEX_VERSION
 					_ invalid TARGET_APEX_VERSION (format fails - 24.3.1)
 					_ incorrect TARGET_APEX_VERSION (does not exist - 24.6)
-			dev
-				installs db, ords, apex from scratch
-					_ verify ORDS/Apex login
-					_ verify DB connectivity
-						_ Create temp table and insert data
-				(same TARGET_APEX_VERSION) resume db, ords, apex
-					_ verify ORDS/Apex login
-					_ verify DB connectivity
-						_ verify temp table
-				(increase TARGET_APEX_VERSION) resume db, ords, apex
-					_ verify ORDS/Apex login
-					_ verify DB connectivity
-						_ verify temp table
-				ORDS_ENABLED:
+			L dev
+				LV installs db, ords, apex from scratch
+					LV verify ORDS/Apex login
+					LV verify DB connectivity
+						LV Create temp table and insert data
+				LV (same TARGET_APEX_VERSION) resume db, ords, apex
+					LV verify ORDS/Apex login
+					LV verify DB connectivity
+						LV verify temp table
+				LV (increase TARGET_APEX_VERSION) resume db, ords, apex
+					LV verify ORDS/Apex login
+					LV verify DB connectivity
+						LV verify temp table
+				L_V ORDS_ENABLED:
+					LV yes
+						LV validation:
+							LV decrease TARGET_APEX_VERSION
+							LV invalid TARGET_APEX_VERSION (format fails - 24.3.1)
+							LV incorrect TARGET_APEX_VERSION (does not exist - 24.6)
+					L no - ORDS container does not run
+						L verify DB connectivity
+				L_V REM_VOL
+					LV yes - remove all volumes
+						L verify ORDS/Apex login
+						L verify DB connectivity
+							L Create temp table and insert data
+		shutdown
+			test
+				REM_VOL
 					_ yes
-						validation:
-							_ decrease TARGET_APEX_VERSION
-							_ invalid TARGET_APEX_VERSION (format fails - 24.3.1)
-							_ incorrect TARGET_APEX_VERSION (does not exist - 24.6)
 					_ no
-	
+			
+			L dev
+				L REM_VOL
+					L yes
+					L no
 		
