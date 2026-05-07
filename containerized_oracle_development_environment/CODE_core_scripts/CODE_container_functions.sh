@@ -553,7 +553,7 @@ function code_container_install_apex_static_files ()
 	fi
 
 	# copy the Apex static images to the shared docker volume in the foreground
-	echo "Copying Apex static images to shared volume (in foreground)..."
+	echo "Copying Apex static images to shared volume..."
 	
 	# Clear out any old static Apex files 
 	rm -rf "${apex_static_dir}"/*
@@ -686,7 +686,7 @@ function code_container_configure_apex_admin()
 	DECLARE
 		v_apex_schema VARCHAR2(30);
 	BEGIN
-		SELECT schema INTO v_apex_schema FROM dba_registry WHERE comp_id = 'Apex';
+		SELECT schema INTO v_apex_schema FROM dba_registry WHERE comp_id = 'APEX';
 		EXECUTE IMMEDIATE 'ALTER SESSION SET CURRENT_SCHEMA = ' || dbms_assert.enquote_name(v_apex_schema);
 	END;
 	/
@@ -698,7 +698,7 @@ function code_container_configure_apex_admin()
 	END;
 	/
 
-	-- Set the ADMIN password for the INTERNAL workspace (based on ORACLE_PWD variable defined in .env file)
+	-- Set the ADMIN password for the INTERNAL workspace (based on ORACLE_PWD variable)
 	BEGIN
 		DBMS_OUTPUT.PUT_LINE('Create the Apex admin user');
 	
@@ -725,6 +725,7 @@ function code_container_configure_apex_admin()
 	/
 	exit;
 EOF
+
 	# check the result of the sqlplus commands
 	if [ $? -eq 0 ]; then
 		echo "Apex setup completed successfully."
