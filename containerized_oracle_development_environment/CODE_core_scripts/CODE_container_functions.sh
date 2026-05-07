@@ -151,12 +151,14 @@ function proj_container_verify_apex_version_exists() {
 # 2: sys_password: oracle admin password
 # 3: target_apex_version: the specified apex version for the ords container
 # 4: dbservicename: the service name for the database container
+# 5: deploy_id: the datestamp of the current deployment to uniquely identify it to the code-ords container
 function proj_container_install_or_upgrade_apex() {
 
 	local sys_credentials="${1}"
 	local sys_password="${2}"
 	local target_apex_version="${3}"
 	local dbservicename="${4}"
+	local deploy_id="${5}"
 	
 	# validate the bash variable values
 	if ! cds_shared_validate_required_vars "sys_credentials" "sys_password" "target_apex_version" "dbservicename"; then
@@ -173,8 +175,8 @@ function proj_container_install_or_upgrade_apex() {
 	echo "Target Apex version: ${target_apex_version}"
 
 	# initialize local variables to track if the Apex upgrade should be installed in the database (skip_db_install) and if the static apex files should be updated (skip_file_install)
-	local skip_db_install=0
-	local skip_file_install=0
+	local skip_db_install
+	local skip_file_install
 
 	# define the function arguments for proj_process_apex_version()
 	local -A process_apex_func_args=(
@@ -200,6 +202,7 @@ function proj_container_install_or_upgrade_apex() {
 			["sys_password"]="${sys_password}"
 			["dbservicename"]="${dbservicename}"
 			["target_apex_version"]="${target_apex_version}"
+			["deploy_id"]="${deploy_id}"
 		)
 
 	# process the apex install/upgrade
@@ -238,6 +241,10 @@ function proj_container_check_apex_version_status()
 	local -n out_skip_file_install_ref="${arg_ref[out_skip_file_install_var_name]}"
 	local -n out_skip_db_install_ref="${arg_ref[out_skip_db_install_var_name]}"
 
+	# set the default values for the file/db installation flag variables
+	out_skip_file_install_ref=0
+	out_skip_db_install_ref=0
+
 	# check the $version_status to determine if the apex database/files should be upgraded
 	if [ "${arg_ref[version_status]}" -eq 2 ]; then
 		# downgrade attempt detected, the target_apex_version is less than the current_apex_version
@@ -252,10 +259,27 @@ function proj_container_check_apex_version_status()
 		out_skip_db_install_ref=1
 		
 		# Check if static files are also in place
-		if [ -f "${arg_ref[apex_static_dir]}/apex_version.js" ]; then
-			echo "Static files are in place. No upgrade needed."
-			# update the variable to indicate the apex file upgrade should be skipped
-			out_skip_file_install_ref=1
+		if [ -f "${arg_ref[apex_static_dir]}/apex_version.txt" ]; then
+			# static Apex files are in place
+
+			echo "Apex files are in place, check if the version matches the target_apex_version"
+
+			# parse the apex version number for the static application files from the apex_version.txt static file
+			apex_static_files_ver=$(grep -oE '[0-9]+\.[0-9]+(\.[0-9]+)?' "${arg_ref[apex_static_dir]}/apex_version.txt")
+
+			echo "The value of the apex_static_files_ver is: ${apex_static_files_ver}" 
+
+			# check if the apex files version matches the target apex version
+			if [[ "${arg_ref[target_apex_version]}" == "${apex_static_files_ver}" ]]; then
+				# the apex files version is the same as the target apex version
+			
+				echo "The version of the Apex files and the target apex version are the same, do not install the apex static files"
+			
+				# update the variable to indicate the apex file upgrade should be skipped
+				out_skip_file_install_ref=1
+			else
+				echo "The version of the Apex static files is not the same as the target apex version, download and install the static files"
+			fi
 		fi
 	else
 		# upgrade the apex version, target_apex_version is greater than the current_apex_version
@@ -277,6 +301,7 @@ function proj_container_check_apex_version_status()
 # target_apex_version: target version of apex that is being used by the ords container
 # oracle_pwd_file: the file location for the oracle admin password secret
 # ords_enabled: flag to indicate if the ords container is enabled (yes) or not (no)
+# deploy_id: the datestamp of the current deployment to uniquely identify it to the code-ords container
 function proj_container_deploy_database_scripts ()
 {
 	# store the function array argument
@@ -289,7 +314,7 @@ function proj_container_deploy_database_scripts ()
     fi
 
 	# input validation:
-	if ! cds_shared_validate_required_array_vals "${arg_array}" "dbhost" "dbport" "dbservicename" "app_schema_name" "oracle_pwd_file" "ords_enabled"; then 
+	if ! cds_shared_validate_required_array_vals "${arg_array}" "dbhost" "dbport" "dbservicename" "app_schema_name" "oracle_pwd_file" "ords_enabled" "deploy_id"; then 
         echo "Error: ${FUNCNAME[0]}() function argument validation failed" >&2
         return 1
     fi
@@ -321,13 +346,10 @@ function proj_container_deploy_database_scripts ()
 	# install or upgrade the apex container installation (if target_apex_version is defined and ords_enabled = yes):
 	if [[ "${arg_ref[ords_enabled]}" == "yes" && -n "${arg_ref[target_apex_version]}" ]]; then
 		echo "target_apex_version is defined and ORDS is enabled, install/upgrade apex"
-		proj_container_install_or_upgrade_apex "${sys_credentials}" "${sys_password}" "${arg_ref[target_apex_version]}" "${arg_ref[dbservicename]}"
+		proj_container_install_or_upgrade_apex "${sys_credentials}" "${sys_password}" "${arg_ref[target_apex_version]}" "${arg_ref[dbservicename]}" "${arg_ref[deploy_id]}"
 	else
 		echo "target_apex_version is not defined or ORDS is not enabled, skip apex install/upgrade process"
 	fi
-
-	# apex has finished installing, create the /apex-static/.deploy_ready file to indicate that the ords container can start now:
-	touch /apex-static/.deploy_ready
 
 #	echo "Checking if the database has been initialized (schema: ${APP_SCHEMA_NAME})..."
 	# Check if the database is initialized by querying DBA_USERS
@@ -384,6 +406,7 @@ function proj_process_apex_version()
 
 	# retrieve the current version of Apex by querying the databae
 	local current_apex_version="$(proj_container_get_installed_apex_version "${arg_ref[sys_credentials]}")"
+	
 	# echo "DEBUG: Current Apex version: ${current_apex_version}"
 
 	# compare the current and target versions of apex and store the return value in version_status
@@ -415,6 +438,7 @@ function proj_process_apex_version()
 # sys_password: oracle admin password
 # dbservicename: the database service name for the database container
 # target_apex_version: the specified apex version for the ords container
+# deploy_id: the datestamp of the current deployment to uniquely identify it to the code-ords container
 function proj_container_process_apex_install()
 {
 	# store the function array argument
@@ -427,7 +451,7 @@ function proj_container_process_apex_install()
 	fi
 
 	# validate that the required function argument array elements exist
-	if ! cds_shared_validate_required_array_vals "${arg_array}" "skip_file_install" "skip_db_install" "apex_zip_path" "apex_download_url" "apex_static_dir" "sys_credentials" "sys_password" "dbservicename" "target_apex_version"; then
+	if ! cds_shared_validate_required_array_vals "${arg_array}" "skip_file_install" "skip_db_install" "apex_zip_path" "apex_download_url" "apex_static_dir" "sys_credentials" "sys_password" "dbservicename" "target_apex_version" "deploy_id"; then
 		echo "Error: ${FUNCNAME[0]}() function required secure array validation failed" >&2
 		return 1
 	fi
@@ -634,5 +658,10 @@ EOF
 		# remove the apex installation files
 		echo "Cleaning up installer files..."
 		rm -rf /tmp/apex "${arg_ref[apex_zip_path]}"
+
+		echo "Create the new deployment metadata file to indicate that the apex installation has completed: /apex-static/.deploy_ready_${arg_ref[deploy_id]}"
+
+		# apex has finished installing, create the /apex-static/.deploy_read_${arg_ref[deploy_id]} file to indicate that the ords container can start now:
+		touch "/apex-static/.deploy_ready_${arg_ref[deploy_id]}"
 	fi
 }

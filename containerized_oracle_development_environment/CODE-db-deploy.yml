@@ -37,6 +37,7 @@ services:
       - DBSERVICENAME=${DBSERVICENAME}
       - APP_SCHEMA_NAME=${APP_SCHEMA_NAME}
       - ORDS_ENABLED=${ORDS_ENABLED}
+      - DEPLOY_ID=${DEPLOY_ID}
     secrets:
       - oracle_pwd
     deploy:

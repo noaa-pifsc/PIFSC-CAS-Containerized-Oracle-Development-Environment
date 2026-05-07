@@ -114,6 +114,9 @@ function code_host_execute_container_scripts_elev_privs()
 				["rem_vol"]="${arg_ref[rem_vol]}"
 			)
 
+		# generate and export a timestamp to uniquely identify this deployment, this environment variable is defined in the code-ords and code-db-ords-deploy containers
+		export DEPLOY_ID="$(date +%s)"
+
 		# execute the secret definitions and the container build/run process on the target folder using a privileged account
 		cds_shared_deploy_container_stack "host_deploy_stack_args"
 	else

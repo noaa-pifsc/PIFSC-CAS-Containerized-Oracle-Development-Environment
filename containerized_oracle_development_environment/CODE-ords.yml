@@ -22,13 +22,15 @@ services:
       - DBHOST=${DBHOST}
       - DBPORT=${DBPORT}
       - DBSERVICENAME=${DBSERVICENAME}
+      - DEPLOY_ID=${DEPLOY_ID}
     # Intercept the startup to wait for the deploy script's flag file, then inject the secret as explicit environment variables before starting ORDS.
     entrypoint:
       - /bin/bash
       - -c
       - |
+        echo 'The current deployment ID is: ${DEPLOY_ID}'
         echo 'Waiting for database deployment to finish:'
-        while [ ! -f /opt/oracle/ords/static/.deploy_ready ]; do
+        while [ ! -f /opt/oracle/ords/static/.deploy_ready_${DEPLOY_ID} ]; do
           sleep 5
           echo 'Still waiting for database deployment to finish...'
         done
