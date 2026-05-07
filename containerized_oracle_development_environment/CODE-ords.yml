@@ -9,8 +9,6 @@ services:
       args:
         ORDS_IMAGE: ${ORDS_IMAGE}
     volumes:
-      # define a new named volume for the ORDS configuration folder
-      - code-ords-config-vol:/etc/ords/config
       # This points to the new shared Docker volume to allow the apex installation/upgrade to be handled by a separate container
       - code-apex-static-vol:/opt/oracle/ords/static
     ports:
@@ -50,8 +48,6 @@ services:
 volumes:
   # Defines the new shared volume for the APEX static application files
   code-apex-static-vol:
-    external: false
-  code-ords-config-vol:
     external: false
 networks: 
   oracle-net:

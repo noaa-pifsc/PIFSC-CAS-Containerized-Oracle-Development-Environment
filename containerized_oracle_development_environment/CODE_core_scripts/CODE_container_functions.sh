@@ -495,10 +495,7 @@ EOF
 
 			# check if the database installation 
 			if [ "${db_install_status}" -eq 0 ]; then
-				echo "Apex database upgrade successful. Configure the apex credentials"
-				
-				# configure the apex administrator/service accounts in the database
-				code_container_configure_apex_admin "${arg_ref[target_apex_version]}" "${arg_ref[sys_password]}" "${arg_ref[sys_credentials]}" "${arg_ref[dbservicename]}"
+				echo "Apex database upgrade was successful"
 			else
 				echo "Error: ${FUNCNAME[0]}() - Apex database upgrade failed."
 				exit 1
@@ -516,9 +513,19 @@ EOF
 		rm -rf /tmp/apex "${arg_ref[apex_zip_path]}"
 	fi
 
-	echo "Create the new deployment metadata file to indicate that the apex installation has completed: /apex-static/.deploy_ready_${arg_ref[deploy_id]}"
+	# Ensure database users match ORDS config every time
+	# retrieve the current apex version
+	local current_apex_version="$(code_container_get_installed_apex_version "${arg_ref[sys_credentials]}")"
+
+	# check if the current version of apex is not 0.0 (indicates it's not installed)
+	if [[ "${current_apex_version}" != "0.0" ]]; then
+
+		# configure the apex administrator/service accounts in the database
+		code_container_configure_apex_admin "${arg_ref[target_apex_version]}" "${arg_ref[sys_password]}" "${arg_ref[sys_credentials]}" "${arg_ref[dbservicename]}"
+	fi
 
 	# apex has finished installing, create the /apex-static/.deploy_read_${arg_ref[deploy_id]} file to indicate that the ords container can start now:
+	echo "Create the new deployment metadata file to indicate that the apex installation has completed: /apex-static/.deploy_ready_${arg_ref[deploy_id]}"
 	touch "/apex-static/.deploy_ready_${arg_ref[deploy_id]}"	
 }
 

@@ -84,6 +84,8 @@ to do:
 				explicit shutdown/removal/deploy:
 					bash ./deployment_scripts/client_scripts/client_execute_CODE_scripts.sh deploy dev local yes
 			
+		_ the apex admin account and ORDS_PUBLIC_USER accounts are reset on each deployment using the secrets.sh file
+		
 		
 		
 		target apex version (TARGET_APEX_VERSION)
@@ -378,9 +380,7 @@ testing:
 			X test
 				_ REM_VOL
 					_ yes
-						static apex and ords config volumes removed
 					_ no
-						static apex and ords config volumes retained
 			
 			X dev
 				X REM_VOL
@@ -442,35 +442,31 @@ testing:
 			L test
 				_ REM_VOL
 					_ yes
-						static apex and ords config volumes removed
 					_ no
-						static apex and ords config volumes retained
 			
 			LV dev
 				LV REM_VOL
 					LV yes
 					LV no
 		
-		_L special scenarios:
-			1 (upgrade apex static files version only):
+		_ special scenarios:
+			L 1 (upgrade apex static files version only):
 				L deploy dev - version 23.2
 				
-				_L test dev rem_vol = no
+				L test dev rem_vol = no
 					install version 24.1
 				
-				_ deploy dev - version 24.1
+				L deploy dev - version 24.1
 					upgrade database only, no need to install static files
 				
 			
 			2 (upgrade db apex version only): 
-				deploy dev - version 23.2
+				_ deploy dev - version 23.2
 				
-				shutdown dev 
-				
-				remove apex static volume: 
+				_ remove apex static volume: 
 					shutdown test rem_vol = yes
 
-				deploy dev - version 23.2
+				_ deploy dev - version 23.2
 					install static files only
 				
 
