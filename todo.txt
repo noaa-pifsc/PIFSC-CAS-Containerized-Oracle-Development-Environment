@@ -45,9 +45,13 @@ to do:
 		X created a new cds_shared_export_array_keys() function that exports environment variables from an array of values based on the list of fields
 			_ cds_shared_export_env_vars may be obsolete, but this needs to be determined after reviewing CDD and CAD functions
 		
-		_ check the volume deletion functionality on host server
-			shutdown with volume purge
-			deploy with volume purge
+		X check the volume deletion functionality on host server
+			X shutdown with volume purge
+			X deploy with volume purge
+	
+		
+		
+		
 	
 	document
 		**** _ clearly indicate this is only intended for development and testing purposes
@@ -72,7 +76,20 @@ to do:
 		_ if there is a scenario where the volumes need to be cleared manually - document it and provide the script and parameters to use
 			_ for example - apex static files are a higher version than the target apex version and the installed database version (think about these more)
 			
+		_ ** document that the only scenario where the volumes need to be removed is when the database needs to be reset
+			Either because the data needs to be replaced/re-seeded or a lower apex version than what is installed on the databse needs to be used:
 			
+				explicit shutdown/removal:
+					bash ./deployment_scripts/client_scripts/client_execute_CODE_scripts.sh shutdown dev local yes
+				explicit shutdown/removal/deploy:
+					bash ./deployment_scripts/client_scripts/client_execute_CODE_scripts.sh deploy dev local yes
+			
+		
+		
+		target apex version (TARGET_APEX_VERSION)
+		current apex version (DB)
+		current apex version (static files)
+		
 		
 		
 		business rules:
@@ -359,7 +376,11 @@ testing:
 	
 		X shutdown
 			X test
-				_ apex and ords volumes removed
+				_ REM_VOL
+					_ yes
+						static apex and ords config volumes removed
+					_ no
+						static apex and ords config volumes retained
 			
 			X dev
 				X REM_VOL
@@ -419,26 +440,37 @@ testing:
 							LV Create temp table and insert data
 		L shutdown
 			L test
-				_ apex and ords volumes removed
+				_ REM_VOL
+					_ yes
+						static apex and ords config volumes removed
+					_ no
+						static apex and ords config volumes retained
 			
 			LV dev
 				LV REM_VOL
 					LV yes
 					LV no
 		
-		_L special scenario:
-			ORDS_ENABLED = yes
-				L deploy dev
-					L verify ORDS/Apex login
-					L verify DB connectivity
-				_ deploy test
-					_ ensure that apex and ords volumes are removed, but db-vol still exists (not in use)
-					_ ensure the containers are created properly
-					_ verify ORDS/Apex login
-					_ verify DB connectivity
-				_ deploy dev
-					_ ensure db-vol still exists
-					_ * it will use the existing apex and ords volumes unless they are explicitly removed (they won't necessarily be in sync with the db-vol's apex/ords version - if any)
-					_ ** document this limitation
-						if you run CODE in the dev scenario and then run the test scenario it will automatically remove the apex and ords volumes because the db is built from scratch
+		_L special scenarios:
+			1 (upgrade apex static files version only):
+				L deploy dev - version 23.2
+				
+				L test dev rem_vol = no
+					install version 24.1
+				
+				_L deploy dev - version 24.1
+					upgrade database only, no need to install static files
+				
+			
+			2 (upgrade db apex version only): 
+				deploy dev - version 23.2
+				
+				shutdown dev 
+				
+				remove apex static volume: 
+					shutdown test rem_vol = yes
+
+				deploy dev - version 23.2
+					install static files only
+				
 
