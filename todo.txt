@@ -86,6 +86,7 @@ to do:
 			
 		_ the apex admin account and ORDS_PUBLIC_USER accounts are reset on each deployment using the secrets.sh file
 		
+		_ document the stateless APEX installation, can switch between dev and test deployments and the oracle apex admin password, ords service account, and apex service account are all set using the defined $oracle_pwd secret value (secrets.sh)
 		
 		
 		target apex version (TARGET_APEX_VERSION)
@@ -452,21 +453,33 @@ testing:
 		_ special scenarios:
 			L 1 (upgrade apex static files version only):
 				L deploy dev - version 23.2
+					L verify ORDS/Apex login
+					L verify DB connectivity
 				
 				L test dev rem_vol = no
-					install version 24.1
+					(install version 24.1: files and db)
+					L verify ORDS/Apex login
+					L verify DB connectivity
 				
 				L deploy dev - version 24.1
-					upgrade database only, no need to install static files
+					(upgrade database only, no need to install static files)
+					_ verify ORDS/Apex login
+					_ verify DB connectivity
 				
 			
 			2 (upgrade db apex version only): 
 				_ deploy dev - version 23.2
+					_ verify ORDS/Apex login
+					_ verify DB connectivity
 				
 				_ remove apex static volume: 
-					shutdown test rem_vol = yes
+					(shutdown test rem_vol = yes)
+					_ verify ORDS/Apex login
+					_ verify DB connectivity
 
 				_ deploy dev - version 23.2
-					install static files only
+					(install static files only)
+					_ verify ORDS/Apex login
+					_ verify DB connectivity
 				
 

@@ -673,6 +673,7 @@ function code_container_configure_apex_admin()
 	ALTER SESSION SET CONTAINER = ${dbservicename};
 	-- Use the same password for all internal accounts for simplicity
 	ALTER USER APEX_PUBLIC_USER IDENTIFIED BY "${sys_password}" ACCOUNT UNLOCK;
+	ALTER USER ORDS_PUBLIC_USER IDENTIFIED BY "${sys_password}" ACCOUNT UNLOCK;
 	SET SERVEROUTPUT ON
 	
 	-- Switch to the Apex schema to perform admin tasks
