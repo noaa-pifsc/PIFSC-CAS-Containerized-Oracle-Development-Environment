@@ -671,9 +671,15 @@ function code_container_configure_apex_admin()
 	sqlplus -s -l "${sys_credentials}" <<EOF
 	WHENEVER SQLERROR EXIT SQL.SQLCODE
 	ALTER SESSION SET CONTAINER = ${dbservicename};
-	-- Use the same password for all internal accounts for simplicity
-	ALTER USER APEX_PUBLIC_USER IDENTIFIED BY "${sys_password}" ACCOUNT UNLOCK;
-	ALTER USER ORDS_PUBLIC_USER IDENTIFIED BY "${sys_password}" ACCOUNT UNLOCK;
+	-- Update the APEX_PUBLIC_USER and ORDS_PUBLIC_USER schema passwords to the system password, query the database to confirm the schema exists before attempting to set the password 
+	BEGIN
+		-- query for the APEX_PUBLIC_USER and ORDS_PUBLIC_USER users in the database, if they exist update the password to the user-specified admin password
+		for rec in (SELECT USERNAME from DBA_USERS where USERNAME IN ('APEX_PUBLIC_USER', 'ORDS_PUBLIC_USER')) LOOP
+			--set the current schema password
+			EXECUTE IMMEDIATE 'ALTER USER '||rec.USERNAME||' IDENTIFIED BY "${sys_password}" ACCOUNT UNLOCK';
+		END LOOP;
+	END;
+	/
 	SET SERVEROUTPUT ON
 	
 	-- Switch to the Apex schema to perform admin tasks

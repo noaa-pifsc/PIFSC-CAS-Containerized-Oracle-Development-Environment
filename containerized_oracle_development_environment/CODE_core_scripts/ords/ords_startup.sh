@@ -4,9 +4,9 @@
 CONFIG_DIR="/etc/ords/config"
 PW_FILE="/run/secrets/oracle_pwd"
 
-# validate the database secret is loaded and configured for the ORDS container
+# validate the database admin password secret exists
 if [ ! -f "${PW_FILE}" ]; then
-    echo "ERROR: Secret oracle_pwd was not found."
+    echo "Error: Secret oracle_pwd was not found."
     exit 1
 fi
 
@@ -44,5 +44,6 @@ EOF
 echo "define the db password"
 ords --config "${CONFIG_DIR}" config secret --password-stdin db.password < "${PW_FILE}"
 
+# launch the official ords entrypoint script and specify the configuration directory
 echo "Use the official docker-entrypoint.sh to start the ords container"
 exec docker-entrypoint.sh --config "${CONFIG_DIR}" serve

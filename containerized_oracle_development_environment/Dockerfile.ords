@@ -1,5 +1,4 @@
 # Use official Oracle ORDS image
-
 ARG ORDS_IMAGE
 FROM ${ORDS_IMAGE}
 
