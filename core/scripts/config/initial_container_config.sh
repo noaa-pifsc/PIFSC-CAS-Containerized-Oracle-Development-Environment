@@ -6,11 +6,11 @@
 
 ##### Container Configuration Variables: #####
 
-	# determine current folder path (containerized_oracle_development_environment/deployment_scripts/config)
+	# determine current folder path (core/scripts/config)
 	declare CONFIG_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-	# determine where the designated container subfolder in the local filesystem is (/containerized_oracle_development_environment):
-	declare BUILD_PATH="${CONFIG_DIR}/../../"
+	# determine where the designated container subfolder in the local filesystem is (/core/scripts/build):
+	declare BUILD_PATH="${CONFIG_DIR}/../../build/"
 
 ##### Container Project Configuration Variables: #####
 

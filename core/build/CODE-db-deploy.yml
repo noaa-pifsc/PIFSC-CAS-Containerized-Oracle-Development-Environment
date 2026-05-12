@@ -21,8 +21,8 @@ services:
   code-db-ords-deploy:
     image: pifsc/code-db-ords-deploy:latest
     build:
-      context: ..
-      dockerfile: containerized_oracle_development_environment/Dockerfile.deploy
+      context: ../..
+      dockerfile: core/build/Dockerfile.deploy
     networks:
       - oracle-net
     volumes:

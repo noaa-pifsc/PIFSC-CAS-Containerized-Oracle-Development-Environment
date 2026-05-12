@@ -183,9 +183,9 @@ function code_client_execute_container_scripts ()
 	# check if this is a deployment, if so load the local secret file so the container secret(s) can be created
 	if [[ "${arg_ref[script_action]}" == "deploy" ]]; then
 		# Check if the secret file exists:
-		if [ -f "${arg_ref[build_path]}/secrets/secrets.sh" ]; then
+		if [ -f "${arg_ref[build_path]}/../../secrets/secrets.sh" ]; then
 			# load the secrets
-			source "${arg_ref[build_path]}"/secrets/secrets.sh
+			source "${arg_ref[build_path]}"/../../secrets/secrets.sh
 
 			# load any custom scripts that define configuration/secret variables
 			proj_client_custom_load_scripts

@@ -1,8 +1,35 @@
 
 to do:
 
+
+	implement workflow:
+
+		define default configuration
+		
+		define project configurations
+
+		load default configuration first and then loop through the list of projects and load each project configuration
+
+		then run code to generate compose file array (needs to go through folders but in order for the default project's CODE-ords.yml to be used the script needs the final ORDS_ENABLED variable value)
+		
+
+		Run the client/host code depending on the user-specified runtime configuration
+
+		For deployment/shutdown code:
+
+			loop through project folders and run any pre run code
+			
+			run the deployment code (using compose file array and global vars)
+
+			then loop through project folders and run any post run code
+
+
+
+
+
+
 	X redo test cases to nest the verification steps under the appropriate headings
-		5/11/26: use server version
+		X 5/11/26: use server version
 
 	X test case for test deployment, rem_vol = yes, ords_enabled = no
 		X (No Need) This will still remove the apex static volume because it's associated with CODE-db-deploy.yml
@@ -93,6 +120,19 @@ to do:
 					project-name (git submodules)
 
 
+
+			Changes:
+				containerized_oracle_development_environment/CODE_core_scripts -> core/scripts/functions 
+				containerized_oracle_development_environment/deployment_scripts -> core/scripts 
+				containerized_oracle_development_environment -> core/build
+				containerized_oracle_development_environment/secrets -> secrets
+				modules/CDS -> core/modules/CDS
+				docs -> core/docs
+
+		
+			to do:
+				X .dockerignore
+		
 		
 	
 	document
@@ -122,9 +162,9 @@ to do:
 			Either because the data needs to be replaced/re-seeded or a lower apex version than what is installed on the databse needs to be used:
 			
 				explicit shutdown/removal:
-					bash ./deployment_scripts/client_scripts/client_execute_CODE_scripts.sh shutdown dev local yes
+					bash ./client_execute_CODE_scripts.sh shutdown dev local yes
 				explicit shutdown/removal/deploy:
-					bash ./deployment_scripts/client_scripts/client_execute_CODE_scripts.sh deploy dev local yes
+					bash ./client_execute_CODE_scripts.sh deploy dev local yes
 			
 		_ the apex admin account and ORDS_PUBLIC_USER accounts are reset on each deployment using the secrets.sh file
 		
@@ -313,53 +353,54 @@ git bash commands:
 
 
 	# change into repo directory:
-	cd /c/Users/jesse.abdul/Documents/Version\ Control/Git/PIFSC-Containerized-Oracle-Development-Environment/containerized_oracle_development_environment
+	cd /c/Users/jesse.abdul/Documents/Version\ Control/Git/PIFSC-Containerized-Oracle-Development-Environment/core/scripts/client_scripts
+
 
 
 	# Dev:
 
 		# build and deploy the development scenario of the CODE (local)
-		bash ./deployment_scripts/client_scripts/client_execute_CODE_scripts.sh deploy dev local
+		bash ./client_execute_CODE_scripts.sh deploy dev local
 
 		# build and deploy the development scenario of the CODE (server)
-		bash ./deployment_scripts/client_scripts/client_execute_CODE_scripts.sh deploy dev server
+		bash ./client_execute_CODE_scripts.sh deploy dev server
 
 		# establish the connection to the docker server mapping the default ports so those access can be access on the client machine (make sure there are no containers using localhost that will cause a conflict)
 		ssh -N -L 1521:localhost:1521 -L 8181:localhost:8181 dev_docker
 
 
 		# shutdown the container (local) and retain volume
-		bash ./deployment_scripts/client_scripts/client_execute_CODE_scripts.sh shutdown dev local no
+		bash ./client_execute_CODE_scripts.sh shutdown dev local no
 
 
 		# shutdown the container (local) and remove volumes
-		bash ./deployment_scripts/client_scripts/client_execute_CODE_scripts.sh shutdown dev local yes
+		bash ./client_execute_CODE_scripts.sh shutdown dev local yes
 
 		# shutdown the container (server) and retain volume
-		bash ./deployment_scripts/client_scripts/client_execute_CODE_scripts.sh shutdown dev server no
+		bash ./client_execute_CODE_scripts.sh shutdown dev server no
 
 
 		# shutdown the container (server) and remove volumes
-		bash ./deployment_scripts/client_scripts/client_execute_CODE_scripts.sh shutdown dev server yes
+		bash ./client_execute_CODE_scripts.sh shutdown dev server yes
 
 
 	# Test:
 
 		# build and deploy the test scenario of the CODE (local)
-		bash ./deployment_scripts/client_scripts/client_execute_CODE_scripts.sh deploy test local
+		bash ./client_execute_CODE_scripts.sh deploy test local
 
 		# build and deploy the test scenario of the CODE (server)
-		bash ./deployment_scripts/client_scripts/client_execute_CODE_scripts.sh deploy test server
+		bash ./client_execute_CODE_scripts.sh deploy test server
 
 		# establish the connection to the docker server mapping the default ports so those access can be access on the client machine (make sure there are no containers using localhost that will cause a conflict)
 		ssh -N -L 1521:localhost:1521 -L 8181:localhost:8181 dev_docker
 
 
 		# shutdown the container (local) 
-		bash ./deployment_scripts/client_scripts/client_execute_CODE_scripts.sh shutdown test local no
+		bash ./client_execute_CODE_scripts.sh shutdown test local no
 
 		# shutdown the container (server)
-		bash ./deployment_scripts/client_scripts/client_execute_CODE_scripts.sh shutdown test server no
+		bash ./client_execute_CODE_scripts.sh shutdown test server no
 
 troubleshooting tips:
 

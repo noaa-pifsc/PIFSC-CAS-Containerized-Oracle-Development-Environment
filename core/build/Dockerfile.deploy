@@ -18,4 +18,4 @@ RUN find /usr/src -type f \( -name "*.sh" \) -exec dos2unix {} +
 WORKDIR /usr/src
 
 # run the container database deployment script
-CMD ["bash", "/usr/src/containerized_oracle_development_environment/deployment_scripts/container_scripts/container_deploy_database.sh"]
+CMD ["bash", "/usr/src/core/scripts/container_scripts/container_deploy_database.sh"]

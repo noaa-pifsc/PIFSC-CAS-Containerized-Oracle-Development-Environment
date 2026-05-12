@@ -344,7 +344,7 @@ function code_container_deploy_database_scripts ()
 
 		# run the custom database deployment scripts:
 		# function that executes database scripts within the container
-		proj_container_database_deploy_custom_scripts
+		# proj_container_database_deploy_custom_scripts
 	else
 		echo "Database already initialized. Skipping deployment script."
 	fi
