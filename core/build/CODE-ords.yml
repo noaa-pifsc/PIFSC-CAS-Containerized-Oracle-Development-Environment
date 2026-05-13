@@ -20,7 +20,7 @@ services:
       - DEPLOY_ID=${DEPLOY_ID}
     entrypoint: ["/bin/bash", "/usr/local/bin/ords_startup.sh"]
     secrets:
-      - oracle_admin_pwd
+      - oracle_pwd
     deploy:
       replicas: 1 
       restart_policy:
@@ -35,6 +35,6 @@ volumes:
 networks: 
   oracle-net:
 secrets:
-  oracle_admin_pwd:
-    name: ${COMPOSE_PROJECT_NAME}_oracle_admin_pwd
+  oracle_pwd:
+    name: ${COMPOSE_PROJECT_NAME}_oracle_pwd
     external: true

@@ -34,20 +34,20 @@ function code_shared_load_CODE_config()
 		source "${include_dir_path}/../../config/default_CODE_runtime_config.sh"
 
 		# check if there is an ACTIVE_PROJECT_NAME defined and if the corresponding project runtime configuration file exists
-		if [[ -n "${ACTIVE_PROJECT_NAME}" && -f "${include_dir_path}/../../../../projects/${ACTIVE_PROJECT_NAME}/project_runtime_config.sh" ]]; then
+		if [[ -n "${ACTIVE_PROJECT_NAME}" && -f "${include_dir_path}/../../../../projects/${ACTIVE_PROJECT_NAME}/config/project_runtime_config.sh" ]]; then
 
-			echo "The active project configuration file exists and this function is running on the client, load ${ACTIVE_PROJECT_NAME}/project_runtime_config.sh"
+			echo "The active project configuration file exists and this function is running on the client, load ${ACTIVE_PROJECT_NAME}/config/project_runtime_config.sh"
 			# load the configuration from the active project preceded by all projects it depends on
-			source "${include_dir_path}/../../../../projects/${ACTIVE_PROJECT_NAME}/project_runtime_config.sh"
+			source "${include_dir_path}/../../../../projects/${ACTIVE_PROJECT_NAME}/config/project_runtime_config.sh"
 		fi
 	fi
 
 	# check if there is an ACTIVE_PROJECT_NAME defined and if the corresponding project hierarchy configuration file exists
-	if [[ -n "${ACTIVE_PROJECT_NAME}" && -f "${include_dir_path}/../../../../projects/${ACTIVE_PROJECT_NAME}/project_hierarchy_config.sh" ]]; then
-		echo "The active project configuration file exists, load ${ACTIVE_PROJECT_NAME}/project_hierarchy_config.sh"
+	if [[ -n "${ACTIVE_PROJECT_NAME}" && -f "${include_dir_path}/../../../../projects/${ACTIVE_PROJECT_NAME}/config/project_hierarchy_config.sh" ]]; then
+		echo "The active project configuration file exists, load ${ACTIVE_PROJECT_NAME}/config/project_hierarchy_config.sh"
 	
 		# load the configuration from the active project preceded by all projects it depends on
-		source "${include_dir_path}/../../../../projects/${ACTIVE_PROJECT_NAME}/project_hierarchy_config.sh"
+		source "${include_dir_path}/../../../../projects/${ACTIVE_PROJECT_NAME}/config/project_hierarchy_config.sh"
 	fi
 
 	# check if this function is running on the host, if so load the runtime configuration

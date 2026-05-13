@@ -10,7 +10,7 @@ services:
     networks:
       - oracle-net
     secrets:
-      - oracle_admin_pwd
+      - oracle_pwd
     deploy:
       replicas: 1 
       restart_policy:
@@ -31,7 +31,7 @@ services:
       - code-apex-static-vol:/apex-static
     environment:
       - TARGET_APEX_VERSION=${TARGET_APEX_VERSION}
-      - ORACLE_ADMIN_PWD_FILE=/run/secrets/oracle_admin_pwd
+      - ORACLE_PWD_FILE=/run/secrets/oracle_pwd
       - DBHOST=${DBHOST}
       - DBPORT=${DBPORT}
       - DBSERVICENAME=${DBSERVICENAME}
@@ -39,7 +39,7 @@ services:
       - ORDS_ENABLED=${ORDS_ENABLED}
       - DEPLOY_ID=${DEPLOY_ID}
     secrets:
-      - oracle_admin_pwd
+      - oracle_pwd
       - oracle_admin_user
     deploy:
       replicas: 1 
@@ -52,8 +52,8 @@ volumes:
 networks: 
   oracle-net:
 secrets:
-  oracle_admin_pwd:
-    name: ${COMPOSE_PROJECT_NAME}_oracle_admin_pwd
+  oracle_pwd:
+    name: ${COMPOSE_PROJECT_NAME}_oracle_pwd
     external: true
   oracle_admin_user:
     name: ${COMPOSE_PROJECT_NAME}_oracle_admin_user

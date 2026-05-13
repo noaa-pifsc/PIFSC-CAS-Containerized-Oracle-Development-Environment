@@ -9,7 +9,9 @@ to do:
 			code_shared_run_lifecycle_hook (): loop through PROJECT_INHERITANCE array and run the corresponding client/host/container and pre/post hook script
 
 
-
+			implement the hooks for each execution platform (client, host, container)
+			
+			push DSC CODE changes back to CODE
 
 
 
@@ -203,6 +205,8 @@ to do:
 			
 		_ contribution guidelines for this project
 			how to fork and submit pull requests or attempt to push changes upstream (think through the scenarios)
+			which files to not change in a given project and which ones are ok
+			
 		
 		X the custom_container_config.sh configuration that is stored on the client machine is used when deploying to the server (passed via environment variables)
 		

@@ -4,11 +4,11 @@
 
 # Define resource paths
 CONFIG_DIR="/etc/ords/config"
-PW_FILE="/run/secrets/oracle_admin_pwd"
+PW_FILE="/run/secrets/oracle_pwd"
 
 # validate the database admin password secret exists
 if [ ! -f "${PW_FILE}" ]; then
-	echo "Error: Secret oracle_admin_pwd was not found."
+	echo "Error: Secret oracle_pwd was not found."
 	exit 1
 fi
 
@@ -19,9 +19,9 @@ while [ ! -f /opt/oracle/ords/static/deployments/.deploy_ready_${DEPLOY_ID} ]; d
   echo "Still waiting for database deployment to finish..."
 done
 echo "Apex installation/upgrade completed"
-export ORACLE_PWD=$(cat /run/secrets/oracle_admin_pwd)
-export ORDS_PWD=$(cat /run/secrets/oracle_admin_pwd)
-export ORACLE_USR_PWD=$(cat /run/secrets/oracle_admin_pwd)
+export ORACLE_PWD=$(cat /run/secrets/oracle_pwd)
+export ORDS_PWD=$(cat /run/secrets/oracle_pwd)
+export ORACLE_USR_PWD=$(cat /run/secrets/oracle_pwd)
 
 # create the default database pool configuration folder
 mkdir -p "${CONFIG_DIR}/databases/default"
