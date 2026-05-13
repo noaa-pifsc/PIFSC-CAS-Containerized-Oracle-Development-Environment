@@ -1,17 +1,5 @@
-# Ignore all content in the DSC directory
-docker/src/DSC/*
+# prevent deployment logs from being saved in the repository
+logs/*.log
 
-# Do not ignore the .gitkeep file for the DSC directory, so the directory itself is tracked.
-!docker/src/DSC/.gitkeep
-
-# Ignore all content in the CAS directory
-docker/src/CAS/*
-
-# Do not ignore the .gitkeep file for the CAS directory, so the directory itself is tracked.
-!docker/src/CAS/.gitkeep
-
-# Ignore all content in the SAM directory
-docker/src/SAM/*
-
-# Do not ignore the .gitkeep file for the SAM directory, so the directory itself is tracked.
-!docker/src/SAM/.gitkeep
+# secrets file
+secrets/secrets.sh
