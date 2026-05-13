@@ -230,7 +230,7 @@ to do:
 			
 		_ the apex admin account and ORDS_PUBLIC_USER accounts are reset on each deployment using the secrets.sh file
 		
-		_ document the stateless APEX installation, can switch between dev and test deployments and the oracle apex admin password, ords service account, and apex service account are all set using the defined $oracle_pwd secret value (secrets.sh)
+		_ document the stateless APEX installation, can switch between dev and test deployments and the oracle apex admin password, ords service account, and apex service account are all set using the defined $oracle_admin_pwd secret value (secrets.sh)
 		
 		_ document why the apex configuration file is generated instead of using the CLI ords config commands
 			it took several seconds for each command, and this added over a minute to the startup time
@@ -241,6 +241,10 @@ to do:
 		
 		_ merge protection: .active_project defines the name of the active project that corresponds to the folder name in the /projects folder
 			
+			
+		_ document that the secrets.sh is cumulative and so the single file needs to contain the secret definitions for all schemas involved 
+			_ should we have the secrets template change with the project? yes, would this be a case where we would want to auto reject changes?
+				There is a chance that the schemas will change in an upstream update - for example if an application schema is implemented it could add another schema during the deployment that needs to be continued down the chain.  These should be very rare, maybe we just have this be a rare merge case?
 			
 			requires one-time setup (https://gemini.google.com/app/8a7f53fd936961a5): git config merge.ours.driver true
 		

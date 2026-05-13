@@ -285,9 +285,10 @@ function code_container_check_apex_version_status()
 # dbservicename: database service name
 # app_schema_name: the schema name that is checked for existence on the database to determine if the database has already been initialized
 # target_apex_version: target version of apex that is being used by the ords container
-# oracle_pwd_file: the file location for the oracle admin password secret
+# oracle_admin_pwd_file: the file location for the oracle admin password secret
 # ords_enabled: flag to indicate if the ords container is enabled (yes) or not (no)
 # deploy_id: the datestamp of the current deployment to uniquely identify it to the code-ords container
+# db_scripts_map: the name of an array with each element containing encoded values with the "|" character as the delimiter: sql path (within container)|sql script file|User Secret Name|Password Secret Name
 function code_container_deploy_database_scripts ()
 {
 	# store the function array argument
@@ -300,7 +301,7 @@ function code_container_deploy_database_scripts ()
     fi
 
 	# input validation:
-	if ! cds_shared_validate_required_array_vals "${arg_array}" "dbhost" "dbport" "dbservicename" "app_schema_name" "oracle_pwd_file" "ords_enabled" "deploy_id"; then 
+	if ! cds_shared_validate_required_array_vals "${arg_array}" "dbhost" "dbport" "dbservicename" "app_schema_name" "oracle_admin_pwd_file" "ords_enabled" "deploy_id" "db_scripts_map"; then 
         echo "Error: ${FUNCNAME[0]}() function argument validation failed" >&2
         return 1
     fi
@@ -309,7 +310,7 @@ function code_container_deploy_database_scripts ()
 	local -n arg_ref="${arg_array}"
 
 	# store the oracle admin password in a local variable
-	local sys_password="$(cat ${arg_ref[oracle_pwd_file]})"
+	local sys_password="$(cat ${arg_ref[oracle_admin_pwd_file]})"
 	
 	# define the SYS credentials for use in deployment scripts based on environment variables:
 	local sys_credentials="SYS/${sys_password}@${arg_ref[dbhost]}:${arg_ref[dbport]}/${arg_ref[dbservicename]} as SYSDBA"
@@ -344,7 +345,9 @@ function code_container_deploy_database_scripts ()
 
 		# run the custom database deployment scripts:
 		# function that executes database scripts within the container
-		# proj_container_database_deploy_custom_scripts
+
+		code_container_deploy_custom_database_scripts "${arg_array}" "${arg_ref[db_scripts_map]}"
+		
 	else
 		echo "Database already initialized. Skipping deployment script."
 	fi
@@ -700,7 +703,7 @@ function code_container_configure_apex_admin()
 	END;
 	/
 
-	-- Set the ADMIN password for the INTERNAL workspace (based on ORACLE_PWD variable)
+	-- Set the ADMIN password for the INTERNAL workspace (based on ORACLE_ADMIN_PWD variable)
 	BEGIN
 		DBMS_OUTPUT.PUT_LINE('Create the Apex admin user');
 	
@@ -717,7 +720,7 @@ function code_container_configure_apex_admin()
 
 		COMMIT;
 	EXCEPTION WHEN OTHERS THEN
-		-- If apex admin user already exists, just reset the password (based on ORACLE_PWD variable defined in .env file)
+		-- If apex admin user already exists, just reset the password (based on ORACLE_ADMIN_PWD variable defined in .env file)
 
 		-- Run the appropriate unlock/reset block
 		${UNLOCK_BLOCK}
@@ -782,4 +785,70 @@ function code_container_check_apex_file_install ()
 			out_skip_file_install_ref=0
 		fi
 	fi
+}
+
+# this function executes the series of commands defined in the db_scripts_map array argument
+# the function accepts the following arguments:
+# 1: arg_array
+# This function accepts the following parameters as elements in the specified array name (arg_array): 
+# dbhost: database hostname
+# dbport: database port
+# dbservicename: database service name
+# 2: db_scripts_map: the name of an array with each element containing encoded values with the "|" character as the delimiter: sql path (within container)|sql script file|User Secret Name|Password Secret Name
+function code_container_deploy_custom_database_scripts()
+{
+	# store the function array argument
+	local arg_array="${1}"
+	local db_scripts_map="${2}"
+
+	# validate the bash variable values
+	if ! cds_shared_validate_required_vars "arg_array" "db_scripts_map"; then
+		echo "Error: ${FUNCNAME[0]}() function required bash variable validation failed" >&2
+		return 1
+	fi
+
+    # Safety check: ensure the argument is a valid array
+    if [[ "$(declare -p "${arg_array}" 2>/dev/null)" != "declare -A"* ]]; then
+        echo "Error: ${FUNCNAME[0]}() function argument '${arg_array}' is not a valid associative array." >&2
+        return 1
+    fi
+
+	# input validation:
+	if ! cds_shared_validate_required_array_vals "${arg_array}" "dbhost" "dbport" "dbservicename"; then 
+        echo "Error: ${FUNCNAME[0]}() function argument validation failed" >&2
+        return 1
+    fi
+
+	# create a pointer to the arg_array variable to make it easy to access the argument array values
+	local -n arg_ref="${arg_array}"
+
+	# define a pointer for the db_scripts_map array:
+	local -n db_scripts_map_ref="${db_scripts_map}"
+
+	# loop through each of the database commands
+	for entry in "${db_scripts_map_ref[@]}"; do
+		# parse the pipe-delimited string and store them in separate variables
+        IFS='|' read -r script_path script_command user_secret_name pass_secret_name <<< "$entry"
+	
+		# store the corresponding username secret
+		local username=$(cat "/run/secrets/${user_secret_name}")
+	
+		# store the corresponding password secret
+		local password=$(cat "/run/secrets/${pass_secret_name}")
+
+		# construct the connection string:
+		local connection_string="${username}/${password}@${arg_ref[dbhost]}:${arg_ref[dbport]}/${arg_ref[dbservicename]}"
+
+		echo "Execute the SQL Script - The values are: ${script_path}, ${script_command}, ${user_secret_name}, ${pass_secret_name}"
+
+		# change to the script_path to run the script_command
+		cd "${script_path}"
+		
+# use sqlplus to run the current script_command		
+sqlplus -s /nolog <<EOF
+${script_command}
+${connection_string}
+EOF
+	
+	done
 }

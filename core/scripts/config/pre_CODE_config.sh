@@ -39,9 +39,9 @@
 	# define the array to track the fork hierarchy, the first element is the direct CODE fork and every subsequent element is the fork of the previous element. This corresponds to the folder name of the project in the /projects folder
 	PROJECT_INHERITANCE=()
 
-	# define the database credentials mapping using the pipe character as a delimiter
+	# define the database scripts and matching credentials mapping using the pipe character as a delimiter
 	# the elements should be in the following form: sql path (within container)|sql script file|User Secret Name|Password Secret Name
-	DB_CREDENTIALS_MAP=()
+	DB_SCRIPTS_MAP=()
 
 	# define the array of non-sensitive environment variable names that are exported for use in the container
 	CUSTOM_ENV_VARS=()
@@ -53,6 +53,7 @@
 
 	# define an associative array with the secret name as the array element and the bash variable name as the array value, the array element values should match the variable names in secrets.sh
 	declare -gA SECRET_MAPPING_ARR=(
-		["oracle_pwd"]="ORACLE_PWD"
+		["oracle_admin_pwd"]="ORACLE_ADMIN_PWD"
+		["oracle_admin_user"]="ORACLE_ADMIN_USER"
 	)
 	
