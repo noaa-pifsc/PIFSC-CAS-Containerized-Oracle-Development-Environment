@@ -799,7 +799,7 @@ function code_container_check_apex_file_install ()
 # dbhost: database hostname
 # dbport: database port
 # dbservicename: database service name
-# 2: db_scripts_map: the name of an array with each element containing encoded values with the "|" character as the delimiter: sql path (within container)|sql script file|User Secret Name|Password Secret Name
+# 2: db_scripts_map: the name of an array with each element containing encoded values with the "|" character as the delimiter: sql path (within container)|sql script file|User Secret Name|Password Secret Name|Script Password Secret (optional when a password is injected into the script - examples include a CREATE USER command) 
 function code_container_deploy_custom_database_scripts()
 {
 	# store the function array argument
@@ -833,13 +833,22 @@ function code_container_deploy_custom_database_scripts()
 	# loop through each of the database commands
 	for entry in "${db_scripts_map_ref[@]}"; do
 		# parse the pipe-delimited string and store them in separate variables
-        IFS='|' read -r script_path script_command user_secret_name pass_secret_name <<< "$entry"
+        IFS='|' read -r script_path script_command user_secret_name pass_secret_name script_password_secret <<< "$entry"
 	
 		# store the corresponding username secret
 		local username=$(cat "/run/secrets/${user_secret_name}")
 	
 		# store the corresponding password secret
 		local password=$(cat "/run/secrets/${pass_secret_name}")
+
+		# check if the script_password_secret variable is not empty and if the corresponding secret exists
+		if [[ -n "${script_password_secret}" && -f "/run/secrets/${script_password_secret}" ]]; then
+			# the script password secret exists, store the secret in pass_secret so it can be injected into the script
+			local pass_secret=$(cat "/run/secrets/${script_password_secret}")
+		else
+			# the script password secret does not exist, set the variable to the blank string
+			local pass_secret=""
+		fi
 
 		# construct the connection string:
 		local connection_string="${username}/${password}@${arg_ref[dbhost]}:${arg_ref[dbport]}/${arg_ref[dbservicename]}"
@@ -853,6 +862,7 @@ function code_container_deploy_custom_database_scripts()
 sqlplus -s /nolog <<EOF
 ${script_command}
 ${connection_string}
+${pass_secret}
 EOF
 	
 	done

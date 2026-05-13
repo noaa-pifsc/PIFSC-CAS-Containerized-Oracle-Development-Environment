@@ -39,8 +39,8 @@
 	# define the array to track the fork hierarchy, the first element is the direct CODE fork and every subsequent element is the fork of the previous element. This corresponds to the folder name of the project in the /projects folder
 	PROJECT_INHERITANCE=()
 
-	# define the database scripts and matching credentials mapping using the pipe character as a delimiter
-	# the elements should be in the following form: sql path (within container)|sql script file|User Secret Name|Password Secret Name
+	# define the database scripts mapping using the pipe character as a delimiter
+	# The elements should contain encoded values with the "|" character as the delimiter: sql path (within container)|sql script file|User Secret Name|Password Secret Name|Script Password Secret (optional when a password is injected into the script - examples include a CREATE USER command) 
 	DB_SCRIPTS_MAP=()
 
 	# define the array of non-sensitive environment variable names that are exported for use in the container
