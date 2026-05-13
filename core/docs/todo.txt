@@ -4,6 +4,20 @@ to do:
 
 	implement workflow:
 
+
+		functions:
+			code_shared_run_lifecycle_hook (): loop through PROJECT_INHERITANCE array and run the corresponding client/host/container and pre/post hook script
+
+
+
+
+
+
+
+
+
+
+
 		define default configuration
 		
 		define project configurations
@@ -17,11 +31,59 @@ to do:
 
 		For deployment/shutdown code:
 
-			loop through project folders and run any pre run code
-			
-			run the deployment code (using compose file array and global vars)
 
-			then loop through project folders and run any post run code
+
+		create separate default/project-specific configuration values that override defaults:
+			GIT_URL
+			APP_SCHEMA_NAME, etc.
+
+		create separate persistent variable configuration file that is used when the container is built and deployed, the override defaults configuration should be separate since those are converted into env vars and passed to host or to containers:
+			PROJECT_INHERITANCE=() - used by the hook processing, or should these all just be cascading where the fork refers to the parent folder?
+				if there is no hook defined for it, it would still need to create the file (let's go with the project_inheritance array instead)
+			DB_MIGRATION_MAP=() - used by the container scripts
+			CUSTOM_ENV_VARS=("APP_SCHEMA_NAME" "ORDS_ENABLED" "TARGET_APEX_VERSION")
+			COMPOSE_FILES=("core/templates/base.yml")
+
+			
+		
+		create two different configuration files for each project
+			_ Some are the global runtime configuration variables (e.g. Git URL, ORDS_ENABLED, etc.) that are loaded by the client machine and then transmitted to the host (when applicable) via environment variables. 
+				_ this only needs to be loaded during the initial client execution (exclude 
+			_ Some are the project inheritance hierarchy that provides the project-specific information - these should be loaded every time for client, host, and container executions
+				_ do we need to load this for client, host, and container? -> YES -> this is used to process all pre- and post-deployment hooks
+				
+
+
+
+
+		new functions:
+			combine the compose_files arrays (build the first elements based on env_name and ords_enabled and then append the rest of the values)
+			
+			run the pre/post hooks for container deployments/shutdowns
+			
+			
+			
+
+
+
+
+		when the container is built:
+			loop through project folders and run any pre run code (prep)
+			
+			construct the compose file array 
+				run the deployment code (using compose file array and global vars)
+
+			then loop through project folders and run any post run code (cleanup)
+
+
+		when the automated container database deployment script is run:
+			when the container script runs it needs to have the necessary environment variables specified when the container is built/run
+				When the container scripts run it just needs to loop through the different array arguments and process the steps:
+					generate the array of secrets based on the cascading project configurations
+					generate the credentials based on the array of secrets and corresponding secret values
+					
+					execute the container database deployment script that will loop through the array of 
+				
 
 
 
@@ -177,7 +239,10 @@ to do:
 		current apex version (DB)
 		current apex version (static files)
 		
-		
+		_ merge protection: .active_project defines the name of the active project that corresponds to the folder name in the /projects folder
+			
+			
+			requires one-time setup (https://gemini.google.com/app/8a7f53fd936961a5): git config merge.ours.driver true
 		
 		business rules:
 			when the apex installation has been completed 

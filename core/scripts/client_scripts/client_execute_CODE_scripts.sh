@@ -35,6 +35,7 @@ function main()
 		["host_scripts_path"]="${HOST_SCRIPTS_PATH}"
 		["secret_data_var_name"]="${SECRET_DATA_VAR_NAME}"
 		["config_dir"]="${CONFIG_DIR}"
+		["compose_file_array"]="COMPOSE_FILES"
 	)
 
 	# echo "DEBUG: the code_client_process_arguments_execute_container_scripts() function arguments are: $(cds_shared_dump_array_vals "client_deploy_container_args")"

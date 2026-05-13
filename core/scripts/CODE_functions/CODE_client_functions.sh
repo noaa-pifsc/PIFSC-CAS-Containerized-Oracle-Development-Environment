@@ -27,6 +27,7 @@
 # git_url: the container git repository URL
 # host_scripts_path: container server CODE source folder's host scripts path
 # secret_data_var_name: variable to store the name of the configuration data variable that is passed via STDIN that contains secret values
+# compose_file_array: name of an array that stores the compose files for each individual CODE project
 function code_client_process_arguments_execute_container_scripts ()
 {
 	# store the function array argument
@@ -39,7 +40,7 @@ function code_client_process_arguments_execute_container_scripts ()
     fi
 
 	# input validation:
-	if ! cds_shared_validate_required_array_vals "${arg_array}" "ords_enabled" "build_path" "secret_mapping_var_name" "compose_project_name" "db_host_port" "ords_host_port" "db_image" "ords_image" "target_apex_version" "app_schema_name" "dbport" "dbhost" "dbservicename" "stack_name" "network_name" "config_dir" "hostname" "host_source_path" "git_url" "host_scripts_path" "secret_data_var_name"; then
+	if ! cds_shared_validate_required_array_vals "${arg_array}" "ords_enabled" "build_path" "secret_mapping_var_name" "compose_project_name" "db_host_port" "ords_host_port" "db_image" "ords_image" "target_apex_version" "app_schema_name" "dbport" "dbhost" "dbservicename" "stack_name" "network_name" "config_dir" "hostname" "host_source_path" "git_url" "host_scripts_path" "secret_data_var_name" "compose_file_array"; then
         echo "Error: ${FUNCNAME[0]}() function argument validation failed" >&2
         return 1
     fi
@@ -154,6 +155,7 @@ function code_client_get_compose_separator()
 # git_url: the container git repository URL
 # host_scripts_path: container server CODE source folder's host scripts path
 # secret_data_var_name: variable to store the name of the configuration data variable that is passed via STDIN that contains secret values
+# compose_file_array: name of an array that stores the compose files for each individual CODE project
 function code_client_execute_container_scripts ()
 {
 	# store the function array argument
@@ -166,7 +168,7 @@ function code_client_execute_container_scripts ()
     fi
 
 	# input validation:
-	if ! cds_shared_validate_required_array_vals "${arg_array}" "script_action" "env_name" "deploy_dest" "rem_vol" "ords_enabled" "build_path" "secret_mapping_var_name"; then
+	if ! cds_shared_validate_required_array_vals "${arg_array}" "script_action" "env_name" "deploy_dest" "rem_vol" "ords_enabled" "build_path" "secret_mapping_var_name" "compose_file_array"; then
         echo "Error: ${FUNCNAME[0]}() function argument validation failed" >&2
         return 1
     fi
@@ -177,8 +179,11 @@ function code_client_execute_container_scripts ()
 	# declare variable to store the list of included .yml files when docker compose runs
 	local compose_file
 
-	# construct the COMPOSE_FILE value of included .yml files
-	proj_client_construct_compose_file_string "compose_file" "${arg_ref[env_name]}" "${arg_ref[deploy_dest]}" "${arg_ref[ords_enabled]}"
+	# a pointer to the compose_file_array array variable
+	local -n compose_file_array_ref="${arg_ref[compose_file_array]}"
+
+	# construct the COMPOSE_FILE value of included .yml files, specify the COMPOSE_FILES elements for any additional .yml configuration files
+	code_client_construct_compose_file_string "compose_file" "${arg_ref[env_name]}" "${arg_ref[deploy_dest]}" "${arg_ref[ords_enabled]}" "${compose_file_array_ref[@]}"
 	
 	# check if this is a deployment, if so load the local secret file so the container secret(s) can be created
 	if [[ "${arg_ref[script_action]}" == "deploy" ]]; then
@@ -281,4 +286,62 @@ function code_client_execute_container_scripts ()
 		# deploy the containers to the remote server
 		cds_client_execute_remote_deployment "remote_deploy_args"
 	fi
+}
+
+# function to construct the compose file string for docker compose
+# the function accepts the following arguments:
+# 1: compose_file_var is the name of the compose file variable that will contain the 
+# 2: env_name: the environment name (dev, test, prod)
+# 3: deploy_dest: deployment destination (local, server)
+# 4: ords_enabled: flag to indicate if the ords container is enabled
+# $@: (Remaining args) the list of compose paths that will be added to the compose_file_var variable 
+function code_client_construct_compose_file_string ()
+{
+	local compose_file_var="${1}"
+	local env_name="${2}"
+	local deploy_dest="${3}"
+	local ords_enabled="${4}"
+
+	# save a reference to the $compose_file_var variable
+	local -n out_compose_file_ref="${compose_file_var}"
+
+	# validate the bash variable values
+	if ! cds_shared_validate_required_vars "env_name" "deploy_dest" "compose_file_var" "ords_enabled"; then
+        echo "Error: ${FUNCNAME[0]}() function required bash variable validation failed" >&2
+        return 1
+	fi
+
+	# compose separator variable
+	local compose_sep 
+
+	# store the compose separator character so it can be used to construct the formatted compose file list
+	code_client_get_compose_separator "compose_sep" "${deploy_dest}"
+	
+	# build the list of compose files using $compose_sep as the separator for the target deployment machine:
+	# include the code-db and code-db-ords-deploy services, and custom docker compose to integrate additional services
+	out_compose_file_ref="./CODE-db-deploy.yml"
+
+	# check if this is intended for a dev environment (retain the database volume across container restarts) 
+	if [ "${env_name}" == "dev" ]; then
+		# add in the named volume for the code-db service
+		out_compose_file_ref="${out_compose_file_ref}${compose_sep}./CODE-db-named-volume.yml"
+	fi
+	
+	# check if the ORDS/Apex service is enabled
+	if [ "${ords_enabled}" == "yes" ]; then
+		# include the ORDS service
+		out_compose_file_ref="${out_compose_file_ref}${compose_sep}./CODE-ords.yml"
+	fi
+	
+	# shift the array to process the project-specific .yml files
+	shift 4
+
+	# loop through the keys to add the project-specific .yml files
+    for key in "$@"; do
+
+		echo "The current compose file is: ${key}"	
+
+		# append the current compose file
+		out_compose_file_ref="${out_compose_file_ref}${compose_sep}${key}"
+    done	
 }

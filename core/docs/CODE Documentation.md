@@ -125,7 +125,7 @@ The PIFSC Containerized Oracle Developer Environment (CODE) project was develope
     -   Add git submodules in a designated folder (e.g. modules) for any git repository dependencies that the given project has
     -   Update [custom-docker-compose.yml](./containerized_oracle_development_environment/custom-docker-compose.yml) to define volumes to mount the corresponding submodule repository folders necessary to deploy the database(s)/apex application(s) 
     -   Update the [custom_client_functions.sh](./containerized_oracle_development_environment/deployment_scripts/client_functions/custom_client_functions.sh) file to update the following functions with the appropriate code for the corresponding project-specific CODE implementation:
-        -   proj_client_construct_compose_file_string(): update to include any additional container compose .yml files for the project-specific CODE implementation
+        -   code_client_construct_compose_file_string(): update to include any additional container compose .yml files for the project-specific CODE implementation
         -   proj_client_custom_export_env_vars(): update to export the environment variable values required for the project-specific CODE implementation
         -   proj_client_custom_string_env_vars(): update to generate the string that defines the environment variable value assignment statements required for the project-specific CODE implementation
         -   proj_client_custom_load_scripts(): load each of the secret/configuration files required for the project-specific CODE implementation
