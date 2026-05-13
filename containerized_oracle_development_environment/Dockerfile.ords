@@ -1,6 +1,0 @@
-# Use official Oracle ORDS image
-ARG ORDS_IMAGE
-FROM ${ORDS_IMAGE}
-
-# copy the ORDS startup script
-COPY --chown=54321:0 ./containerized_oracle_development_environment/CODE_core_scripts/ords/ords_startup.sh /usr/local/bin/ords_startup.sh

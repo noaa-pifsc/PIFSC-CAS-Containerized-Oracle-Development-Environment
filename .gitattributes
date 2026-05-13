@@ -14,3 +14,6 @@
 *.xlsx binary
 
 *.pdf binary
+
+# ignore upstream changes to .active_project
+projects/.active_project merge=ours
