@@ -1,7 +1,5 @@
 #!/bin/sh
 
-echo "loading project_runtime_config.sh"
-
 ##### Container Configuration Variables: #####
 
 	# Container Variables That Must Be Unique For A Given Code Implementation To Allow Concurrent Runs
