@@ -289,6 +289,8 @@ function code_container_check_apex_version_status()
 # ords_enabled: flag to indicate if the ords container is enabled (yes) or not (no)
 # deploy_id: the datestamp of the current deployment to uniquely identify it to the code-ords container
 # db_scripts_map: the name of an array with each element containing encoded values with the "|" character as the delimiter: sql path (within container)|sql script file|User Secret Name|Password Secret Name
+# projects_path: the absolute path to the /projects folder in the root repository directory
+# project_inheritance_var: array variable name that stores the inheritance information for the different forked CODE projects related to the current project
 function code_container_deploy_database_scripts ()
 {
 	# store the function array argument
@@ -301,7 +303,7 @@ function code_container_deploy_database_scripts ()
     fi
 
 	# input validation:
-	if ! cds_shared_validate_required_array_vals "${arg_array}" "dbhost" "dbport" "dbservicename" "app_schema_name" "oracle_pwd_file" "ords_enabled" "deploy_id" "db_scripts_map"; then 
+	if ! cds_shared_validate_required_array_vals "${arg_array}" "dbhost" "dbport" "dbservicename" "app_schema_name" "oracle_pwd_file" "ords_enabled" "deploy_id" "db_scripts_map" "projects_path" "project_inheritance_var"; then 
         echo "Error: ${FUNCNAME[0]}() function argument validation failed" >&2
         return 1
     fi
@@ -343,11 +345,14 @@ function code_container_deploy_database_scripts ()
 	if ! code_container_check_database_initialized "${sys_credentials}" "${arg_ref[app_schema_name]}"; then
 		echo "Database is not initialized, run the custom database and/or application deployment scripts"
 
-		# run the custom database deployment scripts:
-		# function that executes database scripts within the container
+		# execute any pre-container hooks
+		code_shared_run_project_hooks "post" "container" "${arg_ref[project_inheritance_var]}" "${arg_ref[projects_path]}"
 
+		# run the custom database deployment scripts:
 		code_container_deploy_custom_database_scripts "${arg_array}" "${arg_ref[db_scripts_map]}"
-		
+
+		# execute any post-container hooks
+		code_shared_run_project_hooks "post" "container" "${arg_ref[project_inheritance_var]}" "${arg_ref[projects_path]}"		
 	else
 		echo "Database already initialized. Skipping deployment script."
 	fi
@@ -797,7 +802,7 @@ function code_container_check_apex_file_install ()
 # 2: db_scripts_map: the name of an array with each element containing encoded values with the "|" character as the delimiter: sql path (within container)|sql script file|User Secret Name|Password Secret Name|Script Password Secret (optional when a password is injected into the script - examples include a CREATE USER command) 
 function code_container_deploy_custom_database_scripts()
 {
-#	echo "running code_container_deploy_custom_database_scripts(${1}, ${2})"
+#	echo "running code_container_deploy_custom_database_scripts($@)"
 
 	# store the function array argument
 	local arg_array="${1}"
@@ -833,30 +838,43 @@ function code_container_deploy_custom_database_scripts()
 		# parse the pipe-delimited string and store them in separate variables
         IFS='|' read -r script_path script_command user_secret_name pass_secret_name script_password_secret <<< "$entry"
 	
-		# store the corresponding username secret
-		local username=$(cat "/run/secrets/${user_secret_name}")
+		# split the pipe-delimited string into a temporary array
+        IFS='|' read -ra elements <<< "$entry"
 	
-		# store the corresponding password secret
-		local password=$(cat "/run/secrets/${pass_secret_name}")
+		# extract the first four fixed elements
+		local script_path=$(echo "${elements[0]}" | xargs)
+		local script_command=$(echo "${elements[1]}" | xargs)
+		local user_secret_name=$(echo "${elements[2]}" | xargs)
+		local pass_secret_name=$(echo "${elements[3]}" | xargs)
 
-		# check if the script_password_secret variable is not empty and if the corresponding secret exists
-		if [[ -n "${script_password_secret}" && -f "/run/secrets/${script_password_secret}" ]]; then
-			# the script password secret exists, store the secret in pass_secret so it can be injected into the script
-			local pass_secret=$(cat "/run/secrets/${script_password_secret}")
-		else
-			# the script password secret does not exist, set the variable to the blank string
-			local pass_secret=""
-		fi
+		# resolve database connection credentials (username/password)
+		local username="$(cds_shared_get_secret_value "${user_secret_name}")"
+		local password="$(cds_shared_get_secret_value "${pass_secret_name}")"
 
 		# construct the connection string:
 		local connection_string="${username}/${password}@${arg_ref[dbhost]}:${arg_ref[dbport]}/${arg_ref[dbservicename]}"
 
+		# define array to store the arbitrary number of additional secrets (argument index 4 and onwards)
+		local sql_args=()
+
+		# Resolve an arbitrary number of additional secrets (argument index 4 and onwards)
+		# loop through the remaining parsed elements that should correspond to defined secrets
+		for ((i=4; i<${#elements[@]}; i++)); do
+			# resolve the current element's secret
+			
+			# trim whitespace surrounding the current secret name
+			local secret_name="$(echo "${elements[i]}" | xargs)"
+			
+			# append the secret to the sql_args array (enclose with quotes for sqlplus)
+			sql_args+=("\"$(cds_shared_get_secret_value "${secret_name}")\"")
+		done
+
 		# change to the script_path to run the script_command
 		cd "${script_path}"
 		
-# use sqlplus to run the current script_command		
+# use sqlplus to run the current script_command, expand $sql_args for the additional secrets that are defined for the sql script
 sqlplus -s /nolog <<EOF
-${script_command} "${connection_string}" "${pass_secret}"
+${script_command} "${connection_string}" ${sql_args[@]}
 EOF
 	
 		# check return code for sqlplus query

@@ -10,7 +10,19 @@
 	CONFIG_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 	# determine where the designated container subfolder in the local filesystem is (/core/scripts/build):
-	BUILD_PATH="${CONFIG_DIR}/../../build/"
+	BUILD_PATH="${CONFIG_DIR}/../../build"
+	
+	# define the path to the /core repository subfolder
+	CORE_PATH="${CONFIG_DIR}/../.."
+
+	# define the path to the /core/config repository subfolder
+	CORE_CONFIG_PATH="${CONFIG_DIR}/../../config"
+
+	# define the path to the root repository folder
+	ROOT_PATH="${CONFIG_DIR}/../../.."
+
+	# define the path to the /projects folder
+	PROJECTS_PATH="${CONFIG_DIR}/../../../projects"
 
 ##### Container Project Configuration Variables: #####
 
@@ -40,7 +52,7 @@
 	PROJECT_INHERITANCE=()
 
 	# define the database scripts mapping using the pipe character as a delimiter
-	# The elements should contain encoded values with the "|" character as the delimiter: sql path (within container)|sql script file|User Secret Name|Password Secret Name|Script Password Secret (optional when a password is injected into the script - examples include a CREATE USER command) 
+	# The elements should contain encoded values with the "|" character as the delimiter: sql path (within container)|sql script file|User Secret Name|Password Secret Name|Script Password Secrets (this can be one or more optional pipe-delimited secret names when a password is injected into the script - examples include a CREATE USER command) 
 	DB_SCRIPTS_MAP=()
 
 	# define the array of non-sensitive environment variable names that are exported for use in the container
