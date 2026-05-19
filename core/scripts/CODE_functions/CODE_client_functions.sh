@@ -30,6 +30,7 @@
 # compose_file_array: name of an array that stores the compose files for each individual CODE project
 # project_inheritance_var: array variable name
 # projects_path: is the absolute path to the /projects folder in the root repository directory
+# logs_path: the path to the logs folder that will contain the log files from CODE deployments
 function code_client_process_arguments_execute_container_scripts ()
 {
 	# store the function array argument
@@ -42,13 +43,16 @@ function code_client_process_arguments_execute_container_scripts ()
     fi
 
 	# input validation:
-	if ! cds_shared_validate_required_array_vals "${arg_array}" "ords_enabled" "build_path" "secret_mapping_var_name" "compose_project_name" "db_host_port" "ords_host_port" "db_image" "ords_image" "target_apex_version" "app_schema_name" "dbport" "dbhost" "dbservicename" "stack_name" "network_name" "config_dir" "hostname" "host_source_path" "git_url" "host_scripts_path" "secret_data_var_name" "compose_file_array" "project_inheritance_var" "projects_path"; then
+	if ! cds_shared_validate_required_array_vals "${arg_array}" "ords_enabled" "build_path" "secret_mapping_var_name" "compose_project_name" "db_host_port" "ords_host_port" "db_image" "ords_image" "target_apex_version" "app_schema_name" "dbport" "dbhost" "dbservicename" "stack_name" "network_name" "config_dir" "hostname" "host_source_path" "git_url" "host_scripts_path" "secret_data_var_name" "compose_file_array" "project_inheritance_var" "projects_path" "logs_path"; then
         echo "Error: ${FUNCNAME[0]}() function argument validation failed" >&2
         return 1
     fi
 
 	# create a pointer to the arg_array variable to make it easy to access the argument array values
 	local -n arg_ref="${arg_array}"
+
+	# create the log file for the current deployment
+	cds_client_initialize_deployment_script "${arg_ref[logs_path]}"
 
 	local script_action_name="script_action"
 	local env_var_name="env_name"
@@ -78,12 +82,16 @@ function code_client_process_arguments_execute_container_scripts ()
 	cds_client_set_rem_vol_var "${rem_vol_var_name}" "${passed_rem_vol_value}"
 
 	# notify the user of the user-defined runtime value
+	echo ""
+	echo "*****************************************"
 	echo "Runtime Argument Values:"
 	echo "script_action: ${!script_action_name}"
 	echo "env_name: ${!env_var_name}"
 	echo "deploy_dest: ${!dest_var_name}"
 	echo "rem_vol: ${!rem_vol_var_name}"
-
+	echo "*****************************************"
+	echo ""
+	
 	# update the arg_ref array with the processed user-defined runtime values
 	arg_ref[script_action]="${!script_action_name}"
 	arg_ref[env_name]="${!env_var_name}"

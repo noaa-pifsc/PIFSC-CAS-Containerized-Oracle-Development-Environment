@@ -24,6 +24,9 @@
 	# define the path to the /projects folder
 	PROJECTS_PATH="${CONFIG_DIR}/../../../projects"
 
+	# define the path to the logs folder
+	LOGS_PATH="${ROOT_PATH}/logs"
+
 ##### Container Project Configuration Variables: #####
 
 	# define a variable to store the name of the configuration data variable that is passed via STDIN that contains secret values
