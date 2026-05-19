@@ -76,7 +76,7 @@ function code_shared_define_project_inheritance()
 		local -n project_inheritance="${project_inheritance_var}"
 
 		# check if the corresponding configuration file exists
-		if  [[ -f "${projects_path}${project_name}/config/project_parent_config.sh" ]]; then
+		if  [[ -f "${projects_path}/${project_name}/config/project_parent_config.sh" ]]; then
 
 			# unset the current value of the PROJECT_FOLDER_NAME global variable, so it doesn't interfere with the project-specific configuration file that is being loaded
 			unset PROJECT_FOLDER_NAME
@@ -179,7 +179,7 @@ function code_shared_load_CODE_config()
 		# define the project hierarchy relationship from the $ACTIVE_PROJECT_NAME and the project_parent_config.sh configuration files
 		code_shared_define_project_inheritance "${project_inheritance_var}" "${ACTIVE_PROJECT_NAME}" "${projects_path}"
 
-#		echo "The value of project_inheritance is: ${project_inheritance[@]}"
+		echo "The value of project_inheritance is: ${project_inheritance[@]}"
 
 		local active_project_config_path="${projects_path}/${ACTIVE_PROJECT_NAME}/config"
 	fi
