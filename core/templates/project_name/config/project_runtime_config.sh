@@ -13,6 +13,10 @@
 	# define if the ORDS service is enabled (required for Apex/ORDS functionality)
 	# Example: ORDS_ENABLED="no"
 
+	#--- APEX Configuration ---
+	# Set the target APEX version here, if this variable is not defined apex will not be installed
+	# Example: TARGET_APEX_VERSION=23.2
+
 	#--- Primary schema created by deployment script, used to check if the database is installed. If the APP_SCHEMA_NAME exists then do not run the database initialization processes ---
 	# Example: APP_SCHEMA_NAME=DSC
 
