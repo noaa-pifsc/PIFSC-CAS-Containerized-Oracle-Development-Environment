@@ -4,6 +4,9 @@ to do:
 	_ implement branch protection for all CODE forks
 	
 	
+	_ test if the passwords can have special characters in them that would normally require enclosing quotes
+		- @, $, %, *, etc.
+	
 
 	_ fix logs function call - it's missing or not working
 	
@@ -19,7 +22,7 @@ to do:
 	_ update CODE function for DB_MAPPING (allow multiple secrets to be injected)
 	
 	
-	_ can we use a pointer approach to all of the loops? YES
+	X can we use a pointer approach to all of the loops? YES
 		X maintain the .active_project and the $parent_project_folder variables.
 			X The framework can automatically start at the .sactive_project folder and read the parent_project_folder variable from the deepest fork, then move to the parent folder and repeat the process
 			

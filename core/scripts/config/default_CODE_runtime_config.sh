@@ -14,12 +14,12 @@
 	DB_IMAGE=container-registry.oracle.com/database/free:latest
 	ORDS_IMAGE=container-registry.oracle.com/database/ords:latest
 
+	# define if the ORDS service is enabled (required for Apex/ORDS functionality)
+	ORDS_ENABLED="yes"
+
 	#--- APEX Configuration ---
 	# Set the target APEX version here, if this variable is not defined apex will not be installed
 	TARGET_APEX_VERSION=23.2
-
-	# define if the ORDS service is enabled (required for Apex/ORDS functionality)
-	ORDS_ENABLED="yes"
 
 	#--- Primary schema created by deployment script, used to check if the database is installed. If the APP_SCHEMA_NAME exists then do not run the database initialization processes ---
 	APP_SCHEMA_NAME=MY_APP_SCHEMA

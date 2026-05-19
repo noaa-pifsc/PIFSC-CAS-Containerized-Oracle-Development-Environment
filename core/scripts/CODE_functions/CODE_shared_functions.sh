@@ -77,7 +77,7 @@ function code_shared_define_project_inheritance()
 		local -n project_inheritance="${project_inheritance_var}"
 
 		# check if the corresponding configuration file exists
-		if  [[ -f "${projects_path}${project_name}/config/project_parent_config.sh" ]]; then
+		if  [[ -f "${projects_path}/${project_name}/config/project_parent_config.sh" ]]; then
 
 			# unset the current value of the PROJECT_FOLDER_NAME global variable, so it doesn't interfere with the project-specific configuration file that is being loaded
 			unset PROJECT_FOLDER_NAME
@@ -131,7 +131,7 @@ function code_shared_load_project_config_files ()
 		if [[ -f "${projects_path}/${project_name}/config/${configuration_file_name}" ]]; then
 
 			# the configuration file exists, execute it now:
-			echo "the project-specific configuration file exists: ${projects_path}/${project_name}/config/${configuration_file_name}"
+			echo "the project-specific configuration file exists"
 
 			# load the specified configuration file
 			source "${projects_path}/${project_name}/config/${configuration_file_name}"

@@ -1,7 +1,7 @@
 # PIFSC Containerized Oracle Developer Environment
 
 ## Overview
-The PIFSC Containerized Oracle Developer Environment (CODE) project was developed to provide a containerized Oracle development environment for PIFSC software developers.  The project can be extended to automatically create/deploy database schemas and applications to allow data systems with dependencies to be developed and tested using the CODE.  This repository can be forked to customize CODE for a specific software project.  
+The PIFSC Containerized Oracle Developer Environment (CODE) framework was developed to provide a containerized Oracle development environment for PIFSC software developers.  The framework can be extended to automatically create/deploy database schemas and applications to allow data systems with dependencies to be developed and tested using the CODE.  This repository or any other forked CODE repository can be forked to customize CODE for a specific software project and integrate its dependencies.  
 
 ## Resources
 -   ### CODE Version Control Information
@@ -186,12 +186,14 @@ The PIFSC Containerized Oracle Developer Environment (CODE) project was develope
     -   Project-specific hooks are defined for specific timing (pre- or post-) and scope (client, host, container)
         -   The hooks will execute right before and right after the main action for the given scope.
         -   Timing:
-            -   Pre: The pre action hook will execute immediately before the main action
+            -   Pre: The pre action hook will execute immediately before the main action executes
             -   Post: The pre action hook will execute immediately after the main action completes
         -   Scope:
-            -   Client: For local CODE deployments, the main action is building and deploying the CODE container stack. For server deployments, the main action is executing the bash script to deploy the container remotely on the container host  
-            -   Host: For server CODE Deployments, the main action is building and deploying the CODE container stack
-            -   Container: The main action is executing the database scripts to update the database and/or install apex application(s)
+            -   client_local: For local CODE deployments, the main action is building and deploying the CODE container stack. For server deployments, the main action is executing the bash script to deploy the container remotely on the container host  
+            -   client_server: For server CODE deployments, the main action is sending the ssh command to the server to execute the CODE deployment            
+            -   host_prepare: For server CODE Deployments, the main action is executing the host deployment script using the designated account with elevated container privileges  
+            -   host_deploy: For server CODE Deployments, the main action is building and deploying the CODE container stack
+            -   container: The main action is executing the database scripts to update the database and/or install apex application(s)
     -   The naming convention for these files is: [timing]_[scope]_hook.sh. For example, pre_container_hook.sh will run immediately before the database scripts are executed within the container
     -   These hook script files are saved in the corresponding project fork's /projects/project_name/hook folder
 
@@ -308,10 +310,4 @@ For the following connections refer to the active [file-based configuration](#fi
 -   Secure In-Memory Data Transmission (STDIN): Secret values (like passwords and API keys) are never passed as command-line arguments. Instead, they are securely transmitted to remote servers, and between script calls, purely via standard input (STDIN / pipelining). This prevents sensitive data from appearing in process lists, system logs, or bash history files.
 -   Decoupled Configuration Adapter Pattern: The core CODE engine enforces a strict Separation of Concerns. It remains completely independent of project-specific global variables. It only operates on strictly validated associative arrays passed from the client adapter, ensuring that the engine itself cannot inadvertently expose or mishandle project-specific configurations.
 -   Docker Secrets: Database credentials are defined as secrets and retrieved dynamically within the container to protect them from unauthorized access
--   Immutable Shell Executions: When elevating privileges to run container commands, CODE utilizes rigid Heredocs (<<EOF) to pipe commands into the new shell. This creates an immutable execution block that safely separates the runtime variables from the raw secret payload.
-
-## License
-See the [LICENSE.md](./LICENSE.md) for details
-
-## Disclaimer
-This repository is a scientific product and is not official communication of the National Oceanic and Atmospheric Administration, or the United States Department of Commerce. All NOAA GitHub project code is provided on an as is basis and the user assumes responsibility for its use. Any claims against the Department of Commerce or Department of Commerce bureaus stemming from the use of this GitHub project will be governed by all applicable Federal law. Any reference to specific commercial products, processes, or services by service mark, trademark, manufacturer, or otherwise, does not constitute or imply their endorsement, recommendation or favoring by the Department of Commerce. The Department of Commerce seal and logo, or the seal and logo of a DOC bureau, shall not be used in any manner to imply endorsement of any commercial product or activity by DOC or the United States Government.
+-   Immutable Shell Executions: When elevating privileges to run container commands, CODE utilizes rigid Heredocs (\<\<EOF) to pipe commands into the new shell. This creates an immutable execution block that safely separates the runtime variables from the raw secret payload.
