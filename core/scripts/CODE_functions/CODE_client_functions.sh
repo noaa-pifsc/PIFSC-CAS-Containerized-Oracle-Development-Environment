@@ -28,7 +28,7 @@
 # host_scripts_path: container server CODE source folder's host scripts path
 # secret_data_var_name: variable to store the name of the configuration data variable that is passed via STDIN that contains secret values
 # compose_file_array: name of an array that stores the compose files for each individual CODE project
-# project_inheritance_var: array variable name
+# project_linear_dependencies_var: array variable name
 # projects_path: is the absolute path to the /projects folder in the root repository directory
 function code_client_process_arguments_execute_container_scripts ()
 {
@@ -42,13 +42,16 @@ function code_client_process_arguments_execute_container_scripts ()
     fi
 
 	# input validation:
-	if ! cds_shared_validate_required_array_vals "${arg_array}" "ords_enabled" "build_path" "secret_mapping_var_name" "compose_project_name" "db_host_port" "ords_host_port" "db_image" "ords_image" "target_apex_version" "app_schema_name" "dbport" "dbhost" "dbservicename" "stack_name" "network_name" "config_dir" "hostname" "host_source_path" "git_url" "host_scripts_path" "secret_data_var_name" "compose_file_array" "project_inheritance_var" "projects_path"; then
+	if ! cds_shared_validate_required_array_vals "${arg_array}" "ords_enabled" "build_path" "secret_mapping_var_name" "compose_project_name" "db_host_port" "ords_host_port" "db_image" "ords_image" "target_apex_version" "app_schema_name" "dbport" "dbhost" "dbservicename" "stack_name" "network_name" "config_dir" "hostname" "host_source_path" "git_url" "host_scripts_path" "secret_data_var_name" "compose_file_array" "project_linear_dependencies_var" "projects_path"; then
         echo "Error: ${FUNCNAME[0]}() function argument validation failed" >&2
         return 1
     fi
 
 	# create a pointer to the arg_array variable to make it easy to access the argument array values
 	local -n arg_ref="${arg_array}"
+
+	# create the log file for the current deployment
+	cds_client_initialize_deployment_script "${arg_ref[logs_path]}"
 
 	local script_action_name="script_action"
 	local env_var_name="env_name"
@@ -78,12 +81,16 @@ function code_client_process_arguments_execute_container_scripts ()
 	cds_client_set_rem_vol_var "${rem_vol_var_name}" "${passed_rem_vol_value}"
 
 	# notify the user of the user-defined runtime value
+	echo ""
+	echo "*****************************************"
 	echo "Runtime Argument Values:"
 	echo "script_action: ${!script_action_name}"
 	echo "env_name: ${!env_var_name}"
 	echo "deploy_dest: ${!dest_var_name}"
 	echo "rem_vol: ${!rem_vol_var_name}"
-
+	echo "*****************************************"
+	echo ""
+	
 	# update the arg_ref array with the processed user-defined runtime values
 	arg_ref[script_action]="${!script_action_name}"
 	arg_ref[env_name]="${!env_var_name}"
@@ -158,7 +165,7 @@ function code_client_get_compose_separator()
 # host_scripts_path: container server CODE source folder's host scripts path
 # secret_data_var_name: variable to store the name of the configuration data variable that is passed via STDIN that contains secret values
 # compose_file_array: name of an array that stores the compose files for each individual CODE project
-# project_inheritance_var: array variable name
+# project_linear_dependencies_var: array variable name
 # projects_path: is the absolute path to the /projects folder in the root repository directory
 function code_client_execute_container_scripts ()
 {
@@ -172,7 +179,7 @@ function code_client_execute_container_scripts ()
     fi
 
 	# input validation:
-	if ! cds_shared_validate_required_array_vals "${arg_array}" "script_action" "env_name" "deploy_dest" "rem_vol" "ords_enabled" "build_path" "secret_mapping_var_name" "compose_file_array" "project_inheritance_var" "projects_path"; then
+	if ! cds_shared_validate_required_array_vals "${arg_array}" "script_action" "env_name" "deploy_dest" "rem_vol" "ords_enabled" "build_path" "secret_mapping_var_name" "compose_file_array" "project_linear_dependencies_var" "projects_path"; then
         echo "Error: ${FUNCNAME[0]}() function argument validation failed" >&2
         return 1
     fi
@@ -218,7 +225,7 @@ function code_client_execute_container_scripts ()
 		cds_shared_export_env_vars "${CUSTOM_ENV_VARS[@]}"
 
 		# execute any pre-client hooks
-		code_shared_run_project_hooks "pre" "client_local" "${arg_ref[project_inheritance_var]}" "${arg_ref[projects_path]}"
+		code_shared_run_project_hooks "pre" "client_local" "${arg_ref[project_linear_dependencies_var]}" "${arg_ref[projects_path]}"
 
 		# check the script_action value to determine if this is a deployment or shutdown script
 		if [[ "${script_action}" == "deploy" ]]; then
@@ -250,7 +257,7 @@ function code_client_execute_container_scripts ()
 		fi
 		
 		# execute any post-client hooks
-		code_shared_run_project_hooks "post" "client_local" "${arg_ref[project_inheritance_var]}" "${arg_ref[projects_path]}"
+		code_shared_run_project_hooks "post" "client_local" "${arg_ref[project_linear_dependencies_var]}" "${arg_ref[projects_path]}"
 		
 	else
 		# this is a server deployment
@@ -290,13 +297,13 @@ function code_client_execute_container_scripts ()
 			)
 			
 		# execute any pre-client/server deployment hooks
-		code_shared_run_project_hooks "pre" "client_server" "${arg_ref[project_inheritance_var]}" "${arg_ref[projects_path]}"
+		code_shared_run_project_hooks "pre" "client_server" "${arg_ref[project_linear_dependencies_var]}" "${arg_ref[projects_path]}"
 			
 		# deploy the containers to the remote server
 		cds_client_execute_remote_deployment "remote_deploy_args"
 
 		# execute any post-client/server deployment hooks
-		code_shared_run_project_hooks "post" "client_server" "${arg_ref[project_inheritance_var]}" "${arg_ref[projects_path]}"
+		code_shared_run_project_hooks "post" "client_server" "${arg_ref[project_linear_dependencies_var]}" "${arg_ref[projects_path]}"
 
 	fi
 }

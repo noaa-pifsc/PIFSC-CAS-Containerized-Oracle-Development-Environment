@@ -8,18 +8,23 @@ to do:
 		- @, $, %, *, etc.
 	
 
-	_ fix logs function call - it's missing or not working
+	X fix logs function call - it's missing or not working
+		
+
 	
 	X implement the cascading includes (specify the parent folder name and it will automatically include the corresponding files - depending on which configuration file is being loaded)
 		X implemented in the configuration include file
 			X specify the parent folder name as a variable
 			X run a function to include the upstream parent configuration before the current configuration is loaded (recursive processing with array elements added after the recursive function is processed
 
-	_ print out the hierarchy for the user so they are aware of the inheritance relationship
+	X print out the hierarchy for the user so they are aware of the inheritance relationship
+		echo "***************"
+		echo "The project hierarchy, in order from parent to dependent fork is: 
+		echo "***************"
 
-	_ implement CAS parameterized create schemas/apex user scripts
+	X implement CAS parameterized create schemas/apex user scripts
 
-	_ update CODE function for DB_MAPPING (allow multiple secrets to be injected)
+	X update CODE function for DB_MAPPING (allow multiple secrets to be injected)
 	
 	
 	X can we use a pointer approach to all of the loops? YES

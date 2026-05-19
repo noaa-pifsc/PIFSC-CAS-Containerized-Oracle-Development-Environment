@@ -24,6 +24,9 @@
 	# define the path to the /projects folder
 	PROJECTS_PATH="${CONFIG_DIR}/../../../projects"
 
+	# define the path to the logs folder
+	LOGS_PATH="${ROOT_PATH}/logs"
+
 ##### Container Project Configuration Variables: #####
 
 	# define a variable to store the name of the configuration data variable that is passed via STDIN that contains secret values
@@ -44,21 +47,21 @@
 	DBSERVICENAME=FREEPDB1
 
 
-##### Project Hierarchy Configuration: #####
+##### Project Linear Dependency Configuration: #####
 
-# These variables define array that are used to specify custom information about each of the projects in the hierarchy so dependencies can be applied in the corresponding element order
+# These variables define arrays that are used to specify custom information about each of the projects that have linear dependencies so the corresponding actions can be executed in the correct order.
 
-	# define the array to track the fork hierarchy, the first element is the direct CODE fork and every subsequent element is the fork of the previous element. This corresponds to the folder name of the project in the /projects folder
-	PROJECT_INHERITANCE=()
+	# define the array to track the linear fork dependencies, the first element is the direct CODE fork and every subsequent element is the fork of the previous element. This corresponds to the folder name of the project in the /projects folder
+	PROJECT_LINEAR_DEPENDENCIES=()
 
-	# define the database scripts mapping using the pipe character as a delimiter
+	# define the database scripts mapping using the pipe character as a delimiter, they will be executed in the order the elements are added to the array
 	# The elements should contain encoded values with the "|" character as the delimiter: sql path (within container)|sql script file|User Secret Name|Password Secret Name|Script Password Secrets (this can be one or more optional pipe-delimited secret names when a password is injected into the script - examples include a CREATE USER command) 
 	DB_SCRIPTS_MAP=()
 
 	# define the array of non-sensitive environment variable names that are exported for use in the container
 	CUSTOM_ENV_VARS=()
 
-	# define the array of compose files that are used by the individual projects
+	# define the array of compose files that are used by the individual projects, they will be included in the order the elements are added to the array
 	COMPOSE_FILES=()
 
 ##### Container Secret Configuration Variables: #####

@@ -9,7 +9,7 @@
 # env_block: formatted string of environment variable definitions that are passed to the bash script executed as the privileged user (priv_user)
 # secret_mapping_var_name: the name of the configuration data variable that is passed via STDIN that contains secret values
 # host_scripts_path: path to the folder where the host bash scripts are contained
-# project_inheritance_var: array variable name that stores the inheritance information for the different forked CODE projects related to the current project
+# project_linear_dependencies_var: array variable name that stores the inheritance information for the different forked CODE projects related to the current project
 # projects_path: is the absolute path to the /projects folder in the root repository directory
 function code_host_execute_container_scripts()
 {
@@ -23,7 +23,7 @@ function code_host_execute_container_scripts()
     fi
 
 	# input validation:
-	if ! cds_shared_validate_required_array_vals "${arg_array}" "priv_user" "host_source_path" "secret_data_var_name" "script_action" "env_block" "secret_mapping_var_name" "host_scripts_path" "project_inheritance_var" "projects_path"; then
+	if ! cds_shared_validate_required_array_vals "${arg_array}" "priv_user" "host_source_path" "secret_data_var_name" "script_action" "env_block" "secret_mapping_var_name" "host_scripts_path" "project_linear_dependencies_var" "projects_path"; then
         echo "Error: ${FUNCNAME[0]}() function argument validation failed" >&2
         return 1
     fi
@@ -47,7 +47,7 @@ function code_host_execute_container_scripts()
 	# echo "DEBUG: The value of the env_block is: ${env_block}"
 
 	# execute any pre-host prep hooks
-	code_shared_run_project_hooks "pre" "host_prep" "${arg_ref[project_inheritance_var]}" "${arg_ref[projects_path]}"
+	code_shared_run_project_hooks "pre" "host_prep" "${arg_ref[project_linear_dependencies_var]}" "${arg_ref[projects_path]}"
 
 	# declare the function arguments as a local variable
 	local -A func_args=(
@@ -65,7 +65,7 @@ function code_host_execute_container_scripts()
 	cds_host_deploy_container "func_args"	
 
 	# execute any post-host prep hooks
-	code_shared_run_project_hooks "post" "host_prep" "${arg_ref[project_inheritance_var]}" "${arg_ref[projects_path]}"
+	code_shared_run_project_hooks "post" "host_prep" "${arg_ref[project_linear_dependencies_var]}" "${arg_ref[projects_path]}"
 }
 
 
@@ -82,7 +82,7 @@ function code_host_execute_container_scripts()
 # dbhost: The internal container database name
 # dbservicename: The internal container database service name
 # secret_name_prefix: string to prepend to each secret name, this helps to prevent duplicate secret names during concurrent container deployments
-# project_inheritance_var: array variable name that stores the inheritance information for the different forked CODE projects related to the current project
+# project_linear_dependencies_var: array variable name that stores the inheritance information for the different forked CODE projects related to the current project
 # projects_path: is the absolute path to the /projects folder in the root repository directory
 function code_host_execute_container_scripts_elev_privs()
 {
@@ -96,7 +96,7 @@ function code_host_execute_container_scripts_elev_privs()
     fi
 
 	# input validation:
-	if ! cds_shared_validate_required_array_vals "${arg_array}" "script_action" "compose_path" "secret_map" "build_path" "stack_name" "network_name" "rem_vol" "dbport" "dbhost" "dbservicename" "secret_name_prefix" "project_inheritance_var" "projects_path"; then
+	if ! cds_shared_validate_required_array_vals "${arg_array}" "script_action" "compose_path" "secret_map" "build_path" "stack_name" "network_name" "rem_vol" "dbport" "dbhost" "dbservicename" "secret_name_prefix" "project_linear_dependencies_var" "projects_path"; then
         echo "Error: ${FUNCNAME[0]}() function argument validation failed" >&2
         return 1
     fi
@@ -108,7 +108,7 @@ function code_host_execute_container_scripts_elev_privs()
 #	cds_shared_export_array_keys "${arg_array}" "dbport" "dbhost" "dbservicename"
 
 	# execute any pre-host deploy hooks
-	code_shared_run_project_hooks "pre" "host_deploy" "${arg_ref[project_inheritance_var]}" "${arg_ref[projects_path]}"
+	code_shared_run_project_hooks "pre" "host_deploy" "${arg_ref[project_linear_dependencies_var]}" "${arg_ref[projects_path]}"
 
 	# check the specified script action
 	if [[ "${arg_ref[script_action]}" == "deploy" ]]; then 
@@ -140,7 +140,7 @@ function code_host_execute_container_scripts_elev_privs()
 	fi
 
 	# execute any post-host deploy hooks
-	code_shared_run_project_hooks "post" "host_deploy" "${arg_ref[project_inheritance_var]}" "${arg_ref[projects_path]}"
+	code_shared_run_project_hooks "post" "host_deploy" "${arg_ref[project_linear_dependencies_var]}" "${arg_ref[projects_path]}"
 
 	echo "The container script action has been completed"
 }

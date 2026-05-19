@@ -21,4 +21,4 @@ source "${CURR_DIR}/../../CODE_functions/CODE_client_functions.sh"
 source "${CURR_DIR}/../../config/pre_CODE_config.sh"
 
 # load the CODE and active project configurations
-code_shared_load_CODE_config "${CURR_DIR}" "client" "PROJECT_INHERITANCE"
+code_shared_load_CODE_config "${CURR_DIR}" "client" "PROJECT_LINEAR_DEPENDENCIES"

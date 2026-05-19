@@ -122,13 +122,14 @@ The PIFSC Containerized Oracle Developer Environment (CODE) framework was develo
     ```
 
 ## CODE Business Rules
--   ### Project Hierarchy Configuration
-    -   Each time a forked CODE repository is forked to create a new project, the new project references the project folder of its direct parent. 
-    -   If Project B forks Project A, then Project A is a direct dependency of Project B. If Project C forks Project B, then Project A is an indirect dependency of Project C.  
-    -   The parent/fork relationship is established by each project's configuration files automatically loading the corresponding parent project's configuration file before any of the project's configuration values are defined. 
+-   ### Project Linear Dependency Configuration
+    -   Each time a forked CODE repository is forked to create a new project, the new project references the project folder of its direct parent to establish the linear dependency relationship. 
+    -   If Project B forks Project A, then Project A is a direct linear dependency of Project B. If Project C forks Project B, then Project A is an indirect linear dependency of Project C.  
+    -   The top-level parent is defined by the [.active_project](../../projects/.active_project) file, the $ACTIVE_PROJECT_NAME corresponds to the folder name of the corresponding top-level parent project folder in the [/projects/](../../projects) folder
+    -   The parent/fork relationship is established by the [project_parent_config.sh](../templates/project_name/config/project_parent_config.sh) file in each project folder's configuration files. The $PROJECT_FOLDER_NAME variable defines the folder name of the corresponding parent project folder in the [/projects/](../../projects) folder
     -   #### Configuration Arrays:
         -   Each time the CODE framework runs it will iterate through the defined hierarchy configuration arrays and perform the defined actions
-        -   The configuration arrays are defined in the corresponding project's config/project_hierarchy_config.sh file:
+        -   The configuration arrays are defined in the corresponding project's config/project_manifest_config.sh file:
             -   PROJECT_INHERITANCE defines the order of the cascading fork dependencies starting with the foundational dependencies and ending with the current forked CODE repository
             -   CUSTOM_ENV_VARS defines custom environment variables that will be declared based on the corresponding bash variables so they are available to the containers and client/host scripts
 			-   DB_SCRIPTS_MAP defines specific database scripts and their corresponding credentials so they can be executed within the code-db-ords-deploy container 
@@ -146,11 +147,11 @@ The PIFSC Containerized Oracle Developer Environment (CODE) framework was develo
             -   COMPOSE_FILES defines the custom container .yml files that will be included when the CODE framework runs
             	-   \*Note: When specifying a new .yml file, the path must be relative to the /core/build folder  
 -   ### Script and Configuration Order
-    -   For all of the project-specific functionality (hooks, compose files, database deployment scripts, configuration variables) the order of execution will start with the foundational dependency (highest parent repository) and down throughout the chain of forked repositories until the deepest fork to respect the order of dependencies.
+    -   For all of the project-specific functionality (hooks, compose files, database deployment scripts, configuration variables) the order of execution will start with the foundational linear dependency (highest parent repository) and down throughout the chain of forked repositories until the deepest fork to respect the order of dependencies.
     -   Example Scenario: Project A is forked from the CODE repository, Project B is forked from Project A, and Project C is forked from Project B
         -   For configuration files:  then when the compose files are included, project A's configuration variables are defined first and then project B's are defined which can overwrite any duplicate variables defined by project A and so on with Project C. 
         -   For project hierarchy array variables: Project A's configuration array elements are added before Project B's configuration array elements, and so on with Project C.
-        -   For hooks and database deployment scripts: Project A's scripts are run before Project B, and so on with Project C to respect the dependencies.
+        -   For hooks and database deployment scripts: Project A's scripts are run before Project B, and so on with Project C to respect the linear dependencies.
 -   ### Secret Definitions
     -   The /secrets/secrets.sh file's global bash variable definitions must match SECRET_MAPPING_ARR array element values to be implemented successfully
     -   The .yml configuration files must have matching secret declarations to use the corresponding container secrets that are defined in the SECRET_MAPPING_ARR 
@@ -212,7 +213,7 @@ The PIFSC Containerized Oracle Developer Environment (CODE) framework was develo
         -   #### Forked Project Customization
             -   Rename and update the [projects/$ACTIVE_PROJECT_NAME/build/secrets.template.yml](../templates/project_name/build/secrets.template.yml) template file to define any additional secrets for the code-db-ords-deploy container and any configuration overrides for containers that are being added for the forked repository
             -   Add any repository dependencies as git submodules in the [modules](../modules) subfolder
-            -   Update the [projects/$ACTIVE_PROJECT_NAME/config/project_hierarchy_config.sh](../templates/project_name/config/project_hierarchy_config.sh) configuration file with the basic information about the forked CODE implementation:
+            -   Update the [projects/$ACTIVE_PROJECT_NAME/config/project_manifest_config.sh](../templates/project_name/config/project_manifest_config.sh) configuration file with the basic information about the forked CODE implementation:
                 -   PROJECT_INHERITANCE should add an array element with the $ACTIVE_PROJECT_NAME 
                 -   DB_SCRIPTS_MAP: add an array element for each automated database deployment script that will be run on deployments with the corresponding secret names
                 -   CUSTOM_ENV_VARS array values for any custom environment names that need to be transmitted to any of the containers on startup

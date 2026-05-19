@@ -21,7 +21,7 @@ function main()
 			["deploy_id"]="${DEPLOY_ID}"
 			["db_scripts_map"]="DB_SCRIPTS_MAP"
 			["projects_path"]="${PROJECTS_PATH}"
-			["project_inheritance_var"]="PROJECT_INHERITANCE"
+			["project_linear_dependencies_var"]="PROJECT_LINEAR_DEPENDENCIES"
 		)
 
 	# Execute the database orchestration scripts, passing the secure vault by name

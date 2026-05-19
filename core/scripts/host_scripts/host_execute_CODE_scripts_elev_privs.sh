@@ -28,7 +28,7 @@ function main()
 		["dbservicename"]="${DBSERVICENAME}"
 		["script_action"]="${SCRIPT_ACTION}"
 		["projects_path"]="${PROJECTS_PATH}"
-		["project_inheritance_var"]="PROJECT_INHERITANCE"
+		["project_linear_dependencies_var"]="PROJECT_LINEAR_DEPENDENCIES"
 	)
 
 	# deploy the container on the container host using a privileged account

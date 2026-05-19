@@ -6,7 +6,7 @@
 	# Example 2: DB_SCRIPTS_MAP+=("${BUILD_PATH}/../../projects/DSC/modules/DSC/SQL|@automated_deployments/deploy_dev_container.sql|dsc_user|dsc_pwd")
 
 	# define the array of non-sensitive environment variable names that are exported for use in the container
-	# CUSTOM_ENV_VARS+=("CRON_SCHEDULE")
+	# Example: CUSTOM_ENV_VARS+=("CRON_SCHEDULE")
 
 	# define the array of compose files that are used by the individual projects (specify the path relative to the core/build directory
 	# Example: COMPOSE_FILES+=("../../projects/DSC/build/dsc_secrets.yml")
