@@ -13,7 +13,7 @@
 	DB_SCRIPTS_MAP+=("${BUILD_PATH}/../../projects/CAS/modules/AAM/CAS/SQL|@automated_deployments/deploy_apex_dev_container.sql|cas_app_user|cas_app_pwd")
 
 	# define the array of non-sensitive environment variable names that are exported for use in the container
-	# CUSTOM_ENV_VARS+=("CRON_SCHEDULE")
+	# CUSTOM_ENV_VARS+=()
 
 	# define the array of compose files that are used by the individual projects (specify the path relative to the core/build directory
 	COMPOSE_FILES+=("../../projects/CAS/build/cas_secrets.yml")
