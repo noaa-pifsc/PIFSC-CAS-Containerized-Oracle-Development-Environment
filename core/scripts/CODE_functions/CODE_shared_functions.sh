@@ -130,7 +130,7 @@ function code_shared_load_project_config_files ()
 		if [[ -f "${projects_path}/${project_name}/config/${configuration_file_name}" ]]; then
 
 			# the configuration file exists, execute it now:
-			echo "the project-specific configuration file exists: ${projects_path}/${project_name}/config/${configuration_file_name}"
+			echo "the project-specific configuration file exists"
 
 			# load the specified configuration file
 			source "${projects_path}/${project_name}/config/${configuration_file_name}"

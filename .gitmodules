@@ -4,3 +4,6 @@
 [submodule "projects/DSC/modules/DSC"]
 	path = projects/DSC/modules/DSC
 	url = git@github.com:noaa-pifsc/PIFSC-DSC.git
+[submodule "projects/CAS/modules/AAM"]
+	path = projects/CAS/modules/AAM
+	url = git@picgitlab.nmfs.local:centralized-data-tools/authorization-application-module.git
