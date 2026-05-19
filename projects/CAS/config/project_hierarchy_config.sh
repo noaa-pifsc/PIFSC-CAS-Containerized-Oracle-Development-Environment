@@ -4,13 +4,13 @@
 	# The elements should contain encoded values with the "|" character as the delimiter: sql path (within container)|sql script file|User Secret Name|Password Secret Name|Script Password Secrets (this can be one or more optional pipe-delimited secret names when a password is injected into the script - examples include a CREATE USER command) 
 
 	# create schemas, apex workspaces
-	DB_SCRIPTS_MAP+=("${BUILD_PATH}../../projects/CAS/modules/AAM/CAS/SQL|@dev_container_setup/create_docker_schemas.sql|oracle_admin_user|oracle_pwd|cas_pwd|cas_app_pwd|cas_apx_pwd")
+	DB_SCRIPTS_MAP+=("${BUILD_PATH}/../../projects/CAS/modules/AAM/CAS/SQL|@dev_container_setup/create_docker_schemas.sql|oracle_admin_user|oracle_pwd|cas_pwd|cas_app_pwd|cas_apx_pwd")
 	
 	# deploy CAS DB
-	DB_SCRIPTS_MAP+=("${BUILD_PATH}../../projects/CAS/modules/AAM/CAS/SQL|@automated_deployments/deploy_dev_container.sql|cas_user|cas_pwd")
+	DB_SCRIPTS_MAP+=("${BUILD_PATH}/../../projects/CAS/modules/AAM/CAS/SQL|@automated_deployments/deploy_dev_container.sql|cas_user|cas_pwd")
 
 	# deploy CAS Apex app
-	DB_SCRIPTS_MAP+=("${BUILD_PATH}../../projects/CAS/modules/AAM/CAS/SQL|@automated_deployments/deploy_apex_dev_container.sql|cas_app_user|cas_app_pwd")
+	DB_SCRIPTS_MAP+=("${BUILD_PATH}/../../projects/CAS/modules/AAM/CAS/SQL|@automated_deployments/deploy_apex_dev_container.sql|cas_app_user|cas_app_pwd")
 
 	# define the array of non-sensitive environment variable names that are exported for use in the container
 	# CUSTOM_ENV_VARS+=("CRON_SCHEDULE")
