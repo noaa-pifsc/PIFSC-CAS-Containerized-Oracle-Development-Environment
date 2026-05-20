@@ -206,8 +206,6 @@ The PIFSC Containerized Oracle Developer Environment (CODE) framework was develo
             -   container: The main action is executing the database scripts to update the database and/or install apex application(s)
     -   The naming convention for these files is: [timing]_[scope]_hook.sh. For example, pre_container_hook.sh will run immediately before the database scripts are executed within the container
     -   These hook script files are saved in the corresponding project fork's /projects/project_name/hook folder
--   ### Container Deployments
-    -   When the 
 
 ## Container Architecture
 -   The code-db container is built from an official Oracle database image, this is defined by DB_IMAGE in the [file-based configuration](#file-based)
@@ -223,7 +221,7 @@ The PIFSC Containerized Oracle Developer Environment (CODE) framework was develo
 ## CODE Implementation Procedure
 -   \*Note: this process will fork a given CODE repository and repurpose it as a project-specific CODE
 -   ### Forking the Repository
-    -   Fork the desired CODE repository (e.g. [CODE](#code-version-control-information)
+    -   Fork the desired CODE repository (e.g. [CODE](#code-version-control-information))
         -   In the git web interface update the name/description of the forked project to specify the data system that is implemented in CODE
     -   Clone the forked project recursively to a working directory
 -   ### CODE Template 
@@ -250,12 +248,13 @@ The PIFSC Containerized Oracle Developer Environment (CODE) framework was develo
             -   Rename and update the [projects/$ACTIVE_PROJECT_NAME/docs/CODE Fork Documentation.template.md](../templates/project_name/docs/CODE%20Fork%20Documentation.template.md) documentation template
                 -   Update the documentation to specify any relevant information about the forked repository   
             -   Update the [secrets.template.sh](../../secrets/secrets.template.sh) template file to include placeholder variables for any secret values used inside of the forked repository.
+-   Update the [README.md](../../README.md) file to reference the renamed [projects/$ACTIVE_PROJECT_NAME/docs/CODE Fork Documentation.template.md](../templates/project_name/docs/CODE%20Fork%20Documentation.template.md) documentation template so each CODE fork's documentation is accessible from the README
 -   ### Implementation Examples
     -   Standalone database with no dependencies: [DSC CODE](https://github.com/noaa-pifsc/PIFSC-DSC-Containerized-Oracle-Development-Environment)
     -   Oracle database and PHP web container application: [Staff Information Application (SIA) CODE](https://github.com/noaa-pifsc/PIFSC-SIA-Containerized-Oracle-Development-Environment)
     -   Oracle database and Apex application: [Centralized Authorization System (CAS) CODE](https://github.com/noaa-pifsc/PIFSC-CAS-Containerized-Oracle-Development-Environment)
 -   ### Upstream Updates
-    -   This project has been structured specifically to minimize the need to merge upstream changes as the CODE project continues to evolve and accommodates chains of forked projects that have complex dependencies. 
+    -   This project has been structured specifically to minimize the need to merge upstream changes as the [CODE framework](#code-version-control-information) continues to evolve and accommodates chains of forked projects that have layered dependencies. 
         -   Each forked repository has its own dedicated project folder so pulling upstream changes will not trigger any merge conflicts
         -   The [core](../) folder contains all of the CODE framework's source code so when changes are made to the [CODE repository](#code-version-control-information) those upstream changes can be pulled by the individual forked repositories without triggering merge conflicts
             -   \*Note: the core folder should only be modified in the CODE repository
@@ -326,6 +325,60 @@ The PIFSC Containerized Oracle Developer Environment (CODE) framework was develo
             -   (Shown as 3b) The custom project-specific scripts will execute to deploy the corresponding database objects    
     -   \*Note: Additional containers can be deployed using the COMPOSE_FILES variable from the custom [Configuration Arrays](#configuration-arrays)
 ![CODE execution diagram](../docs/diagrams/CODE_execution_diagram.drawio.png)
+
+## Contribution & Repository Management Guidelines
+-   To keep the CODE ecosystem clean, maintainable, and free of merge conflicts, contributions must adhere to a strict division of responsibility between the Upstream Engine and Downstream Project Forks.
+-   ### CODE Repository
+    -   Only change files directly in the [CODE repository](#code-version-control-information) when updating the framework's universal core rules, fixing orchestration bugs, or updating base infrastructure templates.
+    -   Where to make changes:
+        -   [core](../) folder and subfolders where appropriate
+    -   \*Note: Never hardcode any project-specific schemas, port configurations, secret structures, or git submodule paths. The engine must remain entirely project-agnostic and parameter-driven.
+-   ### Downstream CODE Forks
+    -   When customizing a specific CODE fork, developers must confine all modifications to project-specific configurations and corresponding submodules with the corresponding [projects](../../projects/) folder for the CODE fork
+    -   In the [Script and Configuration Order](#script-and-configuration-order) example scenario, if the folder name for project B is "projectB", then the only folder project B should modify is projects/projectB
+    -   \*Note: Do not change any of the file or folder names within the corresponding [projects](../../projects/) subfolder, the CODE framework uses specific filenames and folders to determine the behavior of the framework. 
+
+## Monitoring & Syncing Upstream Updates
+-   Because the upstream engine (CODE) and project forks are hosted on GitHub, maintaining clear synchronization lines is key to pulling upstream features, bug fixes, and security patches seamlessly.
+-   ### Watching Upstream Releases on GitHub
+    -   To stay informed of important changes to the CODE framework:
+        -   In the GitHub website, navigate to the given CODE fork's parent repository and use the "Watch" feature, and select "Releases" and "Security Alerts" to receive those notifications. 
+            -   When new releases are made for the parent repository, they can be integrated into the given CODE fork by pulling the upstream changes.
+        -   (Optional) In the GitHub website, navigate to the [CODE repository](#code-version-control-information) and use the "Watch" feature, and select "Releases" and "Security Alerts" to receive those notifications
+            -   \*Note: Changes to the CODE repository must propagate through the chain of linear dependencies to the parent repository before they can be integrated into the given CODE fork repository.
+-   ### Local Git Remote Setup (One-time per repository)
+    -   In the working copy of the given CODE fork repository, add the "upstream" repository using the git remote:
+        ```
+        # Add the upstream repository and name it "upstream"
+        # Replace [GIT_URL] with the actual SSH Git URL of the parent repository
+        git remote add upstream [GIT_URL]
+
+        # Verify that both "origin" (your fork) and "upstream" (the engine) are listed
+        git remote -v
+        ```
+-   ### The Sync Procedure
+    -   \*Note: for simplicity and flexibility, a branching strategy has not been defined but it is recommended. The example code below uses "main" as the branch but it is not advised to merge upstream changes directly into main unless the changes have been thoroughly tested.
+    -   To safely update the working copy with upstream changes safely:
+        -   Fetch and Merge Upstream Updates:
+            ```
+            # Download the latest commits and branches from the parent repository
+            git fetch upstream
+
+            # Explicitly switch to the current branch of the working copy before merging
+            git checkout main
+
+            # Merge the upstream changes into the current branch
+            git merge upstream/main
+            ```
+    -   Resolve Any Conflicts:
+        -   Because of the [.gitattributes](../../.gitattributes) configuration (.active_project merge=ours), any updates to the upstream project pointer ([.active_project](../../projects/.active_project)) will be silently and automatically ignored by Git so users don't need to manually merge the changes
+        -   If conflicts occur in other files, resolve them using standard Git tools.
+    -   Keep Shared Utilities (Submodules) in Sync:
+        -   If the upstream engine modified the [CDS](../modules/CDS) module, or if any upstream forks have mnodified their project-specific modules, ensure the working copy's local submodules are updated to the tracked commits:
+            ```
+            git submodule update --init --recursive
+            ```
+    -   Push Upstream Changes to the CODE fork: `git push origin main` 
 
 ## Connection Information
 For the following connections refer to the active [file-based configuration](#file-based) and the /secrets/secrets.sh for the corresponding $ORACLE_PWD value

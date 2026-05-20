@@ -329,6 +329,14 @@ to do:
 	
 	document
 
+
+		_ update the documentation to move appropriate business rules into the business rules section and reference the business rules in the appropriate sections of the documentation
+		_ remove repetitive information when possible
+		_ identify missing aspects
+		
+
+
+
 		X document that apex dependencies can be implemented as well, they use the same ords server
 		X non-apex app containers can be implemented as well
 
@@ -412,7 +420,7 @@ to do:
 				
 	
 	
-		Implementation:
+		X Implementation:
 			New:
 				X create fork
 
@@ -443,22 +451,20 @@ to do:
 
 				test dev and test deployments
 				
-				merge feature branch
 				
-				pull upstream changes as new releases are deployed
-					Notify via watching a project and/or checking PRI for new releases
+				X merge feature branch
 				
-			pull upstream changes
+				X pull upstream changes as new releases are deployed
+					X Notify via watching a project and/or checking PRI for new releases
+				
+			X pull upstream changes
 			
-	
-	
-	I would also like to have a brief section on watching for updates
 	
 	
 		**** X clearly indicate this is only intended for development and testing purposes
 			* X Not security hardened, encouraged not to work with sensitive data in a shared environment (anyone with docker privileges can connect to your containers and access the data within it)
 			
-		_ contribution guidelines for this project
+		X contribution guidelines for this project
 			how to fork and submit pull requests or attempt to push changes upstream (think through the scenarios)
 			which files to not change in a given project and which ones are ok
 			
