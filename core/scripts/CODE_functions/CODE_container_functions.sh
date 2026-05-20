@@ -835,9 +835,6 @@ function code_container_deploy_custom_database_scripts()
 	# loop through each of the database commands
 	for entry in "${db_scripts_map_ref[@]}"; do
 
-		# parse the pipe-delimited string and store them in separate variables
-        IFS='|' read -r script_path script_command user_secret_name pass_secret_name script_password_secret <<< "$entry"
-	
 		# split the pipe-delimited string into a temporary array
         IFS='|' read -ra elements <<< "$entry"
 	
