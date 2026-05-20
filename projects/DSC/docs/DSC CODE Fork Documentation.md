@@ -1,18 +1,15 @@
-# PIFSC [PROJECT NAME] Containerized Oracle Developer Environment
+# PIFSC DSC Containerized Oracle Developer Environment
 
 ## Overview
-The PIFSC Containerized Oracle Developer Environment (CODE) project was developed to provide a containerized Oracle development environment for PIFSC software developers. The [PROJECT NAME] was forked from the CODE project or a downstream forked CODE project to extend the CODE project's functionality and integrate [PROJECT NAME]'s dependencies. This repository can be forked to extend the existing functionality to any data systems that depend on the [PROJECT NAME] for both development and testing purposes.
+The PIFSC Containerized Oracle Developer Environment (CODE) project was developed to provide a containerized Oracle development environment for PIFSC software developers. The DSC was forked from the CODE project or a downstream forked CODE project to extend the CODE project's functionality and integrate DSC's dependencies. This repository can be forked to extend the existing functionality to any data systems that depend on the DSC for both development and testing purposes.
 
 ## Resources
 -   ### Version Control Information
-    -   URL: <[PROJECT NAME URL]>
-    -   Version: [PROJECT VERSION] (git tag: [PROJECT VERSION TAG])
+    -   URL: https://github.com/noaa-pifsc/PIFSC-DSC-Containerized-Oracle-Development-Environment
+    -   Version: 1.4 (git tag: DSC_CODE_v1.4)
     -   Upstream repository:
         -   CODE Version Control Information:
-            -   URL: <[UPSTREAM PROJECT URL]>
-
-## Appropriate Use
--   Refer to the CODE [Appropriate Use](../../../../core/docs/CODE%20Documentation.md#appropriate-use) for details
+            -   URL: https://github.com/noaa-pifsc/PIFSC-Containerized-Oracle-Development-Environment
 
 ## Prerequisites
 -   Refer to the CODE [Prerequisites](../../../../core/docs/CODE%20Documentation.md#prerequisites) for details
@@ -23,7 +20,10 @@ The PIFSC Containerized Oracle Developer Environment (CODE) project was develope
 ## Dependencies
 -   Refer to the CODE [Dependencies](../../../../core/docs/CODE%20Documentation.md#dependencies) for details
 -   Custom Dependencies:
-    -   [LIST ALL PROJECT DEPENDENCIES]
+    -   ### DSC Version Control Information
+        -   folder path: [/projects/DSC/modules/DSC](../modules/DSC) 
+        -   Version Control Information:
+            -   URL: <git@github.com:noaa-pifsc/PIFSC-DSC.git>
 
 ## Naming Conventions
 -   Refer to the CODE [Repository Fork Diagram](../../../../core/docs/CODE%20Documentation.md#naming-conventions) for details
