@@ -848,6 +848,13 @@ function code_container_deploy_custom_database_scripts()
 		local username="$(cds_shared_get_secret_value "${user_secret_name}")"
 		local password="$(cds_shared_get_secret_value "${pass_secret_name}")"
 
+		# validate the current secret value
+		if ! code_container_validate_secret "${password}"; then
+			# the secret value is invalid
+			echo "Error: ${FUNCNAME[0]}() function - secret value contains an illegal space or quote character."
+			return 1
+		fi
+
 		# construct the connection string:
 		local connection_string="${username}/\"${password}\"@${arg_ref[dbhost]}:${arg_ref[dbport]}/${arg_ref[dbservicename]}"
 
@@ -862,8 +869,18 @@ function code_container_deploy_custom_database_scripts()
 			# trim whitespace surrounding the current secret name
 			local secret_name="$(echo "${elements[i]}" | xargs)"
 			
+			# resolve the current secret value
+			local secret_value="$(cds_shared_get_secret_value "${secret_name}")"
+
+			# validate the current $secret_value
+			if ! code_container_validate_secret "${secret_value}"; then
+				# the secret value is invalid
+				echo "Error: ${FUNCNAME[0]}() function - secret value contains an illegal space or quote character."
+				return 1
+			fi
+
 			# append the secret to the sql_args array (enclose with quotes for sqlplus)
-			sql_args+=("\"$(cds_shared_get_secret_value "${secret_name}")\"")
+			sql_args+=("\"${secret_value}\"")
 		done
 
 		# change to the script_path to run the script_command
@@ -881,4 +898,30 @@ EOF
 		fi	
 	
 	done
+}
+
+# function that checks if a secret value contains invalid characters (space, single/double quotes), it will return 0 if the secret is valid and 1 if the secret is invalid
+# the function accepts the following arguments:
+# 1: secret_value: the secret value that is being validated
+function code_container_validate_secret()
+{
+	local secret_value="${1}"
+
+	# validate the bash variable values
+	if ! cds_shared_validate_required_vars "secret_value"; then
+		echo "Error: ${FUNCNAME[0]}() function required bash variable validation failed" >&2
+		return 1
+	fi
+
+	# validate that the current password does not contain a space or double/single quote character
+	if [[ "${secret_value}" =~ [[:space:]\'\"] ]]; then
+		# the secret value is invalid
+		echo "Error: the secret value contains an illegal space or quote character."
+		return 1
+	else
+		# the secret value is valid
+		return 0
+
+	fi
+	
 }
