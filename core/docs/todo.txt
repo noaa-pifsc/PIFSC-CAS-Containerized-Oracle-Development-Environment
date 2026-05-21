@@ -2,8 +2,8 @@
 to do:
 
 
-	working on updating pri_secrets.yml 
-		need to override the secrets for the PRI application because they have the ${COMPOSE_PROJECT} prefix
+	X working on updating pri_secrets.yml 
+		X need to override the secrets for the PRI application because they have the ${COMPOSE_PROJECT} prefix
 
 	_ implement branch protection for all CODE forks
 	
@@ -11,8 +11,12 @@ to do:
 	_ test if the passwords can have special characters in them that would normally require enclosing quotes
 		- @, $, %, *, etc.
 	
+	_ detect spaces and double quotes in the password values before they are used
+		_ do this in the code_container_deploy_custom_database_scripts() function before they are used, since it will cause an error
+		
 
-	_ Update README.md for the forks to link to the project folder documentation
+
+	X Update README.md for the forks to link to the project folder documentation
 
 		
 	_ ** re-examine restart policy for the code-db-ords-deploy container - it should probably retry on failure (5 times?)
