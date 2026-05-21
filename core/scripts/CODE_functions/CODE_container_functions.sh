@@ -315,7 +315,7 @@ function code_container_deploy_database_scripts ()
 	local sys_password="$(cat ${arg_ref[oracle_pwd_file]})"
 	
 	# define the SYS credentials for use in deployment scripts based on environment variables:
-	local sys_credentials="SYS/${sys_password}@${arg_ref[dbhost]}:${arg_ref[dbport]}/${arg_ref[dbservicename]} as SYSDBA"
+	local sys_credentials="SYS/\"${sys_password}\"@${arg_ref[dbhost]}:${arg_ref[dbport]}/${arg_ref[dbservicename]} as SYSDBA"
 
 #	echo "Running the custom database/apex deployment process"
 
@@ -849,7 +849,7 @@ function code_container_deploy_custom_database_scripts()
 		local password="$(cds_shared_get_secret_value "${pass_secret_name}")"
 
 		# construct the connection string:
-		local connection_string="${username}/${password}@${arg_ref[dbhost]}:${arg_ref[dbport]}/${arg_ref[dbservicename]}"
+		local connection_string="${username}/\"${password}\"@${arg_ref[dbhost]}:${arg_ref[dbport]}/${arg_ref[dbservicename]}"
 
 		# define array to store the arbitrary number of additional secrets (argument index 4 and onwards)
 		local sql_args=()
@@ -871,7 +871,7 @@ function code_container_deploy_custom_database_scripts()
 		
 # use sqlplus to run the current script_command, expand $sql_args for the additional secrets that are defined for the sql script
 sqlplus -s /nolog <<EOF
-${script_command} "${connection_string}" ${sql_args[@]}
+${script_command} ${connection_string} ${sql_args[@]}
 EOF
 	
 		# check return code for sqlplus query

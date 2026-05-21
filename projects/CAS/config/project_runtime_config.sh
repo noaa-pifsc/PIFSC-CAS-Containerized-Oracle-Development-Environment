@@ -24,3 +24,6 @@
 
 	# define the container git project URL
 	GIT_URL="--branch Branch_CODE_v1.4_install git@github.com:noaa-pifsc/PIFSC-CAS-Containerized-Oracle-Development-Environment.git"
+		
+	# define the container server hostname configuration information
+	HOSTNAME="pifsc-test-docker-01-as"
