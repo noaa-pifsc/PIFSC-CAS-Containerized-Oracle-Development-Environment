@@ -65,6 +65,8 @@ The PIFSC Containerized Oracle Developer Environment (CODE) project was develope
 ## Connection Information
 -   Refer to the CODE [Connection Information](../../../../core/docs/CODE%20Documentation.md/-/blob/main/README.md?ref_type=heads#connection-information) for details
     -   The individual account passwords can be found in the /secrets/secrets.sh file 
+-   The CAS application can be accessed at the following URL (where \$\{ORDS_HOST_PORT\} is the matching value in the active [file-based runtime configuration](../../../core/docs/CODE%20Documentation.md#file-based)):
+    -   <http://localhost:${ORDS_HOST_PORT}/ords/f?p=CAS>
 
 ## Security Features
 -   Refer to the CODE [Security Features](../../../../core/docs/CODE%20Documentation.md#security-features) for details
