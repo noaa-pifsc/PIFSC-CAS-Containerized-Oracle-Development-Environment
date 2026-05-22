@@ -11,6 +11,9 @@ The PIFSC Containerized Oracle Developer Environment (CODE) project was develope
         -   CODE Version Control Information:
             -   URL: https://github.com/noaa-pifsc/PIFSC-DSC-Containerized-Oracle-Development-Environment
 
+## Appropriate Use
+-   Refer to the CODE [Appropriate Use](../../../../core/docs/CODE%20Documentation.md#appropriate-use) for details
+
 ## Prerequisites
 -   Refer to the CODE [Prerequisites](../../../../core/docs/CODE%20Documentation.md#prerequisites) for details
 
