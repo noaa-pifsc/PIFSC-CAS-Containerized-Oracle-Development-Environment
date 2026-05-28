@@ -1,41 +1,27 @@
 # PIFSC Containerized Oracle Developer Environment
 
 ## Overview
-The PIFSC Containerized Oracle Developer Environment (CODE) framework was developed to provide an Oracle development environment for PIFSC software developers.  The framework can be extended to automatically create/deploy database schemas and applications to allow data systems with dependencies to be developed and tested using the CODE.  This repository or any other forked CODE repository can be forked to customize CODE for a specific software project and integrate its dependencies.  
+The PIFSC Containerized Oracle Developer Environment (CODE) framework was developed to provide an Oracle development environment for PIFSC software developers.  The framework can be extended to automatically create/deploy database schemas and applications to allow data systems with dependencies to be developed and tested using the CODE.  This repository or any other forked CODE repository can be forked to customize CODE for a specific data system and integrate its dependencies.  
 
 ## Resources
 -   ### CODE Version Control Information
     -   URL: https://github.com/noaa-pifsc/PIFSC-Containerized-Oracle-Development-Environment
     -   Version: 1.4 (git tag: CODE_v1.4)
--   [CODE Demonstration Outline](./docs/demonstration_outline.md)
+-   [CODE Demonstration Outline](./demonstration_outline.md)
 -   [CODE Repository Fork Diagram](./diagrams/CODE_fork_diagram.drawio.png)
     -   [CODE Repository Fork Diagram source code](./diagrams/CODE_fork_diagram.drawio)
 -   [CODE Execution Diagram](./diagrams/CODE_execution_diagram.drawio.png)
     -   [CODE Execution Diagram source code](./diagrams/CODE_execution_diagram.drawio)
 
-## Appropriate Use
+## Intended Use
 -   The CODE project is NOT intended for production use, it was developed to provide a containerized development and testing environment. There has been no rigorous security hardening process that complies with federal security requirements. 
 -   The CODE project can be used to develop and test features and applications without requiring System Administrator support. The user specifies the administrator passwords when the container is run so they can make system-level configuration changes directly in the database or ORDS containers and then provide the working configuration settings to the System Administrator for implementation in the enterprise test and production environments.
 
 ## Prerequisites
--   Create an account or login to the [Oracle Image Registry](https://container-registry.oracle.com)
-    -   Generate an auth token
-        -   Click on your username and choose "Auth Token"
-        -   Click "Generate Secret Key"
-        -   Click "Copy Secret Key"
-            -   Save this key somewhere secure, you will need it to login to the container registry via docker
-    -   Using the command (cmd) prompt or git bash, log into Oracle Registry with your secret Auth Token
-    ```
-    docker login container-registry.oracle.com
-    ```
-    -   To sign in with a different user account, just use logout command:
-    ```
-    docker logout container-registry.oracle.com
-    ```
 -   Windows/Linux machine serving as the local client
     -   Bash (this was developed using Windows git bash)
-    -   OpenSSH is setup to work with CAC authentication
-    -   OpenSSH is configured to specify the username in the ~/.ssh/config file for each container host (e.g. docker_dev for the dev container host)
+    -   SSH is setup to work with CAC authentication
+    -   SSH is configured to specify the username in the ~/.ssh/config file for each container host (e.g. docker_dev for the dev container host)
         -   The ForwardAgent feature is enabled to allow the git repositories to be cloned on the container host
 -   Automated Database Deployments:
     -   The individual project repositories that are implemented as git submodules for a given CODE fork must define automated database deployment scripts that can be executed via SQL*Plus
@@ -52,6 +38,17 @@ The PIFSC Containerized Oracle Developer Environment (CODE) framework was develo
     -   folder path: [/core/modules/CDS](../modules/CDS)
     -   Version Control Information:
         -   URL: <git@github.com:noaa-pifsc/PIFSC-Container-Deployment-System.git>
+
+## Container Architecture
+-   The code-db container is built from an official Oracle database image, this is defined by $DB_IMAGE in the [file-based configuration](#file-based)
+-   The code-db-ords-deploy container is built from a custom dockerfile ([Dockerfile.deploy](../build/Dockerfile.deploy)) that uses an official Oracle InstantClient image with some custom libraries installed.  
+    -   This container waits until the code-db container is running and the service is healthy before running the [container_deploy_database.sh](../scripts/container_scripts/container_deploy_database.sh) bash script
+        -   The script will then deploy all database schemas, database objects, and when applicable the Apex workspaces, and Apex apps
+        -   \*Note: Refer to the [file-based runtime configuration](#file-based) for relevant business rule information
+    -   Once the code-db_ords_deploy container finishes deploying the database schemas/apps the container will shut down.  
+-   The code-ords container is built from an official Oracle ORDS image, this is defined by $ORDS_IMAGE in the [file-based configuration](#file-based)  
+    -   This container runs [ords_startup.sh](../scripts/ords_scripts/ords_startup.sh) in the container before the ORDS container's official docker entrypoint executes. This script specifies the required Apex and ORDS configuration
+        -   \*Note: the apex configuration files are generated instead of using the CLI ORDS commands to specify the configuration because each CLI command took several seconds to execute.
 
 ## Naming Conventions
 -   ### Functions
@@ -149,7 +146,7 @@ The PIFSC Containerized Oracle Developer Environment (CODE) framework was develo
                 -   \*Note: In the [linear dependency example](#linear-dependency-example), for project B the $PROJECT_FOLDER_NAME = Project A's folder name, and for Project C the $PROJECT_FOLDER_NAME = Project B's folder name
                 -   \*Note: If there is no direct linear dependency for the given project $ACTIVE_PROJECT_NAME is blank, in the [linear dependency example](#linear-dependency-example) this applies to Project A
         -   #### Top-Level Parent
-            -   The project at the top of the linear dependency chain. In the [linear dependency examples](#linear-dependency-example) the top-level parent is Project A.
+            -   The forked repository at the top of the linear dependency chain. In the [linear dependency examples](#linear-dependency-example) the top-level parent is Project A.
     -   #### Configuration Arrays:
         -   Each time the CODE framework runs it will iterate through the defined configuration arrays and perform the defined actions
         -   The configuration arrays are defined in the corresponding projects/\[PROJECT_NAME\]/config/project_manifest_config.sh file:
@@ -230,23 +227,21 @@ The PIFSC Containerized Oracle Developer Environment (CODE) framework was develo
     -   The naming convention for these files is: [timing]_[scope]_hook.sh. For example, pre_container_hook.sh will run immediately before the database scripts are executed within the container
     -   These hook script files are saved in the corresponding project fork's /projects/project_name/hook folder
 
-## Container Architecture
--   The code-db container is built from an official Oracle database image, this is defined by $DB_IMAGE in the [file-based configuration](#file-based)
--   The code-db-ords-deploy container is built from a custom dockerfile ([Dockerfile.deploy](../build/Dockerfile.deploy)) that uses an official Oracle InstantClient image with some custom libraries installed.  
-    -   This container waits until the code-db container is running and the service is healthy before running the [container_deploy_database.sh](../scripts/container_scripts/container_deploy_database.sh) bash script
-        -   The script will then deploy all database schemas, database objects, and when applicable the Apex workspaces, and Apex apps
-        -   \*Note: Refer to the [file-based runtime configuration](#file-based) for relevant business rule information
-    -   Once the code-db_ords_deploy container finishes deploying the database schemas/apps the container will shut down.  
--   The code-ords container is built from an official Oracle ORDS image, this is defined by $ORDS_IMAGE in the [file-based configuration](#file-based)  
-    -   This container runs [ords_startup.sh](../scripts/ords_scripts/ords_startup.sh) in the container before the ORDS container's official docker entrypoint executes. This script specifies the required Apex and ORDS configuration
-        -   \*Note: the apex configuration files are generated instead of using the CLI ORDS commands to specify the configuration because each CLI command took several seconds to execute.
-
 ## CODE Implementation Procedure
 -   \*Note: this process will fork a given CODE repository and repurpose it as a project-specific CODE
 -   ### Forking the Repository
     -   Fork the desired CODE repository (e.g. [CODE](#code-version-control-information))
         -   In the git web interface update the name/description of the forked project to specify the data system that is implemented in CODE
     -   Clone the forked project recursively to a working directory
+        -   In the working copy of the given CODE fork repository, add the "upstream" repository using the git remote:
+            ```
+            # Add the upstream repository and name it "upstream"
+            # Replace [$GIT_URL] with the actual SSH Git URL of the parent repository
+            git remote add upstream [$GIT_URL]
+
+            # Verify that both "origin" (your fork) and "upstream" are listed
+            git remote -v
+            ```
 -   ### CODE Template 
     -   Copy the [project template](../templates/project_name) folder into the [/projects](../../projects) folder
         -   \*Note: Do not modify any of the other folders within the [/projects](../../projects) folder since those are managed in upstream forked CODE repositories.
@@ -275,6 +270,9 @@ The PIFSC Containerized Oracle Developer Environment (CODE) framework was develo
                 -   For more information refer to the [Automated Hooks](#automated-hooks) section for relevant business rule information 
             -   Rename and update the [projects/$ACTIVE_PROJECT_NAME/docs/CODE Fork Documentation.template.md](../templates/project_name/docs/CODE%20Fork%20Documentation.template.md) documentation template
                 -   Update the documentation to specify any relevant information about the forked repository   
+                    -   The "Upstream Repositories" section should list all of the forked repository's parent repositories
+                    -   The "Dependencies" section should list all dependencies of the current forked repository as well as all the forked repository's parent repositories
+                -   Refer to the [CTP Fork Documentation](https://github.com/noaa-pifsc/PIFSC-CTP-Containerized-Oracle-Development-Environment/blob/main/projects/CTP/docs/CTP%20CODE%20Fork%20Documentation.md) for an example of a forked CODE project with two levels of direct linear project dependencies
             -   Update the [secrets.template.sh](../../secrets/secrets.template.sh) template file to include placeholder variables for any secret values used inside of the forked repository.
                 -   \*Note: Refer to [Secret Definitions](#secret-definitions) for details about the secrets.sh variables for a given CODE fork
 -   Update the [README.md](../../README.md) file to reference the renamed [projects/$ACTIVE_PROJECT_NAME/docs/CODE Fork Documentation.template.md](../templates/project_name/docs/CODE%20Fork%20Documentation.template.md) documentation template so each CODE fork's documentation is accessible from the README
@@ -328,6 +326,8 @@ The PIFSC Containerized Oracle Developer Environment (CODE) framework was develo
     -   #### Test:
         -   (env_name = "test") This scenario does not retain the database across container restarts, this is intended to test the deployment process of schemas and applications
         -   \*Note: the container run process can take up to approximately 30 minutes depending on the resources allocated to the container platform software since the database is initialized and when $ORDS_ENABLED is "yes" it also installs Apex on the ORDS container
+    -   \*Note: development and test deployments can be run concurrently to allow flexible software development workflows. 
+        -   For example, a development instance can be used for incremental development and the updated database scripts can be periodically tested by deploying them with a test environment to ensure the database deployment process works properly. The database diff tool can be used to ensure the deployment process on the test instance produces the same data model as the development instance    
 -   A log file for each client script execution is saved in the [logs](../../logs) folder and is named client_deploy_application.sh.$(date +%Y%m%d_%H%M%S).log based on the date/time the script is executed.  This file will include the output from the remote host and container scripts
 -   ### CODE Execution Diagram
     -   The [CODE execution diagram](../docs/diagrams/CODE_execution_diagram.drawio.png) provides an overview of the CODE execution for both server and local deployments.
@@ -364,16 +364,6 @@ The PIFSC Containerized Oracle Developer Environment (CODE) framework was develo
             -   When new releases are made for the parent repository, they can be integrated into the given CODE fork by pulling the upstream changes.
         -   (Optional) In the GitHub website, navigate to the [CODE repository](#code-version-control-information) and use the "Watch" feature, and select "Releases" and "Security Alerts" to receive those notifications
             -   \*Note: Changes to the CODE repository must propagate through the chain of linear dependencies to the parent repository before they can be integrated into the given CODE fork repository.
--   ### Local Git Remote Setup (One-time per repository)
-    -   In the working copy of the given CODE fork repository, add the "upstream" repository using the git remote:
-        ```
-        # Add the upstream repository and name it "upstream"
-        # Replace [$GIT_URL] with the actual SSH Git URL of the parent repository
-        git remote add upstream [$GIT_URL]
-
-        # Verify that both "origin" (your fork) and "upstream" (the engine) are listed
-        git remote -v
-        ```
 -   ### The Sync Procedure
     -   This project has been structured specifically to minimize the need to merge upstream changes as the [CODE framework](#code-version-control-information) continues to evolve and accommodates chains of forked projects that have layered dependencies. 
         -   Each forked repository has its own dedicated project subfolder in the [/projects](../../projects) folder, so pulling upstream changes will not trigger any merge conflicts
@@ -399,7 +389,7 @@ The PIFSC Containerized Oracle Developer Environment (CODE) framework was develo
         -   Because of the [.gitattributes](../../.gitattributes) configuration (.active_project merge=ours), any updates to the upstream project pointer ([.active_project](../../projects/.active_project)) will be silently and automatically ignored by Git so users don't need to manually merge the changes
         -   If conflicts occur in other files, resolve them using standard Git tools.
     -   Keep Shared Utilities (Submodules) in Sync:
-        -   If the upstream engine modified the [CDS](../modules/CDS) module, or if any upstream forks have mnodified their project-specific modules, ensure the working copy's local submodules are updated to the tracked commits:
+        -   If the upstream engine modified the [CDS](../modules/CDS) module, or if any upstream forks have modified their project-specific modules, ensure the working copy's local submodules are updated to the tracked commits:
             ```
             git submodule update --init --recursive
             ```
@@ -423,7 +413,7 @@ For the following connections refer to the active [file-based configuration](#fi
 
 ## Security Features
 -   The CODE project inherits security features from the [CDS module](./modules/CDS/README.md#security-features).
--   Secure In-Memory Data Transmission (STDIN): Secret values (like passwords and API keys) are never passed as command-line arguments. Instead, they are securely transmitted to remote servers, and between script calls, purely via standard input (STDIN / pipelining). This prevents sensitive data from appearing in process lists, system logs, or bash history files.
--   Decoupled Configuration Adapter Pattern: The core CODE engine enforces a strict Separation of Concerns. It remains completely independent of project-specific global variables. It only operates on strictly validated associative arrays passed from the client adapter, ensuring that the engine itself cannot inadvertently expose or mishandle project-specific configurations.
+-   Secure In-Memory Data Transmission (STDIN): Secret values are never passed as command-line arguments. They are securely transmitted to remote servers, and between script calls, purely via standard input (STDIN / pipelining). This prevents sensitive data from appearing in process lists, system logs, or bash history files.
+-   Decoupled Configuration Adapter Pattern: The core CODE engine enforces a strict Separation of Concerns. It remains completely independent of project-specific global variables. It only operates on strictly validated associative arrays and arguments passed from the client adapter, ensuring that the engine itself cannot inadvertently expose or mishandle project-specific configurations.
 -   Docker Secrets: Database credentials are defined as secrets and retrieved dynamically within the container to protect them from unauthorized access
 -   Immutable Shell Executions: When elevating privileges to run container commands, CODE utilizes rigid Heredocs (\<\<EOF) to pipe commands into the new shell. This creates an immutable execution block that safely separates the runtime variables from the raw secret payload.

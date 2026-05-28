@@ -1,6 +1,16 @@
 
 to do:
 
+	_ reordered documentation, propagate changes down the dependency chain
+	
+	_ tagging strategy
+		_ yml file (use a template)
+		_ tag message
+		_ documentation for method
+		
+		
+	
+
 	_ is there a way to query gitlab or github for all the git submodules implemented for a given repository?
 		This could serve as a metric for utilization, and it would help to notify folks when there are updates available. This could be more directed than watching a github project
 
@@ -9,6 +19,8 @@ to do:
 		_ look to add the cron jobs later for the UVM and BDM
 		
 		
+	** (5/26/26) CODE is now at branch: Branch_CODE_v1.4
+		_ pull upstream changes into the different forked repos
 
 
 	X working on updating pri_secrets.yml 
