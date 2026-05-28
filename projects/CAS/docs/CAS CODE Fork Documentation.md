@@ -7,12 +7,16 @@ The PIFSC Containerized Oracle Developer Environment (CODE) project was develope
 -   ### Version Control Information
     -   URL: <https://github.com/noaa-pifsc/PIFSC-CAS-Containerized-Oracle-Development-Environment>
     -   Version: 1.3 (git tag: CAS_CODE_v1.3)
-    -   Upstream repository:
-        -   CODE Version Control Information:
+    -   Upstream Repositories (in order from direct parent to top-level parent):
+        -   DSC CODE Version Control Information:
             -   URL: <https://github.com/noaa-pifsc/PIFSC-DSC-Containerized-Oracle-Development-Environment>
+            -   Version: 1.4 (git tag: DSC_CODE_v1.4)
+        -   CODE Version Control Information:
+            -   URL: <https://github.com/noaa-pifsc/PIFSC-Containerized-Oracle-Development-Environment>
+            -   Version: 1.4 (git tag: CODE_v1.4)
 
-## Appropriate Use
--   Refer to the CODE [Appropriate Use](../../../../core/docs/CODE%20Documentation.md#appropriate-use) for details
+## Intended Use
+-   Refer to the CODE [Intended Use](../../../../core/docs/CODE%20Documentation.md#intended-use) for details
 
 ## Prerequisites
 -   Refer to the CODE [Prerequisites](../../../../core/docs/CODE%20Documentation.md#prerequisites) for details
@@ -27,10 +31,16 @@ The PIFSC Containerized Oracle Developer Environment (CODE) project was develope
         -   folder path: [/projects/DSC/modules/DSC](../../DSC/modules/DSC) 
         -   Version Control Information:
             -   URL: <git@github.com:noaa-pifsc/PIFSC-DSC.git>
+            -   Version 1.1 (git tag: dsc_db_v1.1)
     -   ### CAS Version Control Information
-        -   folder path: [/projects/CAS/modules/AAM](../modules/AAM) 
+        -   folder path: [/projects/CAS/modules/AAM](../../CAS/modules/AAM) 
         -   Version Control Information:
             -   URL: <git@picgitlab.nmfs.local:centralized-data-tools/authorization-application-module.git>
+            -   Application Version: 1.1 (Git tag: cas_app_v1.1)
+            -   Database Version: 1.2 (Git tag: central_auth_app_db_v1.2)
+
+## Container Architecture
+-   Refer to the CODE [Container Architecture](../../../../core/docs/CODE%20Documentation.md#container-architecture) for details
 
 ## Naming Conventions
 -   Refer to the CODE [Repository Fork Diagram](../../../../core/docs/CODE%20Documentation.md#naming-conventions) for details
@@ -43,9 +53,6 @@ The PIFSC Containerized Oracle Developer Environment (CODE) project was develope
 
 ## CODE Business Rules
 -   Refer to the CODE [Business Rules](../../../../core/docs/CODE%20Documentation.md#code-business-rules) for details
-
-## Container Architecture
--   Refer to the CODE [Container Architecture](../../../../core/docs/CODE%20Documentation.md#container-architecture) for details
 
 ## CODE Implementation Procedure
 -   Refer to the CODE [Implementation Procedure](../../../../core/docs/CODE%20Documentation.md#code-implementation-procedure) for details
@@ -63,7 +70,7 @@ The PIFSC Containerized Oracle Developer Environment (CODE) project was develope
 -   Refer to the [Monitoring and Syncing Upstream Updates](../../../../core/docs/CODE%20Documentation.md#monitoring-and-syncing-upstream-updates) for details
 
 ## Connection Information
--   Refer to the CODE [Connection Information](../../../../core/docs/CODE%20Documentation.md/-/blob/main/README.md?ref_type=heads#connection-information) for details
+-   Refer to the CODE [Connection Information](../../../../core/docs/CODE%20Documentation.md#connection-information) for details
     -   The individual account passwords can be found in the /secrets/secrets.sh file 
 -   The CAS application can be accessed at the following URL (where \$\{ORDS_HOST_PORT\} is the matching value in the active [file-based runtime configuration](../../../core/docs/CODE%20Documentation.md#file-based)):
     -   <http://localhost:${ORDS_HOST_PORT}/ords/f?p=CAS>
