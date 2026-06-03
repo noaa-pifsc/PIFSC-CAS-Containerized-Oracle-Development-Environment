@@ -1,14 +1,14 @@
 
 to do:
 
-	_ update PRI repo to specify a variable to define the port and then simply override that variable in the PRI CODE repository and move on.
-		_ we can define this in the custom configuration file so it can be changed to allow concurrent CODE containers to run
+	X update PRI repo to specify a variable to define the port and then simply override that variable in the PRI CODE repository and move on.
+		X we can define this in the custom configuration file so it can be changed to allow concurrent CODE containers to run
 		
 
 
-	_ update the docker apps to allow the HTTPS ports to be defined by a configuration variable
+	X update the docker apps to allow the HTTPS ports to be defined by a configuration variable
 	
-	_ PRI: fix problem with CRON_SCHEDULE not being transferred properly -> it should work without modification with the configuration file loading hooks, check again
+	X PRI: fix problem with CRON_SCHEDULE not being transferred properly -> it should work without modification with the configuration file loading hooks, check again
 	
 
 	X reordered documentation, propagate changes down the dependency chain
@@ -76,8 +76,8 @@ to do:
 				_ LHP
 				_ PRI
 				_ LCE
-			_ CAD:
-				_ general improvements:
+			X CAD:
+				X general improvements:
 					X use ${FUNCNAME[0]} instead of hardcoding the function names in error messages
 					X update cds_host_deploy_container function calls to set persistent_container flag
 					X cds_host_cleanup_container_source_folder() accepts two parameters now (source_dir, target_user)
@@ -93,10 +93,10 @@ to do:
 						_ change to use array arguments (since there are 5 args now)
 						
 						_ this should be implemented as an option to allow volumes to be easily removed
-					_ update 
-				_ PRI
-				_ SIA
-				_ PLW
+					X update 
+				X PRI
+				X SIA
+				X PLW
 
 			
 		
