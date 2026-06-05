@@ -12,11 +12,8 @@ The PIFSC Containerized Oracle Developer Environment (CODE) project was develope
             -   URL: <[UPSTREAM PROJECT URL]>
             -   Version: [UPSTREAM VERSION] (git tag: [UPSTREAM VERSION TAG])
 
-## Intended Use
--   Refer to the CODE [Intended Use](../../../../core/docs/CODE%20Documentation.md#intended-use) for details
-
-## Prerequisites
--   Refer to the CODE [Prerequisites](../../../../core/docs/CODE%20Documentation.md#prerequisites) for details
+## Requirements
+-   Refer to the CODE [Requirements](../../../../core/docs/CODE%20Documentation.md#requirements) for details
 
 ## Container Host Instances
 -   Refer to the CODE [Container Host Instances](../../../../core/docs/CODE%20Documentation.md#container-host-instances) for details
