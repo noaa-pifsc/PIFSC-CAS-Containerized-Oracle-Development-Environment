@@ -8,8 +8,9 @@ to do:
 
 		_ think about how to automate retrieving and parsing a manifest file (using PRI GIM) that will associate the upstream repositories with the given CODE fork
 		
-		_ is there a way to query gitlab or github for all the git submodules implemented for a given repository?
+		_ (no need to do this if the tagging strategy is followed) is there a way to query gitlab or github for all the git submodules implemented for a given repository?
 			This could serve as a metric for utilization, and it would help to notify folks when there are updates available. This could be more directed than watching a github project
+			X Currently the tagging strategy is to tag submodule versions when they are integrated, so this information could be derived from matching tags
 
 	add as github issues:
 		_ pre-bake images? (this is usually a one-time setup except for test runs where it will be installed as part of the deployment process)
@@ -125,11 +126,27 @@ document:
 	X review the sections defined for CDD/CAD and implement the ones that are appropriate
 		
 
+
+	X design strategy:
+		X leverage modularity to promote code reuse
+		X leverage inheritance to allow fully working real-world data systems to be built upon easily or to run them as individual copies for various purposes (review, evaluation, development, etc.)
+		Developers are free to implement any of these as submodules
+		
+	Benefits:
+		X Fully portable applications. Now if some Center likes a certain application or database utility they can run it themselves
+			X Before with database dependencies it would've been very challenging to 
+			X Can be used for evaluation purposes
+
+		GitHub public repos:
+			Anyone in NMFS can clone, run, and evaluate the databases/apps
+			
+
+
 git bash commands:
 
 
 	# change into repo directory:
-	cd /c/Users/jesse.abdul/Documents/Version\ Control/Git/PIFSC-Containerized-Oracle-Development-Environment/core/scripts/client_scripts
+	cd /c/Users/USERNAME/Documents/Version\ Control/Git/PIFSC-Containerized-Oracle-Development-Environment/core/scripts/client_scripts
 
 
 
@@ -178,269 +195,268 @@ git bash commands:
 		# shutdown the container (server)
 		bash ./client_execute_CODE_scripts.sh shutdown test server no
 
-Key:
-	L => laptop
-	V => Virtual Machine
+	
 
 testing:
-	X server:
-		X deploy
-			X test
-				X ORDS_ENABLED:
-					X yes
-						X installs db, ords, apex from scratch
-							X verify ORDS/Apex login
-							X verify DB connectivity
-								X Create temp table and insert data
-						X validation:
-							X invalid TARGET_APEX_VERSION (format fails - 24.3.1)
-							X incorrect TARGET_APEX_VERSION (does not exist - 24.6)
-						X REM_VOL
-							X yes - remove apex static volume
-							X no - retain all volumes
-					X no
-						X REM_VOL
-							X yes - remove apex static volume
-								X verify DB connectivity
-							X no
-								X verify DB connectivity
-			X dev
-				X ORDS_ENABLED:
-					X yes
-						X installs db, ords, apex from scratch
-							X verify ORDS/Apex login
-							X verify DB connectivity
-								X Create temp table and insert data
-						X (same TARGET_APEX_VERSION) resume db, ords, apex
-							X verify ORDS/Apex login
-							X verify DB connectivity
-								X verify temp table
-						X (increase TARGET_APEX_VERSION) resume db, ords, apex
-							X verify ORDS/Apex login
-							X verify DB connectivity
-								X verify temp table
-						X REM_VOL
-							X yes - remove all volumes
-								X verify ORDS/Apex login
-								X verify DB connectivity
-									X Create temp table and insert data
-							X no - retain all volumes
-						X validation:
-							X decrease TARGET_APEX_VERSION (downgrade error)
-							X invalid TARGET_APEX_VERSION (format fails - 24.3.1)
-							X incorrect TARGET_APEX_VERSION (does not exist - 24.6)
-					X no - ORDS container does not run
+	*Note: used PRI for the ORDS_ENABLED = no cases and CTP for ORDS_ENABLED = yes test cases
+	_ server:
+		_ deploy
+			_ test
+				_ ORDS_ENABLED:
+					_ yes
+						_ installs db, ords, apex from scratch
+							_ verify ORDS/Apex login
+							_ verify DB connectivity
+								_ Create temp table and insert data
+						_ validation:
+							_ invalid TARGET_APEX_VERSION (format fails - 24.3.1)
+							_ incorrect TARGET_APEX_VERSION (does not exist - 24.6)
+						_ REM_VOL
+							_ yes - remove apex static volume
+							_ no - retain all volumes
+					_ no
+						_ REM_VOL
+							_ yes - remove apex static volume
+								_ verify DB connectivity
+							_ no
+								_ verify DB connectivity
+			_ dev
+				_ ORDS_ENABLED:
+					_ yes
+						_ installs db, ords, apex from scratch
+							_ verify ORDS/Apex login
+							_ verify DB connectivity
+								_ Create temp table and insert data
+						_ (same TARGET_APEX_VERSION) resume db, ords, apex
+							_ verify ORDS/Apex login
+							_ verify DB connectivity
+								_ verify temp table
+						_ (increase TARGET_APEX_VERSION) resume db, ords, apex
+							_ verify ORDS/Apex login
+							_ verify DB connectivity
+								_ verify temp table
+						_ REM_VOL
+							_ yes - remove all volumes
+								_ verify ORDS/Apex login
+								_ verify DB connectivity
+									_ Create temp table and insert data
+							_ no - retain all volumes
+						_ validation:
+							_ decrease TARGET_APEX_VERSION (downgrade error)
+							_ invalid TARGET_APEX_VERSION (format fails - 24.3.1)
+							_ incorrect TARGET_APEX_VERSION (does not exist - 24.6)
+					_ no - ORDS container does not run
 						X initial
 							X verify DB connectivity
 							X Create temp table and insert data
-						X restart
-							X verify DB connectivity
-							X verify temp table
-						X REM_VOL
-							X yes - remove all volumes
-								X verify DB connectivity
-									X Create temp table and insert data
-							X no - retain all volumes
-		X shutdown
-			X test
-				X REM_VOL
-					X yes
+						_ restart
+							_ verify DB connectivity
+							_ verify temp table
+						_ REM_VOL
+							_ yes - remove all volumes
+								_ verify DB connectivity
+									_ Create temp table and insert data
+							_ no - retain all volumes
+		_ shutdown
+			_ test
+				_ REM_VOL
+					_ yes
 						ORDS_ENABLED:
-							X yes: remove apex static volume
-							X no: remove apex static volume
-					X no
+							_ yes: remove apex static volume
+							_ no: remove apex static volume
+					_ no
 						ORDS_ENABLED:
-							X yes: retain volumes
-							X no: retain volumes
-			X dev
-				X REM_VOL
-					X yes
+							_ yes: retain volumes
+							_ no: retain volumes
+			_ dev
+				_ REM_VOL
+					_ yes
 						ORDS_ENABLED:
-							X yes: remove apex static and db volumes
-							X no: remove apex static and db volumes
-					X no
+							_ yes: remove apex static and db volumes
+							_ no: remove apex static and db volumes
+					_ no
 						ORDS_ENABLED:
-							X yes: retain volumes
-							X no: retain volumes
+							_ yes: retain volumes
+							_ no: retain volumes
 
-		X special scenarios:
-			X ORDS enabled:
-				X 1 (upgrade apex static files version only):
-					X deploy dev - version 23.1
-						X verify ORDS/Apex login
-						X verify DB connectivity
-							X create table/insert test data
+		_ special scenarios:
+			_ ORDS enabled:
+				_ 1 (upgrade apex static files version only):
+					_ deploy dev - version 23.1
+						_ verify ORDS/Apex login
+						_ verify DB connectivity
+							_ create table/insert test data
 					
-					X deploy test rem_vol = no
+					_ deploy test rem_vol = no
 						(install version 23.2: files and db)
-						X verify ORDS/Apex login
-						X verify DB connectivity
+						_ verify ORDS/Apex login
+						_ verify DB connectivity
 					
-					X deploy dev - version 23.1
+					_ deploy dev - version 23.1
 						(upgrade files only, no need to install database)
-						X verify ORDS/Apex login
-						X verify DB connectivity
-							X verify database values from initial dev run are still in the database
+						_ verify ORDS/Apex login
+						_ verify DB connectivity
+							_ verify database values from initial dev run are still in the database
 					
 				
-				X 2 (upgrade apex static files version only): 
-					X deploy dev - version 23.1
-						X verify ORDS/Apex login
-						X verify DB connectivity
-							X create table/insert test data
+				_ 2 (upgrade apex static files version only): 
+					_ deploy dev - version 23.1
+						_ verify ORDS/Apex login
+						_ verify DB connectivity
+							_ create table/insert test data
 					
-					X remove apex static volume: 
+					_ remove apex static volume: 
 						(shutdown test rem_vol = yes)
-						X confirm apex static dir volume is removed
+						_ confirm apex static dir volume is removed
 
-					X deploy dev - version 23.1
+					_ deploy dev - version 23.1
 						(install static files only)
-						X verify ORDS/Apex login
-						X verify DB connectivity
-							X verify database values from initial dev run are still in the database
+						_ verify ORDS/Apex login
+						_ verify DB connectivity
+							_ verify database values from initial dev run are still in the database
 					
 
-			X ORDS not enabled:
-				X 1 (verify dev DB data is retained):
+			_ ORDS not enabled:
+				_X 1 (verify dev DB data is retained):
 					X deploy dev
 						X verify DB connectivity
 							X create table/insert test data
 					
-					X deploy test
-						X verify DB connectivity
+					_ deploy test
+						_ verify DB connectivity
 					
-					X deploy dev
-						X verify DB connectivity
-							X verify database values from initial dev run are still in the database
+					_ deploy dev
+						_ verify DB connectivity
+							_ verify database values from initial dev run are still in the database
 					
-	X local:
-		X deploy
-			X test
-				X ORDS_ENABLED:
-					X yes
-						X installs db, ords, apex from scratch
-							X verify ORDS/Apex login
-							X verify DB connectivity
-								X Create temp table and insert data
-						X validation:
-							X invalid TARGET_APEX_VERSION (format fails - 24.3.1)
-							X incorrect TARGET_APEX_VERSION (does not exist - 24.6)
-						X REM_VOL
-							X yes - remove apex static volume
-							X no - retain all volumes
-					X no
-						X REM_VOL
-							X yes - remove apex static volume
-								X verify DB connectivity
-							X no
-								X verify DB connectivity
-			X dev
-				X ORDS_ENABLED:
-					X yes
-						X installs db, ords, apex from scratch
-							X verify ORDS/Apex login
-							X verify DB connectivity
-								X Create temp table and insert data
-						X (same TARGET_APEX_VERSION) resume db, ords, apex
-							X verify ORDS/Apex login
-							X verify DB connectivity
-								X verify temp table
-						X (increase TARGET_APEX_VERSION) resume db, ords, apex
-							X verify ORDS/Apex login
-							X verify DB connectivity
-								X verify temp table
-						X REM_VOL
-							X yes - remove all volumes
-								X verify ORDS/Apex login
-								X verify DB connectivity
-									X Create temp table and insert data
-							X no - retain all volumes
-						X validation:
-							X decrease TARGET_APEX_VERSION (downgrade error)
-							X invalid TARGET_APEX_VERSION (format fails - 24.3.1)
-							X incorrect TARGET_APEX_VERSION (does not exist - 24.6)
-					X no - ORDS container does not run
-						X initial
-							X verify DB connectivity
-							X Create temp table and insert data
-						X restart
-							X verify DB connectivity
-							X verify temp table
-						X REM_VOL
-							X yes - remove all volumes
-								X verify DB connectivity
-									X Create temp table and insert data
-							X no - retain all volumes
-				X shutdown docker daemon
-					X restart docker daemon (ORDS, apps, DB is available)
+	_ local:
+		_ deploy
+			_ test
+				_ ORDS_ENABLED:
+					_ yes
+						_ installs db, ords, apex from scratch
+							_ verify ORDS/Apex login
+							_ verify DB connectivity
+								_ Create temp table and insert data
+						_ validation:
+							_ invalid TARGET_APEX_VERSION (format fails - 24.3.1)
+							_ incorrect TARGET_APEX_VERSION (does not exist - 24.6)
+						_ REM_VOL
+							_ yes - remove apex static volume
+							_ no - retain all volumes
+					_ no
+						_ REM_VOL
+							_ yes - remove apex static volume
+								_ verify DB connectivity
+							_ no
+								_ verify DB connectivity
+			_ dev
+				_ ORDS_ENABLED:
+					_ yes
+						_ installs db, ords, apex from scratch
+							_ verify ORDS/Apex login
+							_ verify DB connectivity
+								_ Create temp table and insert data
+						_ (same TARGET_APEX_VERSION) resume db, ords, apex
+							_ verify ORDS/Apex login
+							_ verify DB connectivity
+								_ verify temp table
+						_ (increase TARGET_APEX_VERSION) resume db, ords, apex
+							_ verify ORDS/Apex login
+							_ verify DB connectivity
+								_ verify temp table
+						_ REM_VOL
+							_ yes - remove all volumes
+								_ verify ORDS/Apex login
+								_ verify DB connectivity
+									_ Create temp table and insert data
+							_ no - retain all volumes
+						_ validation:
+							_ decrease TARGET_APEX_VERSION (downgrade error)
+							_ invalid TARGET_APEX_VERSION (format fails - 24.3.1)
+							_ incorrect TARGET_APEX_VERSION (does not exist - 24.6)
+					_ no - ORDS container does not run
+						_ initial
+							_ verify DB connectivity
+							_ Create temp table and insert data
+						_ restart
+							_ verify DB connectivity
+							_ verify temp table
+						_ REM_VOL
+							_ yes - remove all volumes
+								_ verify DB connectivity
+									_ Create temp table and insert data
+							_ no - retain all volumes
+				_ shutdown docker daemon
+					_ restart docker daemon (ORDS, apps, DB is available)
 						
-		X shutdown
-			X test
-				X REM_VOL
-					X yes
+		_ shutdown
+			_ test
+				_ REM_VOL
+					_ yes
 						ORDS_ENABLED:
-							X yes: remove apex static volume
-							X no: remove apex static volume
-					X no
+							_ yes: remove apex static volume
+							_ no: remove apex static volume
+					_ no
 						ORDS_ENABLED:
-							X yes: retain volumes
-							X no: retain volumes
-			X dev
-				X REM_VOL
-					X yes
+							_ yes: retain volumes
+							_ no: retain volumes
+			_ dev
+				_ REM_VOL
+					_ yes
 						ORDS_ENABLED:
-							X yes: remove apex static and db volumes
-							X no: remove apex static and db volumes
-					X no
+							_ yes: remove apex static and db volumes
+							_ no: remove apex static and db volumes
+					_ no
 						ORDS_ENABLED:
-							X yes: retain volumes
-							X no: retain volumes
-		X special_ scenarios:
-			X ORDS enabled:
-				X 1 (upgrade apex static files version only):
-					X deploy dev - version 23.2
-						X verify ORDS/Apex login
-						X verify DB connectivity
-							X create table/insert test data
+							_ yes: retain volumes
+							_ no: retain volumes
+		_ special_ scenarios:
+			_ ORDS enabled:
+				_ 1 (upgrade apex static files version only):
+					_ deploy dev - version 23.2
+						_ verify ORDS/Apex login
+						_ verify DB connectivity
+							_ create table/insert test data
 					
-					X deploy test rem_vol = no
+					_ deploy test rem_vol = no
 						(install version 24.1: files and db)
-						X verify ORDS/Apex login
-						X verify DB connectivity
+						_ verify ORDS/Apex login
+						_ verify DB connectivity
 					
-					X deploy dev - version 23.2
+					_ deploy dev - version 23.2
 						(install static files, leave database as-is)
-						X verify ORDS/Apex login
-						X verify DB connectivity
-							X verify database values from initial dev run are still in the database
+						_ verify ORDS/Apex login
+						_ verify DB connectivity
+							_ verify database values from initial dev run are still in the database
 					
 				
-				X 2 (upgrade apex static files version only): 
-					X deploy dev - version 23.2
-						X verify ORDS/Apex login
-						X verify DB connectivity
-							X create table/insert test data
+				_ 2 (upgrade apex static files version only): 
+					_ deploy dev - version 23.2
+						_ verify ORDS/Apex login
+						_ verify DB connectivity
+							_ create table/insert test data
 					
-					X remove apex static volume: 
+					_ remove apex static volume: 
 						(shutdown test rem_vol = yes)
-						X confirm apex static dir volume is removed
+						_ confirm apex static dir volume is removed
 
-					X deploy dev - version 23.2
+					_ deploy dev - version 23.2
 						(install static files, leave database as-is)
-						X verify ORDS/Apex login
-						X verify DB connectivity
-							X verify database values from initial dev run are still in the database
+						_ verify ORDS/Apex login
+						_ verify DB connectivity
+							_ verify database values from initial dev run are still in the database
 					
 
-			X ORDS not enabled:
-				X 1 (verify dev DB data is retained):
-					X deploy dev
-						X verify DB connectivity
-							X create table/insert test data
+			_ ORDS not enabled:
+				_ 1 (verify dev DB data is retained):
+					_ deploy dev
+						_ verify DB connectivity
+							_ create table/insert test data
 					
-					X deploy test
-						X verify DB connectivity
+					_ deploy test
+						_ verify DB connectivity
 					
-					X deploy dev
-						X verify DB connectivity
-							X verify database values from initial dev run are still in the database
+					_ deploy dev
+						_ verify DB connectivity
+							_ verify database values from initial dev run are still in the database

@@ -304,17 +304,18 @@ The PIFSC Containerized Oracle Developer Environment (CODE) framework was develo
     -   \*Note: There is a [secrets template](../../secrets/secrets.template.sh) file that can be used to create the secrets.sh file for each database instance 
     -   \*Note: the actual secret files should never be committed to the repository for security purposes, a [.gitignore](../../.gitignore) file has been added to the repository to prevent these sensitive files from being included in git.  
     -   \*Note Refer to the [Secret Definitions](#secret-definitions) section for relevant business rules
--   #### Runtime Scenarios
-    -   ##### Standalone CODE Repository
+-   ### Runtime Scenarios
+    -   #### Standalone CODE Repository
         -   \*Note: the CODE framework can be run directly from the CODE repository to provide a standard Oracle development environment with minimal setup. 
         -   \*Note: the CODE repository can also be forked to customize the standard Oracle development environment   
         -   Update the [default_CODE_runtime_config.sh](../scripts/config/default_CODE_runtime_config.sh) configuration file to specify the appropriate runtime configuration
-    -   ##### Custom Forked Repository
+    -   #### Custom Forked Repository
         -   \*Note: the CODE repository forks can customized for specific data systems and then those forks can be forked to build on those specific data system dependencies.
         -   Update the [/projects/$ACTIVE_PROJECT_NAME/config/project_runtime_config.sh](../templates/project_name/config/project_runtime_config.sh) configuration file to specify the appropriate runtime configuration 
 -   To allow multiple developers to use CODE concurrently on the same container host, update the three variables identified in the top section: $COMPOSE_PROJECT_NAME, $DB_HOST_PORT, and $ORDS_HOST_PORT to have unique values
     -   \*Note: refer to the the [file-based configuration](#file-based) for relevant business rule information under the "Concurrent CODE deployments" section
--   Setup docker swarm (one-time setup): `docker swarm init`
+-   ### Container Host
+    -   (One-time setup) Setup docker swarm: `docker swarm init`
 
 ## Executing the CODE Project
 -   Following the [Setup](#setup) process, execute the [client_execute_CODE_scripts.sh](../scripts/client_scripts/client_execute_CODE_scripts.sh) script using bash and specify the appropriate script parameters:
@@ -403,17 +404,20 @@ The PIFSC Containerized Oracle Developer Environment (CODE) framework was develo
                         -   A diff tool is used to compare the files within each of the corresponding [projects](../../projects/) subfolders between the working copies of Project A and C as well as Project B and C to update the working copies of the corresponding upstream repositories
                         -   Project C commits the changes to the corresponding [projects](../../projects/) subfolder that belongs to Project C
                             -   Project C stashes all changes to the files/folders that are not within the corresponding [projects](../../projects/) subfolder that belongs to Project C
-                -   CODE commits and pushes its changes
-                -   Project A commits its changes and pulls the upstream changes from CODE, verifies Project A is working, and then pushes its changes 
-                -   Project B commits its changes and pulls the upstream changes from Project A, verifies Project B is working, and then pushes its changes 
-                -   Project C commits its changes and pulls the upstream changes from Project B, verifies Project C is working, and then pushes its changes 
-                -   Project D pulls the upstream changes from Project A, verify Project D is working, and then pushes its changes
+                -   Propagating Changes to CODE Forks:
+                    -   \*Note: The white arrows show the direction of the upstream updates that are pulled from the individual CODE forks 
+                    -   CODE commits and pushes its changes
+                    -   Project A commits its changes and pulls the upstream changes from CODE, verifies Project A is working, and then pushes its changes 
+                    -   Project B commits its changes and pulls the upstream changes from Project A, verifies Project B is working, and then pushes its changes 
+                    -   Project C commits its changes and pulls the upstream changes from Project B, verifies Project C is working, and then pushes its changes 
+                    -   Project D pulls the upstream changes from Project A, verify Project D is working, and then pushes its changes
         ![Diagram](./diagrams/CODE%20dev%20workflow%20diagram%20scenario%202.drawio.png)
 -   ### Database Development Workflow Recommendations
     -   Deploy a development CODE instance with the foundational database model (current version used as a starting point)
     -   Make the data model changes to the development database and save the corresponding DDL in an upgrade file
     -   Periodically deploy the test CODE instance deployment that runs the DDL upgrade file 
     -   Use a database diff tool (e.g. SQL Developer) between the development and test instances to ensure the data models are equivalent
+    -   Shutdown test instance when not actively in use to conserve resources
 
 ## Monitoring and Syncing Upstream Updates
 -   Because the upstream engine (CODE) and project forks are hosted on GitHub, maintaining clear synchronization lines is key to pulling upstream features, bug fixes, and security patches seamlessly.
@@ -423,36 +427,26 @@ The PIFSC Containerized Oracle Developer Environment (CODE) framework was develo
             -   When new releases are made for the parent repository, they can be integrated into the given CODE fork by pulling the upstream changes.
         -   (Optional) In the GitHub website, navigate to the [CODE repository](#code-version-control-information) and use the "Watch" feature, and select "Releases" and "Security Alerts" to receive those notifications
             -   \*Note: Changes to the CODE repository must propagate through the chain of linear dependencies to the parent repository before they can be integrated into the given CODE fork repository.
--   ### The Sync Procedure
-    -   This project has been structured specifically to minimize the need to merge upstream changes as the [CODE framework](#code-version-control-information) continues to evolve and accommodates chains of forked projects that have layered dependencies. 
-        -   Each forked repository has its own dedicated project subfolder in the [/projects](../../projects) folder, so pulling upstream changes will not trigger any merge conflicts
+-   ### Syncing Upstream Updates
+    -   #### CODE Folder Structure and Policies
+        -   This project has been structured specifically to minimize the need to merge upstream changes as the [CODE framework](#code-version-control-information) continues to evolve and accommodates chains of forked projects that have layered dependencies. 
         -   The [core](../) folder contains all of the CODE framework's source code so when changes are made to the [CODE repository](#code-version-control-information) those upstream changes can be pulled by the individual forked repositories without triggering merge conflicts
             -   \*Note: the core folder should only be modified in the CODE repository
+        -   Each forked repository has its own dedicated project subfolder in the [/projects](../../projects) folder to prevent conflicts when merging upstream changes
         -   For a given [Active Project](#active-project), all other subfolders within the [/projects](../../projects) folder should never be modified, since those are managed in upstream forked CODE repositories.  
-            -   Instead, when upstream changes are made they should be pulled by the corresponding forked projects.
+            -   Instead, when upstream changes are made they should be pulled by the corresponding forked projects based on their direct linear dependencies.
         -   Global bash array configuration variables are defined by the CODE framework and then the individual projects add elements to these arrays which determine the behavior of the CODE framework.
-    -   \*Note: for simplicity and flexibility, a branching strategy has not been defined but it is recommended. The example code below uses "main" as the branch but it is not advised to merge upstream changes directly into main unless the changes have been thoroughly tested.
-    -   To safely update the working copy with upstream changes safely:
-        -   Fetch and Merge Upstream Updates:
-            ```
-            # Download the latest commits and branches from the parent repository
-            git fetch upstream
-
-            # Explicitly switch to the current branch of the working copy before merging
-            git checkout main
-
-            # Merge the upstream changes into the current branch
-            git merge upstream/main
-            ```
-    -   Resolve Any Conflicts:
-        -   Because of the [.gitattributes](../../.gitattributes) configuration (.active_project merge=ours), any updates to the upstream project pointer ([.active_project](../../projects/.active_project)) will be silently and automatically ignored by Git so users don't need to manually merge the changes
-        -   If conflicts occur in other files, resolve them using standard Git tools.
-    -   Keep Shared Utilities (Submodules) in Sync:
-        -   If the upstream engine modified the [CDS](../modules/CDS) module, or if any upstream forks have modified their project-specific modules, ensure the working copy's local submodules are updated to the tracked commits:
-            ```
-            git submodule update --init --recursive
-            ```
-    -   Push Upstream Changes to the CODE fork: `git push origin main` 
+    -   #### Synchronization Procedure
+        -   Pull the upstream changes including tags
+        -   Resolve Any Conflicts:
+            -   Because of the [.gitattributes](../../.gitattributes) configuration (.active_project merge=ours), any updates to the upstream project pointer ([.active_project](../../projects/.active_project)) will be silently and automatically ignored by Git so users don't need to manually merge the changes
+            -   If conflicts occur in other files, resolve them using standard Git tools.
+        -   Keep Shared Utilities (Submodules) in Sync:
+            -   If the upstream engine modified the [CDS](../modules/CDS) module, or if any upstream forks have modified their project-specific modules, ensure the working copy's local submodules are updated to the tracked commits:
+                ```
+                git submodule update --init --recursive
+                ```
+        -   Push the merged and tested changes to the CODE fork 
 
 ## Connection Information
 For the following connections refer to the active [file-based configuration](#file-based) and the /secrets/secrets.sh for the corresponding variable values
@@ -471,8 +465,15 @@ For the following connections refer to the active [file-based configuration](#fi
     -   hostname: http://localhost:\$\{ORDS_HOST_PORT\}/ords
 
 ## Security Features
--   The CODE project inherits security features from the [CDS module](./modules/CDS/README.md#security-features).
--   Secure In-Memory Data Transmission (STDIN): Secret values are never passed as command-line arguments. They are securely transmitted to remote servers, and between script calls, purely via standard input (STDIN / pipelining). This prevents sensitive data from appearing in process lists, system logs, or bash history files.
--   Decoupled Configuration Adapter Pattern: The core CODE engine enforces a strict Separation of Concerns. It remains completely independent of project-specific global variables. It only operates on strictly validated associative arrays and arguments passed from the client adapter, ensuring that the engine itself cannot inadvertently expose or mishandle project-specific configurations.
+-   The CODE project inherits security features from the [CDS module](../modules/CDS/README.md#security-features).
+-   Decoupled Configuration Adapter Pattern: The core CODE engine enforces a strict Separation of Concerns. It remains completely independent of project-specific global variables. It only operates on strictly validated associative arrays and arguments, ensuring that the engine itself cannot inadvertently expose or mishandle project-specific configurations.
 -   Docker Secrets: Database credentials are defined as secrets and retrieved dynamically within the container to protect them from unauthorized access
--   Immutable Shell Executions: When elevating privileges to run container commands, CODE utilizes rigid Heredocs (\<\<EOF) to pipe commands into the new shell. This creates an immutable execution block that safely separates the runtime variables from the raw secret payload.
+
+## Design Strategy
+-   Leverage the [CDS module design strategy](../modules/CDS/README.md#design-strategy) for its collection of flexible and reusable container functions
+    -   Benefits:
+        -   Reduce the amount of custom code needed for CODE
+-   Leverage inheritance to allow real-world data systems to be run on any docker host
+    -   Benefits:
+        -   Facilitates deploying fully-functional data systems in a containerized environment so they can be reviewed and evaluated 
+        -   Facilitates the implementation of a dependent data systems using the forking feature
